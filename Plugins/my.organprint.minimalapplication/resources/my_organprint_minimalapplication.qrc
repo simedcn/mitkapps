@@ -8,4 +8,7 @@
   <qresource prefix="/images">
     <file>logo.png</file>
   </qresource>
+  <qresource prefix="/my.organprint.minimalapplication">
+      <file>inoflat2.qss</file>
+  </qresource>
 </RCC>

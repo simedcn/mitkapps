@@ -73,9 +73,7 @@ QLabel#segmentation_title_label, QLabel#Profil_title_label
     color: #FFF; 
 }
 
-QPushButton {
-	background-color:#FF0000;
-}
+
 
 /****************************************************************
  *																*
@@ -103,4 +101,7 @@ QWidget#patient_images_widget
 QLabel#logo_label
 {
     background-color: #6f6f6f;
+}
+QPushButton {
+	background-color:#FF0000;
 }

@@ -60,6 +60,6 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     //berry::IQtStyleManager::StyleList styles;
     //styleManager->GetStyles(styles);
     //styleManager->SetStyle(styles.last().fileName);
-    styleManager->SetStyle(":/org.blueberry.ui.qt/inoflat.qss");
+    styleManager->SetStyle(":/my.organprint.minimalapplication/inoflat2.qss");
   }
 }

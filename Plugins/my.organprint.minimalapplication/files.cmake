@@ -19,7 +19,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resources/my_awesomeproject_minimalapplication.qrc
+  resources/my_organprint_minimalapplication.qrc
 )
 
 set(CPP_FILES )
