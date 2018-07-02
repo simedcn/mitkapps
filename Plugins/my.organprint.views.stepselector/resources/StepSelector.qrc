@@ -1,5 +1,5 @@
 <RCC>
-  <qresource prefix="/Awesome" >
+  <qresource prefix="/my.organprint.views.stepselector" >
     <file>AwesomeIcon.png</file>
     <file>Styles.qss</file>
   </qresource>

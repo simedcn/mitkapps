@@ -1,4 +1,4 @@
-project(my_organprint_stepselector)
+project(my_organprint_views_stepselector)
 
 mitk_create_plugin(
   EXPORT_DIRECTIVE AWESOME_EXPORTS

@@ -31,7 +31,7 @@
 #include "mitkImageCast.h"
 #include <mitkITKImageImport.h>
 #include <mitkPaintbrushTool.h>
-
+#include <QFile>
 #include <itkBinaryThresholdImageFilter.h>
 
 
@@ -50,6 +50,13 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
 	ui.setupUi(parent);
 	this->GetRenderWindowPart(OPEN);
 	this->RequestRenderWindowUpdate();
+	
+
+    QFile file(":/my.organprint.views.stepselector/Styles.qss");
+    file.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(file.readAll());
+    parent->setStyleSheet(styleSheet);
+
 
 	// Wire up the UI widgets with our functionality.
 	m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
