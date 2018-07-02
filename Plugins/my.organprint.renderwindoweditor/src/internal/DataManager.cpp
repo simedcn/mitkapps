@@ -1,9 +1,10 @@
 #include "DataManager.h"
-#include "itkGDCMImageIO.h"
+#include <itkGDCMImageIO.h>
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QDir>
 #include <mitkIOUtil.h>
+#include <itkImageFileReader.h>
 #include <mitkRenderingManager.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
@@ -17,15 +18,15 @@ DataManager::DataManager(mitk::DataStorage *datastorage, QObject *parent) :
 
 bool DataManager::ProbeDicomFile(const std::string& filename, std::string& patientId)
 {
-  itk::GDCMImageIO::Pointer reader = itk::GDCMImageIO::New();
-  if(!reader->CanReadFile(filename.c_str()))
-    return false;
-  reader->SetFileName(filename);
-  reader->ReadImageInformation();
-  char id[512];
-  reader->GetPatientID(id);
-  patientId = id;
-  return true;
+	itk::GDCMImageIO::Pointer reader = itk::GDCMImageIO::New();
+	if(!reader->CanReadFile(filename.c_str()))
+	return false;
+	reader->SetFileName(filename);
+	reader->ReadImageInformation();
+	char id[512];
+	reader->GetPatientID(id);
+	patientId = id;
+	return true;
 }
 
 void DataManager::AddImage(const std::string& name, mitk::Image::Pointer image)
@@ -160,20 +161,10 @@ std::vector<std::string> DataManager::LoadDataOfCurrentPatient()
   for(auto key : keys)
   { /*dicom.series.SeriesInstanceUID*/
     QString segFile = this->m_Settings.value(key).toString();
-    mitk::Image::Pointer image = LoadImage(segFile.toStdString());
+	mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(segFile.toStdString());
     this->AddImage(key.toStdString(),image);
     loadedFiles.push_back(key.toStdString());
   }
   this->m_Settings.endGroup(); //patientId
   return loadedFiles;
-}
-
-mitk::Image::Pointer DataManager::LoadImage(const std::string &path)
-{
-    mitk::Image::Pointer image
-        =  mitk::IOUtil::Load<mitk::Image>(path);
-
-    //mitk::Image::Pointer image = dynamic_cast<mitk::Image::Pointer>(baseData);
-
-    return image;
 }
