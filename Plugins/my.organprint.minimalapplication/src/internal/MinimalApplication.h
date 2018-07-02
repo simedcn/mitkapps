@@ -24,7 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QObject>
 #include <QScopedPointer>
 
+using namespace std;
+
 class MinimalWorkbenchAdvisor;
+class OrganPrintWorkbenchWindowAdvisor;
 
 class MinimalApplication : public QObject, public berry::IApplication
 {
@@ -37,6 +40,10 @@ public:
 
   QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;
+  
+  public:
+  static const vector<QString> VIEW_IDS;
+  
 };
 
 #endif /*MINIMALAPPLICATION_H_*/

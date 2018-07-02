@@ -28,6 +28,7 @@ MinimalPerspective::MinimalPerspective()
 void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   QString editorArea = layout->GetEditorArea();
+  layout->AddView("my.organprint.views.stepselector", berry::IPageLayout::LEFT, 0.3f, editorArea);
   layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   layout->AddView("my.organprint.views.sidepanel", berry::IPageLayout::RIGHT, 0.3f, editorArea);
@@ -35,6 +36,7 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
   layout->AddView("org.mitk.views.segmentation", berry::IPageLayout::BOTTOM, 0.5f, "my.organprint.views.sidepanel");
   layout->AddView("org.mitk.views.properties", berry::IPageLayout::BOTTOM, 0.7f, "org.mitk.views.datamanager");
 
+ 
 
   //layout->GetViewLayout("my.awesomeproject.editors.renderwindow");
   
@@ -44,11 +46,11 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 //  berry::IViewLayout::Pointer awesomeview = layout->GetViewLayout("org.mitk.views.segmentation");
 //  awesomeview->SetCloseable(false);
 //  awesomeview->SetMoveable(false);
-
+	
   layout->GetViewLayout("org.mitk.views.datamanager");
 
   layout->SetFixed(true);
-
+  layout->GetViewLayout("org.mitk.views.datamanager")->SetShowTitle(false);
   ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
 
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();

@@ -5,6 +5,7 @@ if("${ProjectToGenerate}" STREQUAL "OrganPrint")
 	  Plugins/my.organprint.renderwindoweditor:ON
 	  Plugins/my.organprint.minimalapplication:ON
 	  Plugins/my.pacs.views.dicomview:ON
+	  Plugins/my.organprint.views.stepselector:ON
 	)
 elseif("${ProjectToGenerate}" STREQUAL "POPE")
 	  set(PROJECT_PLUGINS
