@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "MainApplication.h"
+#include "MainWorkbenchAdvisor.h"
 
 #include <QPoint>
 //#include <QMainWindow>
@@ -22,9 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatformUI.h>
 
-#include "MainWorkbenchAdvisor.h"
-
-// MainApplication
 
 MainApplication::MainApplication()
 {

@@ -3,7 +3,7 @@
 #define TOOLSPLUGINPREFERENCEPAGE_H
 
 #include <berryIPreferences.h>
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 
 using namespace std;
 
@@ -45,6 +45,8 @@ protected:
 
 	QRadioButton* m_RadioButton_3DAutoRotation;
 	QRadioButton* m_RadioButton_Std4ViewWidget;
+
+	QCheckBox* m_CheckBox_VolumeRendering;
 
 	QCheckBox* m_CheckBox_ShowPatientData;
 	QCheckBox* m_CheckBox_GroupTags;

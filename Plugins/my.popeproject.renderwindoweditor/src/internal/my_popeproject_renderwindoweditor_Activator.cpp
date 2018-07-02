@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "my_popeproject_renderwindoweditor_Activator.h"
-
 #include "PopeRenderWindowEditor.h"
 #include "PopePreferencePage.h"
 

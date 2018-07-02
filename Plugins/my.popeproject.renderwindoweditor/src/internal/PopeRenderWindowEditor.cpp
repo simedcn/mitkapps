@@ -15,6 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "PopeRenderWindowEditor.h"
+#include "MainWindow.h"
+#include "DataManager.h"
+#include "PopeRenderWindowEditorPrivate.h"
+#include "QmitkStdMultiWidgetPartListener.h"
+
 
 #include <berryUIException.h>
 #include <berryIWorkbenchPage.h>
@@ -27,17 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkColorProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIDataStorageService.h>
 
 #include <QmitkMouseModeSwitcher.h>
 #include <QmitkStdMultiWidget.h>
-#include "MainWindow.h"
-#include "DataManager.h"
-#include "PopeRenderWindowEditorPrivate.h"
-#include "QmitkStdMultiWidgetPartListener.h"
-
 
 const QString PopeRenderWindowEditor::EDITOR_ID = "my.popeproject.editors.renderwindow";
 
@@ -210,7 +209,7 @@ void PopeRenderWindowEditor::CreateQtPartControl(QWidget* parent)
 
     // Initialize views as axial, sagittal, coronar to all data objects in DataStorage
     // (from top-left to bottom)
-    mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+    auto geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
     mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
     // Initialize bottom-right view as 3D view

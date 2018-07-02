@@ -15,7 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "DicomPerspective.h"
-#include "berryIFolderLayout.h"
+
+#include <berryIFolderLayout.h>
 
 DicomPerspective::DicomPerspective()
 {

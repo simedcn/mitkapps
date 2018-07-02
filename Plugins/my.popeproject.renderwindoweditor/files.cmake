@@ -1,5 +1,3 @@
-SET(SRC_CPP_FILES
-)
 
 SET(INTERNAL_CPP_FILES
   my_popeproject_renderwindoweditor_Activator.cpp
@@ -11,10 +9,13 @@ SET(INTERNAL_CPP_FILES
   PopePreferencePage.cpp
 )
 
-SET(SRC_CPP_FILES
+SET(SRC_H_FILES
   internal/PopeRenderWindowEditorPrivate.h
-  internal/PopeRenderWindowEditorPrivate.cpp
   internal/QmitkStdMultiWidgetPartListener.h
+)
+
+SET(SRC_CPP_FILES
+  internal/PopeRenderWindowEditorPrivate.cpp
   internal/QmitkStdMultiWidgetPartListener.cpp
 )
 
@@ -35,10 +36,13 @@ SET(UI_FILES
 )
 
 SET(CACHED_RESOURCE_FILES
+  resources/PopeIcon.png
+  resources/POPE_icon.ico
   plugin.xml
 )
 
 SET(QRC_FILES
+  resources/my.popeproject.renderwindoweditor.qrc
 )
 
 SET(CPP_FILES )

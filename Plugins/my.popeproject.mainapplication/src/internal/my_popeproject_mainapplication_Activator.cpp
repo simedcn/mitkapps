@@ -21,10 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "DicomPerspective.h"
 #include "MainApplicationPreferencePage.h"
 
-#include "ctkPluginContext.h"
+#include <ctkPluginContext.h>
 
-#include "berryIPreferencesService.h"
-#include "berryPlatform.h"
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
 ctkPluginContext* my_popeproject_mainapplication_Activator::m_Context = nullptr;
 
@@ -37,7 +37,7 @@ void my_popeproject_mainapplication_Activator::start(ctkPluginContext *context)
 
   ////BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomBrowser, context);
   //auto prefService = berry::Platform::GetPreferencesService();
-  //berry::IPreferences::Pointer prefNodesWithNoData = prefService->GetSystemPreferences()->Node("org.mitk.editors.dicombrowser");
+  //berry::IPreferences::Pointer prefNodesWithNoData = prefService->GetSystemPreferences()->Node("/org.mitk.editors.dicombrowser");
   //prefNodesWithNoData->PutBool("Show nodes containing no data", true);
 
 

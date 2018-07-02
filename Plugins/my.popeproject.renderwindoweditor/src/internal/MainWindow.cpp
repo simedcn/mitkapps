@@ -5,15 +5,15 @@
 #include "my_popeproject_renderwindoweditor_Activator.h"
 #include "DataManager.h"
 
-#include "mitkImageAccessByItk.h"
-#include "QmitkRenderWindow.h"
-//#include "QmitkSliceWidget.h"
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
-#include "mitkPointSet.h"
-#include "mitkPointSetDataInteractor.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkRenderingManager.h"
+#include <mitkImageAccessByItk.h>
+#include <QmitkRenderWindow.h>
+//#include <QmitkSliceWidget.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkPointSet.h>
+#include <mitkPointSetDataInteractor.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkRenderingManager.h>
 #include <mitkIOUtil.h>
 #include <mitkDataStorage.h>
 
@@ -32,11 +32,17 @@
 
 #include <service/event/ctkEventConstants.h>
 
-#include "berryIEditorInput.h"
-#include "berryFileEditorInput.h"
-#include "berryIWorkbenchWindow.h"
-#include "berryIWorkbenchPage.h"
-#include "berryPlatformUI.h"
+#include <berryWindow.h>
+#include <berryMenuManager.h>
+#include <berryIEditorInput.h>
+#include <berryFileEditorInput.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryIWorkbenchPage.h>
+#include <berryPlatformUI.h>
+#include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
+#include <berryPlatform.h>
+
 
 MainWindow::MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent) :
 	QWidget(parent),
@@ -134,8 +140,6 @@ void MainWindow::on_pushButton_OpenFolder_clicked()
 	emit this->ImageFolderHasToBeLoaded(imagePath);
 }
 
-#include "berryWindow.h"
-#include "berryMenuManager.h"
 void MainWindow::on_pushButton_PACS_clicked()
 {
 	auto workbench = berry::PlatformUI::GetWorkbench();
@@ -220,9 +224,6 @@ void MainWindow::on_pushButton_PACS_clicked()
 	}
 }
 
-#include "berryIPreferencesService.h"
-#include "berryIPreferences.h"
-#include "berryPlatform.h"
 void MainWindow::on_pushButton_Settings_clicked()
 {
 	//!! Test code: preferences

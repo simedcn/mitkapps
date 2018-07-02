@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
-#include "DisplayCoordinateSupplier.h"
+#include <DisplayCoordinateSupplier.h>
 #include <usServiceRegistration.h>
 
 #include <ctkPluginContext.h>

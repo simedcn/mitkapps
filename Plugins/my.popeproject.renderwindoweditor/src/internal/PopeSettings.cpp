@@ -1,7 +1,7 @@
 
 #include "ui_PopeSettings.h"
-
 #include "PopeSettings.h"
+
 #include <QString>
 #include <QMessageBox>
 

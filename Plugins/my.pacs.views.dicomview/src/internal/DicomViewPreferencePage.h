@@ -3,7 +3,7 @@
 #define DICOMVIEWPREFERENCEPAGE_H
 
 #include <berryIPreferences.h>
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 
 using namespace std;
 
