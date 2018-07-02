@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/Awesome" >
     <file>AwesomeIcon.png</file>
+    <file>Styles.qss</file>
   </qresource>
 </RCC>

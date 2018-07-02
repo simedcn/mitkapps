@@ -17,6 +17,7 @@ set(MOC_H_FILES
 # plugin view menu at the top of the application window.
 set(CACHED_RESOURCE_FILES
   resources/AwesomeIcon.png
+  resources/Styles.qss
   plugin.xml
 )
 

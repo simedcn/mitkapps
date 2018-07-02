@@ -50,7 +50,7 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
   layout->GetViewLayout("org.mitk.views.datamanager");
 
   layout->SetFixed(true);
-  layout->GetViewLayout("org.mitk.views.datamanager")->SetShowTitle(false);
+  //layout->GetViewLayout("org.mitk.views.datamanager")->SetShowTitle(false);
   ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
 
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
