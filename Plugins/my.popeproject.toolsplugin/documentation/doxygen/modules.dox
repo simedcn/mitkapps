@@ -1,0 +1,16 @@
+/**
+  \defgroup my_popeproject_toolsplugin my.popeproject.exampleplugin Plugin
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup my_popeproject_toolsplugin_internal Internal
+  \ingroup my_popeproject_toolsplugin
+
+  \brief This subcategory includes the internal classes of the my.popeproject.toolsplugin plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

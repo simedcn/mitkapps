@@ -1,8 +1,19 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 # Change project and application name to your own
-set(MY_PROJECT_NAME AwesomeProject)
-set(MY_APP_NAME AwesomeApp)
+# Change project and application name to your own
+set(ProjectToGenerate "OrganPrint" CACHE STRING "Project")
+set(ProjectToGenerateValues "OrganPrint;POPE" CACHE STRING "List of possible projects")
+set_property(CACHE ProjectToGenerate PROPERTY STRINGS ${ProjectToGenerateValues})
+message(STATUS "Project='${ProjectToGenerate}'")
+
+if("${ProjectToGenerate}" STREQUAL "OrganPrint")
+  set(MY_PROJECT_NAME OrganPrintProject)
+  set(MY_APP_NAME OrganPrintApp)
+elseif("${ProjectToGenerate}" STREQUAL "POPE")
+  set(MY_PROJECT_NAME PopeProject)
+  set(MY_APP_NAME POPEApp)
+endif()
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -68,7 +79,7 @@ else()
 endif()
 
 set(CMAKE_CXX_EXTENSIONS 0)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 #-----------------------------------------------------------------------------
@@ -376,7 +387,7 @@ add_subdirectory(Modules)
 # The CMake code in this section *must* be in the top-level CMakeLists.txt file
 
 macro(GetMyTargetLibraries all_target_libraries varname)
-  set(re_ctkplugin "^my_awesomeproject_[a-zA-Z0-9_]+$")
+  set(re_ctkplugin "^[a-zA-Z0-9_]+$")
   set(_tmp_list)
   list(APPEND _tmp_list ${all_target_libraries})
   ctkMacroListFilter(_tmp_list re_ctkplugin OUTPUT_VARIABLE ${varname})

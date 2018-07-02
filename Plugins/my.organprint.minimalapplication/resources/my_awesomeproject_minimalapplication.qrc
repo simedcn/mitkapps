@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/StyleSheets">
+    <file alias="StyleSheet">StyleSheet.qss</file>
+  </qresource>
+  <qresource prefix="/icons">
+    <file alias="Organ_print_icon">Organ_print_icon.ico</file>
+  </qresource>
+  <qresource prefix="/images">
+    <file>logo.png</file>
+  </qresource>
+</RCC>

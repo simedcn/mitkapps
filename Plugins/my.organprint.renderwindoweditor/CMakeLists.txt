@@ -1,0 +1,9 @@
+PROJECT(my_organprint_renderwindoweditor)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE ORGANPRINT_RENDERWINDOWEDITOR
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDS MitkQtWidgets MitkDICOMReader OrganPrintLib
+  PACKAGE_DEPENDS Qt5|Xml
+  SUBPROJECTS MITK-CoreUI
+  )

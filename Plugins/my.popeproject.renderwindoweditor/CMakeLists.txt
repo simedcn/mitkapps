@@ -1,0 +1,9 @@
+PROJECT(my_popeproject_renderwindoweditor)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE MY_POPEPROJECT_RENDERWINDOWEDITOR
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDS MitkQtWidgets MitkDICOMReader AppInteraction PopeLib
+  PACKAGE_DEPENDS Qt5|Xml
+  SUBPROJECTS MITK-CoreUI
+  )

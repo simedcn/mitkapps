@@ -1,5 +1,17 @@
-set(PROJECT_PLUGINS
-  Plugins/my.awesomeproject.exampleplugin:ON
-  Plugins/my.awesomeproject.exampleapp:OFF
-  Plugins/my.awesomeproject.renderwindoweditor:OFF
-)
+if("${ProjectToGenerate}" STREQUAL "OrganPrint")
+	set(PROJECT_PLUGINS
+	  Plugins/my.organprint.views.sidepanel:ON
+	  Plugins/my.organprint.app:OFF
+	  Plugins/my.organprint.renderwindoweditor:ON
+	  Plugins/my.organprint.minimalapplication:ON
+	  Plugins/my.pacs.views.dicomview:ON
+	)
+elseif("${ProjectToGenerate}" STREQUAL "POPE")
+	  set(PROJECT_PLUGINS
+	    Plugins/my.popeproject.renderwindoweditor:ON
+	    Plugins/my.popeproject.toolsplugin:ON
+	    Plugins/my.popeproject.segmentation:ON
+	    Plugins/my.popeproject.mainapplication:ON
+	    Plugins/my.pacs.views.dicomview:ON
+	  )
+endif()

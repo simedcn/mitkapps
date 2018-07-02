@@ -1,0 +1,395 @@
+#include "DataManager.h"
+#include "PatientSelector.h"
+#include <PopeElements.h>
+
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
+
+#include <mitkIOUtil.h>
+#include <mitkRenderingManager.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+
+#include <QMessageBox>
+#include <QFileInfo>
+#include <QDir>
+#include <QCoreApplication>
+
+#include <memory>
+#include <map>
+#include <vector>
+#include <set>
+#include <utility>
+
+
+//QSettings DataManager::m_Settings("savedFiles.ini", QSettings::IniFormat);
+berry::IPreferences::Pointer DataManager::m_PreferencesNode;
+
+QStringList get_all_subdirs(QDir dir)
+{
+	QStringList subDirs;
+	dir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+	subDirs = dir.entryList();
+	int num_subfolders = subDirs.size();
+
+	// Add absolute path
+	for (auto& sub_dir : subDirs)
+	{
+		QDir subDir(dir.absolutePath());
+		sub_dir = subDir.filePath(sub_dir);
+	}
+
+	// Add subfolders
+	if (num_subfolders > 0)
+	{
+		for (const auto& sub_dir_relative_path : subDirs)
+		{
+			QDir subDir(dir.absolutePath());
+			subDir = subDir.filePath(sub_dir_relative_path);
+			auto folders = get_all_subdirs(subDir);
+			subDirs.append(folders);
+		}
+	}
+	return subDirs;
+}
+
+DataManager::DataManager(mitk::DataStorage *datastorage, QObject *parent)
+	: QObject(parent), m_DataStorage(datastorage)
+{
+	//bool load_nrrd = false;
+	//m_Settings.setValue("AppSettings/LoadRNND", load_nrrd); //??
+}
+
+int DataManager::AskAboutNewPatient()
+{
+	QMessageBox msgBox;
+	msgBox.setText("The data you selected refers to another patient.");
+	msgBox.setInformativeText("Do you want to save your changes and clear the datastorage?");
+	msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+	msgBox.setDefaultButton(QMessageBox::Save);
+	int ret = msgBox.exec();
+	switch (ret)
+	{
+	case QMessageBox::Save:
+		this->SaveDataOfCurrentPatient();
+		break;
+	case QMessageBox::Cancel:
+		return -2;
+		break;
+	default:
+		break;
+	}
+	m_DataStorage->Remove(this->m_DataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)))));
+	return 0;
+}
+
+int DataManager::on_LoadImageSet(const QString &filenameAndDirectory)
+{
+	/// Check the file if it is readable
+	string filepath = filenameAndDirectory.toStdString();
+	QString patientId = Elements::get_patientId_or_patientName(filepath);
+	if (patientId.isEmpty())
+		return -1;
+
+	/// Check if the image is from the same patient
+	bool toAsk = (!m_PatientId.isEmpty() && patientId != m_PatientId);
+	if (toAsk)
+	{
+		int retval = AskAboutNewPatient();
+		if (retval != 0)
+			return retval;
+	}
+
+	/// Update PatientId, CurrentFolder, and WorkDirectory
+	m_PatientId = patientId;
+	QFileInfo fi(filenameAndDirectory);
+	SetWorkDirectory(fi.dir().absolutePath());
+
+	/// Load data
+	vector<string> loadedFiles = this->LoadDataOfCurrentPatient();
+	auto loaded = mitk::IOUtil::Load(filepath);
+
+	bool is_first = true;
+	for (const auto baseData : loaded)
+	{
+		//mitk::DataNode::Pointer dn = mitk::DataNode::New();
+		/// Get patient ID
+		string curPatID = Elements::get_patientId_or_patientName(baseData);
+		if (patientId == QString::fromStdString(curPatID))
+		{
+			/// Generate an image name
+			string image_name = Elements::get_imageName(baseData);
+			//MITK_INFO << image_name;
+			/// Detect if the datanode is already saved
+			bool isInDS = !loadedFiles.empty() && (std::find(loadedFiles.begin(), loadedFiles.end(), image_name) != loadedFiles.end());
+			/// Load if it is a new one
+			mitk::Image* img = dynamic_cast<mitk::Image*>(baseData.GetPointer());
+			if (!isInDS && img)
+			{
+				auto datanode = this->AddImage(image_name, img);
+				/// Select the first node loaded
+				if (is_first)
+				{
+					//datanode->SetSelected(true);
+					
+
+					is_first = false;
+				}
+			}
+		}
+	}
+	/// Initialize views as axial, sagittal, coronar (from top-left to bottom)
+	mitk::TimeGeometry::Pointer geo = this->m_DataStorage->ComputeBoundingGeometry3D(this->m_DataStorage->GetAll());
+	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+	//this->InitializeView();
+
+	return 0;
+}
+int DataManager::on_LoadImageFolder(const QString& directory)
+{
+	/// Get all subfolders if needed
+	list<QDir> dirs;
+	QDir main_dir(directory);
+	dirs.push_back(main_dir);
+	main_dir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+	QStringList subDirs = main_dir.entryList();
+	if (subDirs.size() > 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("The folder you selected contains subfolders.");
+		msgBox.setInformativeText("Do you want to run the search in these folders as well?");
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::Yes);
+		int ret = msgBox.exec();
+		if (ret == QMessageBox::Yes)
+		{
+			QStringList all_subdirs = get_all_subdirs(main_dir);
+			for (auto& subdir : all_subdirs)
+			{
+				dirs.push_back(subdir);
+			}
+		}
+	}
+	
+	/// Go through all the dirs
+	vector<mitk::BaseData::Pointer> all_loaded;
+	for (auto& dir : dirs)
+	{
+		/// Get all DCM files from the directory
+		dir.setFilter(QDir::Files);
+		dir.setNameFilters(QStringList("*.dcm"));
+		auto files = dir.entryList();
+		//string path = dir.absolutePath().toStdString();
+		//int num = files.size();
+
+		/// Find the first correct (readable) file and delete wrong files from the list
+		QString correct_file;
+		auto it = files.begin();
+		while (it != files.end())
+		{
+			const auto& file = *it;
+			QString path = dir.filePath(file);
+			//MITK_INFO << path.toStdString();
+			QString id = Elements::get_patientId_or_patientName(path);
+			if (id.isEmpty())
+			{
+				it = files.erase(it);
+			}
+			else
+			{
+				correct_file = path;
+				break;
+			}
+		}
+		if (correct_file.isEmpty())
+			continue;
+		string filepath = correct_file.toStdString();
+
+		/// Read data
+		auto loaded = mitk::IOUtil::Load(filepath);
+		if (loaded.size() == 0)
+			return -11;
+
+		all_loaded.insert(all_loaded.end(), loaded.begin(), loaded.end());
+	}
+	if (all_loaded.size() == 0)
+		return -12;
+
+	/// Group the data by patient id
+	map<string, list<mitk::BaseData::Pointer>> groups;
+	for (const auto baseData : all_loaded)
+	{
+		/// Get patient ID
+		string patientID = Elements::get_patientId_or_patientName(baseData);
+		groups[patientID].push_back(baseData);
+	}
+
+	/// Get all patient IDs
+	vector<string> patientIDs(groups.size());
+	vector<shared_ptr<PatientDescription>> patientDescriptors(groups.size());
+	int i = 0;
+	for (const auto patient : groups)
+	{
+		const string& id = patient.first;
+		patientIDs[i] = id;
+		QString str_id = QString::fromStdString(id);
+		const auto& baseDataList = patient.second;
+		string name = Elements::find_patientName(baseDataList);
+		QString str_name = QString::fromStdString(name);
+		auto images = Elements::get_imageNames(baseDataList);
+		patientDescriptors[i] = make_shared<PatientDescription>(str_id, str_name, images);
+		i++;
+	}
+
+	/// Select the patient
+	int index = 0;
+	if (groups.size() > 1)
+	{
+		PatientSelector patientSelector(nullptr);
+		patientSelector.SetPatientData(patientDescriptors);
+		patientSelector.SetFolder(directory);
+		int retval = patientSelector.exec();
+		if (retval != QDialog::Accepted)
+			return -13;
+		index = patientSelector.SelectedPatientIDIndex();
+		if (index < 0 || index >= patientIDs.size())
+			return -14;
+	}
+	string selected_id = patientIDs[index];
+
+	/// Check if the image is from the same patient
+	bool toAsk = !m_PatientId.isEmpty() && (selected_id != m_PatientId.toStdString());
+	if (toAsk)
+	{
+		int retval = AskAboutNewPatient();
+		if (retval != 0)
+			return retval;
+	}
+
+	/// Update PatientId, CurrentFolder, and WorkDirectory
+	m_PatientId = QString::fromStdString(selected_id);
+	SetWorkDirectory(directory);
+
+	/// Load data
+	vector<string> loadedFiles = this->LoadDataOfCurrentPatient();
+	for (const auto baseData : groups[selected_id])
+	{
+		/// Generate an image name
+		string image_name = Elements::get_imageName(baseData);
+		//MITK_INFO << image_name;
+		/// Detect if the datanode is already saved
+		bool isInDS = !loadedFiles.empty() && (std::find(loadedFiles.begin(), loadedFiles.end(), image_name) != loadedFiles.end());
+		/// Load if it is a new one
+		mitk::Image* img = dynamic_cast<mitk::Image*>(baseData.GetPointer());
+		if (!isInDS && img)
+		{
+			auto datanode = this->AddImage(image_name, img);
+		}
+	}
+
+	/// Initialize views as axial, sagittal, coronar (from top-left to bottom)
+	mitk::TimeGeometry::Pointer geo = this->m_DataStorage->ComputeBoundingGeometry3D(this->m_DataStorage->GetAll());
+	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+
+	return 0;
+}
+
+mitk::DataNode::Pointer DataManager::AddImage(const string& name, mitk::Image::Pointer image)
+{
+	bool isInDS = false;//is the datanode already loaded?
+	auto allNodes = this->m_DataStorage->GetAll();
+	auto iterator = allNodes->Begin();
+	while (iterator != allNodes->End())
+	{
+		mitk::DataNode::Pointer datanode = iterator->Value();
+		++iterator;
+		if (datanode->GetName().compare(name) == 0)
+		{
+			isInDS = true;
+			return datanode;
+		}
+	}
+	//if !isInDS:
+	mitk::DataNode::Pointer dn = mitk::DataNode::New();
+	dn->SetName(name);
+	dn->SetData(image);
+	this->m_DataStorage->Add(dn);
+	return dn;
+}
+
+void DataManager::SaveDataOfCurrentPatient()
+{
+	auto allNodes = this->m_DataStorage->GetAll();
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	QString node_name = "/saved.patients." + this->m_PatientId;
+	auto node = prefService->GetSystemPreferences()->Node(node_name);
+	for (auto it = allNodes->Begin(); it != allNodes->End(); ++it)
+	{
+		mitk::DataNode::Pointer datanode = it->Value();
+		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+		if (image)
+		{
+			QString name = QString::fromStdString(datanode->GetName());
+			QString filename = name;
+			filename.append(".nrrd");
+			QString currentPath = GetWorkDirectory();
+			QString path = currentPath + "/" + filename;
+			mitk::IOUtil::Save(image, path.toStdString());
+			//m_Settings.beginGroup(this->m_PatientId);
+			//m_Settings.setValue(key, path);
+			//m_Settings.endGroup();
+			node->Put(name, path);
+		}
+	}
+}
+
+std::vector<std::string> DataManager::LoadDataOfCurrentPatient()
+{
+	std::vector<std::string> loadedFiles;
+	QString currentPath = GetWorkDirectory();
+	if (currentPath.isEmpty() || this->m_PatientId.isEmpty())
+		return loadedFiles;
+	bool load_nrrd = DataManager::getPreferencesNode()->GetBool("load rnnd", false);
+	if (!load_nrrd)
+		return loadedFiles;
+	//m_Settings.beginGroup(this->m_PatientId);
+	//auto keys = m_Settings.childKeys();
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	QString node_name = "/saved.patients." + this->m_PatientId;
+	auto node = prefService->GetSystemPreferences()->Node(node_name);
+	auto keys = node->ChildrenNames();
+	for (const auto& key : keys)
+	{ //dicom.series.SeriesInstanceUID
+		//QString segFile = m_Settings.value(key).toString();
+		QString segFile = node->Get(key, "");
+		if (!segFile.isEmpty())
+		{
+			mitk::Image::Pointer image = mitk::IOUtil::LoadImage(segFile.toStdString());
+			this->AddImage(key.toStdString(), image);
+			loadedFiles.push_back(key.toStdString());
+		}
+	}
+	//m_Settings.endGroup(); //patientId
+	return loadedFiles;
+}
+
+berry::IPreferences::Pointer DataManager::getPreferencesNode()
+{
+	if (m_PreferencesNode.IsNotNull())
+		return m_PreferencesNode;
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	m_PreferencesNode = prefService->GetSystemPreferences()->Node("/my.popeproject.editors.renderwindow");
+	return m_PreferencesNode;
+}
+QString DataManager::GetWorkDirectory()
+{
+	//return m_Settings.value("AppSettings/WorkDirectory").toString();
+	QString def_path = QCoreApplication::applicationDirPath();
+	QString path = DataManager::getPreferencesNode()->Get("data folder", def_path);
+	return path;
+}
+void DataManager::SetWorkDirectory(const QString& dir_path)
+{
+	//m_Settings.setValue("AppSettings/WorkDirectory", dir_path);
+	m_PreferencesNode->Put("data folder", dir_path);
+}

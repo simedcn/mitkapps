@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/StyleSheets">
+    <file alias="StyleSheet">StyleSheet.qss</file>
+  </qresource>
+  <qresource prefix="/icons">
+    <file alias="POPE_icon">POPE_icon.ico</file>
+  </qresource>
+  <qresource prefix="/images">
+    <file>logo48.png</file>
+  </qresource>
+</RCC>

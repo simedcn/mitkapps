@@ -1,5 +1,8 @@
 set(module_dirs
-  MyAwesomeLib
+	
+  OrganPrintLib
+  PopeLib
+  Interactions
 )
 
 foreach(module_dir ${module_dirs})

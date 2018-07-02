@@ -1,0 +1,103 @@
+QPushButton {
+    font: Roboto;
+    font: bold;
+    font-size: 16px;
+    color: #FFF;
+    background-color: transparent;
+    border: 0px;
+    padding: 12px;
+}
+
+QPushButton:hover
+{
+    background-color:rgba(0,0,0,20%);
+}
+QLabel
+{
+    font: Roboto;
+    font: bold;
+    font-size: 10pt;
+    color: #FFF; 
+}
+
+
+QSpinBox, QSpinBox::before
+{
+    background-color: transparent;
+    font: Roboto;
+    font: normal;
+    font-size: 10pt;
+    color: #FFF; 
+    border:0px;
+}
+
+QLabel#PatientName_label, QLabel#PatientGender_label, QLabel#PatientDOB_label, QLabel#PatientID_label
+{
+    font: normal;
+}
+
+QPushButton#Print_pushbutton 
+{
+    background-color: #db4067;
+    border-width: 0px;
+    border-top-left-radius:9px;
+    border-top-right-radius:9px;
+    border-bottom-left-radius:9px;
+    border-bottom-right-radius:9px;
+    padding: 12px;
+    font: Roboto;
+    font-size: 18px;
+}
+
+QPushButton#Viewall_pushbutton
+{
+    font-size:14px;
+    border:5px solid white;
+    border-top:1px;
+    border-left:1px;
+    border-right:1px;
+    padding: 12px;
+}
+
+QPushButton#pushButtonRegionGrowing
+{
+    font-size:16px;
+    padding: 12px;
+}
+
+
+QLabel#segmentation_title_label, QLabel#Profil_title_label
+{
+    font: Roboto;
+    font-size: 16pt;
+    color: #FFF; 
+}
+
+
+/****************************************************************
+ *																*
+ *	QWidgets menus												*
+ *																*
+ ***************************************************************/
+QWidget#sidebar_widget
+{
+    background-color: #6f6f6f;
+}
+QWidget#top_menu_widget
+{
+    background-color: #623288;
+}
+
+QWidget#ProfileWidget
+{
+    background-color: #623288;
+}
+QWidget#patient_images_widget
+{
+    background-color: #000000;
+}
+
+QLabel#logo_label
+{
+    background-color: #6f6f6f;
+}

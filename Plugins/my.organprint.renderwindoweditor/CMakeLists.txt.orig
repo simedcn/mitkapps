@@ -1,0 +1,12 @@
+PROJECT(my_awesomeproject_renderwindoweditor)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE MY_AWESOMEPROJECT_RENDERWINDOWEDITOR
+  EXPORTED_INCLUDE_SUFFIXES src
+<<<<<<< HEAD
+  MODULE_DEPENDS MitkQtWidgets MitkDICOMReader
+=======
+  MODULE_DEPENDS MitkQtWidgets OrganPrintInteraction
+>>>>>>> c87673ba561d2e6c211f8fd2500d44e365402c11
+  SUBPROJECTS MITK-CoreUI
+  )

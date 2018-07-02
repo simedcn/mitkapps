@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="my.pacs.views.dicomview"
+          name="PACS Browser"
+          class="DicomView"
+          icon="resources/CreateSurface.png"
+    />
+  </extension>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.DicomViewPreferencePage" name="PACS" class="DicomViewPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords">
+      </keywordreference>
+    </page>
+  </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="DICOM" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="PACS" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="preferences" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="settings" />
+  </extension>
+  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
+    <contextMenuAction nodeDescriptorName="Unknown" label="Upload to PACS" icon="" smoothed="false" class="UploadToPACSAction" />
+  </extension>
+
+</plugin>

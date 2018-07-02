@@ -1,0 +1,15 @@
+/**
+  \defgroup my_popeproject_mainapplication my.popeproject.gui.mainapplication
+  \ingroup MITKExamplePlugins
+
+  \brief A main applictaion plug-in.
+*/
+
+/**
+  \defgroup my_popeproject_mainapplication_internal Internal
+  \ingroup my_popeproject_mainapplication
+
+  \brief This subcategory includes the internal classes of the my.popeproject.gui.mainapplication plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

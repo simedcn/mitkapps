@@ -1,0 +1,68 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include "MinimalPerspective.h"
+
+// Berry
+#include "berryIViewLayout.h"
+#include "berryIQtStyleManager.h"
+#include "my_awesomeproject_minimalapplication_Activator.h"
+
+#include "berryIWorkbenchPage.h"
+MinimalPerspective::MinimalPerspective()
+{
+}
+
+void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+{
+  // Hides the editor area.
+  QString editorArea = layout->GetEditorArea();
+  layout->SetEditorAreaVisible(false);
+
+  layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorArea);
+
+<<<<<<< HEAD
+  layout->AddView("my.awesomeproject.views.awesomeview", berry::IPageLayout::RIGHT, 0.3f, editorArea);
+=======
+  layout->AddStandaloneView("org.mitk.views.segmentation", false, berry::IPageLayout::RIGHT, 0.3f, editorArea);
+>>>>>>> 9fa5cc4aa6829bcf57e6b1acf519648b32c6d4cd
+
+//  layout->GetViewLayout("my.awesomeproject.editors.renderwindow");
+//  editor->SetCloseable(false);
+//  editor->SetMoveable(false);
+
+//  berry::IViewLayout::Pointer awesomeview = layout->GetViewLayout("org.mitk.views.segmentation");
+//  awesomeview->SetCloseable(false);
+//  awesomeview->SetMoveable(false);
+
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.datamanager");
+  lo->SetCloseable(false);
+  lo->SetMoveable(false);
+
+  layout->SetFixed(true);
+
+  ctkPluginContext* context = my_awesomeproject_minimalapplication_Activator::GetContext();
+
+  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
+  if (styleManagerRef)
+  {
+    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
+    //berry::IQtStyleManager::StyleList styles;
+    //styleManager->GetStyles(styles);
+    //styleManager->SetStyle(styles.last().fileName);
+    styleManager->SetStyle(":/org.blueberry.ui.qt/darkstyle.qss");
+  }
+}
