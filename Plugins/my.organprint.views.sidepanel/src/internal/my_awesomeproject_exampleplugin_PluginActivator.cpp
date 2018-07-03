@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "my_awesomeproject_exampleplugin_PluginActivator.h"
 #include "AwesomeView.h"
-
+#include "ImportPanel.h"
 #include <usModuleInitialization.h>
 #include <usGetModuleContext.h>
 
@@ -24,7 +24,8 @@ US_INITIALIZE_MODULE
 
 void my_awesomeproject_exampleplugin_PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(AwesomeView, context)
+    BERRY_REGISTER_EXTENSION_CLASS(AwesomeView, context);
+    BERRY_REGISTER_EXTENSION_CLASS(orgpnt::ImportPanel, context);
 }
 
 void my_awesomeproject_exampleplugin_PluginActivator::stop(ctkPluginContext*)

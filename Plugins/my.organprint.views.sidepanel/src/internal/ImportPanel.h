@@ -14,35 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef AwesomeView_h
-#define AwesomeView_h
+#ifndef IMPORTPANEL_H
+#define IMPORTPANEL_H
 
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
-#include <DisplayCoordinateSupplier.h>
-#include <usServiceRegistration.h>
-#include <memory>
 
 // There's an item "AwesomeViewControls.ui" in the UI_FILES list in
 // files.cmake. The Qt UI Compiler will parse this file and generate a
 // header file prefixed with "ui_", which is located in the build directory.
 // Use Qt Creator to view and edit .ui files. The generated header file
 // provides a class that contains all of the UI widgets.
-#include <ui_AwesomeViewControls.h>
-
-namespace mitk
-{
-class LabelSetImage;
-class LabelSet;
-class Label;
-class DataStorage;
-class ToolManager;
-class DataNode;
-}
+#include <ui_ImportPanelControls.h>
 
 // All views in MITK derive from QmitkAbstractView. You have to override
 // at least the two methods CreateQtPartControl() and SetFocus().
-class AwesomeView : public QmitkAbstractView
+
+namespace orgpnt {
+
+
+class ImportPanel : public QmitkAbstractView
 {
     // As QmitkAbstractView derives from QObject and we want to use the Qt
     // signal and slot mechanism, we must not forget the Q_OBJECT macro.
@@ -57,61 +48,24 @@ public:
     // to initialize it in the implementation file.
     static const std::string VIEW_ID;
 
-    AwesomeView();
-    ~AwesomeView();
-
     // In this method we initialize the GUI components and connect the
     // associated signals and slots.
     void CreateQtPartControl(QWidget* parent) override;
 
-public slots:
-    void NotifyCoordinates(QVector<double> point);
-    void enableVolRenderingForCurrentNode(bool volRen);
-    void enablePaint();
-
-protected:
-    void NodeRemoved(const mitk::DataNode *node) override;
-    void NodeAdded(const mitk::DataNode *node) override;
+protected slots:
+    void OpenImageFromDisk();
+    void QueryPacs();
 
 private:
     // Typically a one-liner. Set the focus to the default widget.
     void SetFocus() override;
 
-    // This method is conveniently called whenever the selection of Data Manager
-    // items changes.
-    void OnSelectionChanged(
-        berry::IWorkbenchPart::Pointer source,
-        const QList<mitk::DataNode::Pointer>& dataNodes) override;
 
-    void SetLabelWidget();
-
-    mitk::DataNode *GetWorkingNode();
 
     // Generated from the associated UI file, it encapsulates all the widgets
     // of our view.
-    Ui::AwesomeViewControls m_Controls;
-    mitk::ToolManager *m_ToolManager;
-
-    mitk::DataNode* m_ActiveWorkingNode;
-    mitk::DataNode* m_VRNode;
-
-    std::unique_ptr<DisplayCoordinateSupplier> m_DisplayCoordinateSupplier;
-    us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
-
-    enum TableColumns
-    {
-        NAME_COL = 0,
-        COLOR_COL,
-        VISIBLE_COL
-    };
-
-private slots:
-    void OnColorButtonClicked();
-    void OnVisibleButtonClicked();
-    void OnPushButtonOtsuSegmentationClicked();
-    void OnSTLsExportButtonClicked();
-    void OnExportButtonClicked();
-
+    Ui::ImportPanelControls m_Controls;
 };
+}
 
 #endif

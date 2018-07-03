@@ -27,39 +27,40 @@ MinimalPerspective::MinimalPerspective()
 
 void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  QString editorArea = layout->GetEditorArea();
-  layout->AddView("my.organprint.views.stepselector", berry::IPageLayout::LEFT, 0.3f, editorArea);
-  layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorArea);
+    QString editorArea = layout->GetEditorArea();
+    layout->AddView("my.organprint.views.stepselector", berry::IPageLayout::LEFT, 0.3f, editorArea);
+    layout->AddView("my.organprint.views.importpanel",berry::IPageLayout::LEFT, 0.3f,editorArea);
+    layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::RIGHT, 0.3f, editorArea);
 
-  layout->AddView("my.organprint.views.sidepanel", berry::IPageLayout::RIGHT, 0.3f, editorArea);
+    layout->AddView("my.organprint.views.sidepanel", berry::IPageLayout::RIGHT, 0.3f, editorArea);
 
-  layout->AddView("org.mitk.views.segmentation", berry::IPageLayout::BOTTOM, 0.5f, "my.organprint.views.sidepanel");
-  layout->AddView("org.mitk.views.properties", berry::IPageLayout::BOTTOM, 0.7f, "org.mitk.views.datamanager");
+    //layout->AddView("org.mitk.views.segmentation", berry::IPageLayout::BOTTOM, 0.5f, "my.organprint.views.sidepanel");
+    layout->AddView("org.mitk.views.properties", berry::IPageLayout::BOTTOM, 0.3f, "org.mitk.views.datamanager");
 
- 
 
-  //layout->GetViewLayout("my.awesomeproject.editors.renderwindow");
-  
+
+    //layout->GetViewLayout("my.awesomeproject.editors.renderwindow");
+
 //  editor->SetCloseable(false);
 //  editor->SetMoveable(false);
 
 //  berry::IViewLayout::Pointer awesomeview = layout->GetViewLayout("org.mitk.views.segmentation");
 //  awesomeview->SetCloseable(false);
 //  awesomeview->SetMoveable(false);
-	
-  layout->GetViewLayout("org.mitk.views.datamanager");
 
-  layout->SetFixed(true);
-  //layout->GetViewLayout("org.mitk.views.datamanager")->SetShowTitle(false);
-  ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
+    layout->GetViewLayout("org.mitk.views.datamanager");
 
-  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
-  if (styleManagerRef)
-  {
-    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
-    //berry::IQtStyleManager::StyleList styles;
-    //styleManager->GetStyles(styles);
-    //styleManager->SetStyle(styles.last().fileName);
-    styleManager->SetStyle(":/my.organprint.minimalapplication/inoflat2.qss");
-  }
+    layout->SetFixed(true);
+    //layout->GetViewLayout("org.mitk.views.datamanager")->SetShowTitle(false);
+    ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
+
+    ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
+    if (styleManagerRef)
+    {
+        auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
+        //berry::IQtStyleManager::StyleList styles;
+        //styleManager->GetStyles(styles);
+        //styleManager->SetStyle(styles.last().fileName);
+        styleManager->SetStyle(":/my.organprint.minimalapplication/inoflat2.qss");
+    }
 }

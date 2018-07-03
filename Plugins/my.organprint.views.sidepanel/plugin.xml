@@ -5,5 +5,11 @@
           name="Awesome View"
           class="AwesomeView"
           icon="resources/AwesomeIcon.png" />
+
+
+<view id="my.organprint.views.importpanel"
+      name="Import Panel"
+      class="orgpnt::ImportPanel"
+      icon="resources/AwesomeIcon.png" />
   </extension>
 </plugin>
