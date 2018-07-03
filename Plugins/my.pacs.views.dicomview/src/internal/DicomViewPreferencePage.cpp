@@ -16,7 +16,7 @@
 #include <berryPlatform.h>
 
 
-DicomViewPreferencePage::DicomViewPreferencePage(QWidget* parent, Qt::WindowFlags f)
+DicomViewPreferencePage::DicomViewPreferencePage(QWidget* , Qt::WindowFlags )
 //	: m_MainControl(nullptr), m_Initializing(false)
 {}
 

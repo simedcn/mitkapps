@@ -161,7 +161,7 @@ void DicomView::addSeriesToDataManager(const QStringList& listOfFilesForSeries, 
 
 						//set some specific colorwash and isoline properties
 						bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(), true);
-						bool showIsolinesGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(), true);
+						//bool showIsolinesGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(), true);
 
 						//Set reference dose property
 						double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(), mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
@@ -649,20 +649,25 @@ void DicomView::on_retrieveProgress_changed(int value)
 void DicomView::on_lineEdit_IP_textChanged(QString value)
 {
 	m_DicomViewPreferencesNode->Put("PACS IP", ui.lineEdit_IP->text());
+	cout << "on_lineEdit_IP_textChanged " << value << endl;
 }
 void DicomView::on_spinBox_Port_valueChanged(int value)
 {
 	m_DicomViewPreferencesNode->PutInt("PACS port", ui.spinBox_Port->value());
+	cout << "on_spinBox_Port" << value << endl;
 }
 void DicomView::on_lineEdit_AETitle_textChanged(QString value)
 {
 	m_DicomViewPreferencesNode->Put("PACS AETitle", ui.lineEdit_AETitle->text());
+	cout << "on_lineEdit_AETitle_textChanged " << value << endl;
 }
 void DicomView::on_comboBox_Protocol_currentIndexChanged(int value)
 {
 	m_DicomViewPreferencesNode->PutInt("PACS protocol", ui.comboBox_Protocol->currentIndex());
+	cout << "on_comboBox_Protocol_currentIndexChanged " << value << endl;
 }
 void DicomView::on_lineEdit_StorageAETitle_textChanged(QString value)
 {
 	m_DicomViewPreferencesNode->Put("PACS storage AETitle", ui.lineEdit_StorageAETitle->text());
+	cout << "on_lineEdit_StorageAETitle_textChanged " << value << endl;
 }

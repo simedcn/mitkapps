@@ -73,15 +73,17 @@ void UploadToPACSAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   vector<int> nums;
   string prop_files = baseData->GetProperty("files")->GetValueAsString();
   bool OK = Elements::split_properties(prop_files, &files, &nums);
-  /*if (!OK)
+  if (!OK)
   {
+  	/*
 	  string path = baseData->GetProperty("path")->GetValueAsString();
 	  QFileInfo fi(QString::fromStdString(path));
 	  QString folderpath = fi.dir().absolutePath();
 	  QDir dir = folderpath;
 	  dir.setFilter(QDir::Files);
 	  files = dir.entryList();
-  }*/
+	  */
+  }
 
   int num_files = files.size();
   if (num_files == 0)
