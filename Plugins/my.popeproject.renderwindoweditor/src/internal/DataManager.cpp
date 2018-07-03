@@ -139,7 +139,7 @@ int DataManager::on_LoadImageSet(const QString &filenameAndDirectory)
 		}
 	}
 	/// Initialize views as axial, sagittal, coronar (from top-left to bottom)
-	mitk::TimeGeometry::Pointer geo = this->m_DataStorage->ComputeBoundingGeometry3D(this->m_DataStorage->GetAll());
+	auto geo = this->m_DataStorage->ComputeBoundingGeometry3D(this->m_DataStorage->GetAll());
 	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 	//this->InitializeView();
 
@@ -288,7 +288,7 @@ int DataManager::on_LoadImageFolder(const QString& directory)
 	}
 
 	/// Initialize views as axial, sagittal, coronar (from top-left to bottom)
-	mitk::TimeGeometry::Pointer geo = this->m_DataStorage->ComputeBoundingGeometry3D(this->m_DataStorage->GetAll());
+	auto geo = this->m_DataStorage->ComputeBoundingGeometry3D(this->m_DataStorage->GetAll());
 	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
 	return 0;
@@ -364,7 +364,7 @@ std::vector<std::string> DataManager::LoadDataOfCurrentPatient()
 		QString segFile = node->Get(key, "");
 		if (!segFile.isEmpty())
 		{
-			mitk::Image::Pointer image = mitk::IOUtil::LoadImage(segFile.toStdString());
+			mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(segFile.toStdString());
 			this->AddImage(key.toStdString(), image);
 			loadedFiles.push_back(key.toStdString());
 		}

@@ -4,13 +4,13 @@
 
 #include "ImageStatisticsCalculationThread.h"
 
-#include "mitkILifecycleAwarePart.h"
+#include <mitkILifecycleAwarePart.h>
 #include <berryIPartListener.h>
 
 #include <berryIPreferences.h>
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
-#include "DisplayCoordinateSupplier.h"
+#include <DisplayCoordinateSupplier.h>
 #include <usServiceRegistration.h>
 
 #include <ctkPluginContext.h>

@@ -1,4 +1,17 @@
+
+set(CPP_FILES
+  ../../Classes/MainWorkbenchWindowAdvisor.cpp
+  ../../Classes/ShowViewAction.cpp
+  ../../Classes/PartListenerForPlugins.cpp
+  ../../Classes/PluginDescriptors.cpp
+)
+
 set(SRC_CPP_FILES
+)
+
+set(H_FILES
+  ../../Classes/PartListenerForPlugins.h
+  ../../Classes/PluginDescriptors.h
 )
 
 set(INTERNAL_CPP_FILES
@@ -8,9 +21,6 @@ set(INTERNAL_CPP_FILES
   DicomPerspective.cpp
   MainWorkbenchAdvisor.cpp
   MainApplicationPreferencePage.cpp
-  MainWorkbenchWindowAdvisor.cpp
-  ShowViewAction.cpp
-  PartListenerForPlugins.cpp
 )
 
 set(MOC_H_FILES
@@ -20,9 +30,8 @@ set(MOC_H_FILES
   src/internal/DicomPerspective.h
   src/internal/MainWorkbenchAdvisor.h
   src/internal/MainApplicationPreferencePage.h
-  src/internal/MainWorkbenchWindowAdvisor.h
-  src/internal/ShowViewAction.h
-  src/internal/PartListenerForPlugins.h
+  ../../Classes/MainWorkbenchWindowAdvisor.h
+  ../../Classes/ShowViewAction.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -34,8 +43,6 @@ set(CACHED_RESOURCE_FILES
 set(QRC_FILES
   resources/my_popeproject_mainapplication.qrc
 )
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

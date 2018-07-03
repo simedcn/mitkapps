@@ -1,7 +1,7 @@
 
 #include "ui_PatientSelector.h"
-
 #include "PatientSelector.h"
+
 #include <QString>
 #include <QMessageBox>
 

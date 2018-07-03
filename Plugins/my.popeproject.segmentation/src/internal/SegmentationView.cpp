@@ -40,20 +40,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <service/event/ctkEventAdmin.h>
 #include <service/event/ctkEventConstants.h>
 
-#include "mitkLabel.h"
-#include "mitkToolManagerProvider.h"
-#include "mitkOtsuSegmentationFilter.h"
-#include "mitkImageToSurfaceFilter.h"
-#include "mitkIOUtil.h"
-#include "mitkIRenderWindowPart.h"
+#include <mitkLabel.h>
+#include <mitkToolManagerProvider.h>
+#include <mitkOtsuSegmentationFilter.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkIOUtil.h>
+#include <mitkIRenderWindowPart.h>
 
 // us
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModuleResource.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
 
-#include "itkImageRegionIterator.h"
-#include "mitkImageCast.h"
+#include <itkImageRegionIterator.h>
+#include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkPaintbrushTool.h>
 

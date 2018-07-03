@@ -21,10 +21,6 @@ using namespace std;
 
 class PopeLib_EXPORT Elements final
 {
-public:
-	struct PluginDescriptor;
-	using pPluginDescriptor = const PluginDescriptor*;
-
 private:
 	Elements();
 
@@ -67,47 +63,6 @@ public:
 
 	static bool recognize_property(QString* property, int* count);
 	static bool split_properties(const string& str_prop, QStringList* properties, vector<int>* nums = nullptr);
-
-	static shared_ptr<vector<Elements::pPluginDescriptor>> plugins_by_order();
-	static const PluginDescriptor* find_plugin(const QString& id);
-
-public:
-	static const vector<PluginDescriptor> plugins;
-protected:
-	static shared_ptr<vector<pPluginDescriptor>> plugins_in_order;
-
-public:
-	enum PluginPosistion
-	{
-		PluginPosistion_left,
-		PluginPosistion_right,
-		PluginPosistion_bottom_right,
-		PluginPosistion_bottom,
-		PluginPosistion_bottom_left
-	};
-
-	struct PluginDescriptor
-	{
-	public:
-		PluginDescriptor(initializer_list<QString> params);
-
-	//protected:
-	public:
-		int order = -1;
-		QString id;
-		QString name;
-		bool is_main = false;
-		bool show_title = false;
-		PluginPosistion position = PluginPosistion_right;
-		bool is_open = true;
-
-	public:
-	//	const QString& Id() const;
-	//	const QString& Name() const;
-	//	bool IsMain() const;
-	//	bool IsTitleVisible() const;
-	//	PluginPosistion Position() const;
-	};
 };
 
 #endif

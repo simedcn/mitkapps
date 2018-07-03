@@ -15,22 +15,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "MainPerspective.h"
-#include <PopeElements.h>
+#include "../../Classes/PluginDescriptors.h"
+#include "my_popeproject_mainapplication_Activator.h"
 
 // Berry
-#include "berryIViewLayout.h"
-#include "berryIFolderLayout.h"
-#include "berryIQtStyleManager.h"
-#include "berryIEditorInput.h"
-#include "berryFileEditorInput.h"
-#include "berryIWorkbenchWindow.h"
-#include "berryIWorkbenchPage.h"
-#include "berryIWorkbenchWindowConfigurer.h"
-#include "berryPlatformUI.h"
+#include <berryIViewLayout.h>
+#include <berryIFolderLayout.h>
+#include <berryIQtStyleManager.h>
+#include <berryIEditorInput.h>
+#include <berryFileEditorInput.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIWorkbenchWindowConfigurer.h>
+#include <berryPlatformUI.h>
 #include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
-#include "my_popeproject_mainapplication_Activator.h"
+#include <berryQtPreferences.h>
 
 enum CloseableMoveablePlugins : int
 {
@@ -53,23 +54,23 @@ void MainPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 	auto bottom = layout->CreateFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);
 	auto bottom_left = layout->CreateFolder("bottom_left", berry::IPageLayout::BOTTOM, 0.3f, "left");
 	auto bottom_right = layout->CreateFolder("bottom_right", berry::IPageLayout::BOTTOM, 0.78f, "right");
-	for (const auto& plugin : Elements::plugins)
+	for (const auto& plugin : PluginDescriptors::get())
 	{
 		switch (plugin.position)
 		{
-		case Elements::PluginPosistion::PluginPosistion_bottom_left:
+		case PluginDescriptor::PluginPosistion::PluginPosistion_bottom_left:
 			bottom_left->AddView(plugin.id);
 			break;
-		case Elements::PluginPosistion::PluginPosistion_bottom_right:
+		case PluginDescriptor::PluginPosistion::PluginPosistion_bottom_right:
 			bottom_right->AddView(plugin.id);
 			break;
-		case Elements::PluginPosistion::PluginPosistion_bottom:
+		case PluginDescriptor::PluginPosistion::PluginPosistion_bottom:
 			bottom->AddView(plugin.id);
 			break;
-		case Elements::PluginPosistion::PluginPosistion_left:
+		case PluginDescriptor::PluginPosistion::PluginPosistion_left:
 			left->AddView(plugin.id);
 			break;
-		case Elements::PluginPosistion::PluginPosistion_right:
+		case PluginDescriptor::PluginPosistion::PluginPosistion_right:
 		default:
 			right->AddView(plugin.id);
 			break;
@@ -92,7 +93,7 @@ void MainPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 	bool is_main_moveable = (moveable_plugins != NotForAll && moveable_plugins != YesForAllButMain);
 
 	//berry::IViewLayout::Pointer view;
-	for (const auto& plugin : Elements::plugins)
+	for (const auto& plugin : PluginDescriptors::get())
 	{
 		auto view = layout->GetViewLayout(plugin.id);
 		bool closeable = plugin.is_main ? is_main_closeable : is_closeable;
@@ -110,8 +111,23 @@ void MainPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 		auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
 		//berry::IQtStyleManager::StyleList styles;
 		//styleManager->GetStyles(styles);
-		//styleManager->SetStyle(styles.last().fileName);
-		styleManager->SetStyle(":/org.blueberry.ui.qt/darkstyle.qss");
+		//for (auto s : styles)
+		//	MITK_INFO << s.name << " " << s.fileName;
+		QString darkStyle = ":/org.blueberry.ui.qt/darkstyle.qss";
+		styleManager->SetStyle(darkStyle);
+		berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+		if (prefService != nullptr)
+		{
+			auto systemPrefs = prefService->GetSystemPreferences();
+			if (systemPrefs != nullptr)
+			{
+				berry::IPreferences::Pointer stylePref = systemPrefs->Node(berry::QtPreferences::QT_STYLES_NODE);
+				if (stylePref != nullptr)
+				{
+					stylePref->Put(berry::QtPreferences::QT_STYLE_NAME, darkStyle);
+				}
+			}
+		}
 	}
 
 	/// Configure plugins
