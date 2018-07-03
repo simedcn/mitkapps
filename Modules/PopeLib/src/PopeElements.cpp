@@ -422,6 +422,6 @@ bool Elements::split_properties(const string& str_prop, QStringList* properties,
 	}
 
 	assert(props.size() >= 1);
-	assert(nums == nullptr || (props.size() == nums->size()));
+	assert(nums == nullptr || (props.size() == (int) nums->size()));
 	return isOK;
 }
