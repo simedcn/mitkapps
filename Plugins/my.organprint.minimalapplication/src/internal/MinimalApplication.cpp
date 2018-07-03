@@ -29,8 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::vector<QString> MinimalApplication::VIEW_IDS =
 {
-	//"my.awesomeproject.views.awesomeview",
-	//"org.mitk.views.basicimageprocessing",
+	"my.organprint.views.sidepanel",
+	//"org.mitk.views.segmentation",
+	"org.mitk.views.deformableclippingplane",
 	"org.mitk.views.segmentationutilities",
 	"org.mitk.views.properties"
 };
@@ -88,7 +89,7 @@ public:
     berry::IWorkbenchWindowConfigurer::Pointer configurer) override
   {
     // Set an individual initial size
-    configurer->SetInitialSize(QPoint(600, 400));
+    configurer->SetInitialSize(QPoint(1200, 800));
     // Set an individual title
     configurer->SetTitle("Minimal Application");
     // Enable or disable the perspective bar

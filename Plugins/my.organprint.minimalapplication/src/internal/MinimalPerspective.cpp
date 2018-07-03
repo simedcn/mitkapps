@@ -1,20 +1,17 @@
 /*===================================================================
-
 The Medical Imaging Interaction Toolkit (MITK)
-
 Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
-
 This software is distributed WITHOUT ANY WARRANTY; without
 even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
-
 See LICENSE.txt or http://www.mitk.org for details.
-
 ===================================================================*/
 
 #include "MinimalPerspective.h"
+
+#include "MinimalApplication.h"
 
 // Berry
 #include "berryIViewLayout.h"
@@ -28,30 +25,17 @@ MinimalPerspective::MinimalPerspective()
 void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
     QString editorArea = layout->GetEditorArea();
-    layout->AddView("my.organprint.views.stepselector", berry::IPageLayout::LEFT, 0.3f, editorArea);
-    layout->AddView("my.organprint.views.importpanel",berry::IPageLayout::LEFT, 0.3f,editorArea);
-    layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::RIGHT, 0.3f, editorArea);
+    QString stepSelectorId = "my.organprint.views.stepselector";
+    layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, 0.2f, editorArea);
+    layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::BOTTOM, 0.3f, stepSelectorId);
+    QString prev_id = editorArea;
+    for (auto& viewId : MinimalApplication::VIEW_IDS)
+    {
+        layout->AddStandaloneView(viewId, false, berry::IPageLayout::RIGHT, 0.7f, prev_id);
+        auto view = layout->GetViewLayout(viewId);
+        prev_id = viewId;
+    }
 
-    layout->AddView("my.organprint.views.sidepanel", berry::IPageLayout::RIGHT, 0.3f, editorArea);
-
-    //layout->AddView("org.mitk.views.segmentation", berry::IPageLayout::BOTTOM, 0.5f, "my.organprint.views.sidepanel");
-    layout->AddView("org.mitk.views.properties", berry::IPageLayout::BOTTOM, 0.3f, "org.mitk.views.datamanager");
-
-
-
-    //layout->GetViewLayout("my.awesomeproject.editors.renderwindow");
-
-//  editor->SetCloseable(false);
-//  editor->SetMoveable(false);
-
-//  berry::IViewLayout::Pointer awesomeview = layout->GetViewLayout("org.mitk.views.segmentation");
-//  awesomeview->SetCloseable(false);
-//  awesomeview->SetMoveable(false);
-
-    layout->GetViewLayout("org.mitk.views.datamanager");
-
-    layout->SetFixed(true);
-    //layout->GetViewLayout("org.mitk.views.datamanager")->SetShowTitle(false);
     ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
 
     ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();

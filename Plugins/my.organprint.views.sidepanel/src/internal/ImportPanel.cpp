@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleRegistry.h>
 
 #include <QMessageBox>
-
+#include <QFileDialog>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -51,6 +51,10 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
 
     cout << "Thank you for clicking" << endl;
     /*
+    QString imagePath = QFileDialog::getOpenFileName(
+                            this, tr("Open File")
+                        );
+
     QString imagePath = QFileDialog::getOpenFileName(
                             this, tr("Open File")
                         );
