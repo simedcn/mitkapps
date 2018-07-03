@@ -26,12 +26,12 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
     QString editorArea = layout->GetEditorArea();
     QString stepSelectorId = "my.organprint.views.stepselector";
-    layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, 0.2f, editorArea);
-    layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::BOTTOM, 0.3f, stepSelectorId);
-    QString prev_id = editorArea;
+    layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, 0.3f, editorArea);
+    layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.3f, editorArea);
+    QString prev_id = stepSelectorId;
     for (auto& viewId : MinimalApplication::VIEW_IDS)
     {
-        layout->AddStandaloneView(viewId, false, berry::IPageLayout::RIGHT, 0.7f, prev_id);
+        layout->AddStandaloneView(viewId, false, berry::IPageLayout::RIGHT, 0.3f, prev_id);
         auto view = layout->GetViewLayout(viewId);
         prev_id = viewId;
     }

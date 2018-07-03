@@ -65,9 +65,9 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
 	// Set steps
 	m_steps =
 	{
-		{ "my.organprint.views.sidepanel",			ui.pushButton_1 },
-		//{ "org.mitk.views.segmentation",			ui.pushButton_2 },
-		{ "org.mitk.views.deformableclippingplane",	ui.pushButton_2 },
+		{ "my.organprint.views.importpanel",		ui.pushButton_1 },
+		{ "org.mitk.views.segmentation",			ui.pushButton_2 },
+		//{ "org.mitk.views.deformableclippingplane",	ui.pushButton_2 },
 		{ "org.mitk.views.segmentationutilities", 	ui.pushButton_3 },
 		{ "org.mitk.views.properties", 				ui.pushButton_4 }
 	};

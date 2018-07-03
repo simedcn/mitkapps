@@ -29,9 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::vector<QString> MinimalApplication::VIEW_IDS =
 {
-	"my.organprint.views.sidepanel",
-	//"org.mitk.views.segmentation",
-	"org.mitk.views.deformableclippingplane",
+	"my.organprint.views.importpanel",
+	"org.mitk.views.segmentation",
+	//"org.mitk.views.deformableclippingplane",
 	"org.mitk.views.segmentationutilities",
 	"org.mitk.views.properties"
 };
