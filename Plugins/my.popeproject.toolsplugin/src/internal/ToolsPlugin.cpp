@@ -8,6 +8,8 @@
 #include <berryIWorkbenchWindow.h>
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
+#include <berryPlatformUI.h>
+#include <berryQtWorkbenchAdvisor.h>
 
 #include <usModuleRegistry.h>
 #include <QmitkDataStorageComboBox.h>
@@ -30,27 +32,27 @@
 #include <service/event/ctkEventAdmin.h>
 #include <service/event/ctkEventConstants.h>
 
-#include "mitkLabel.h"
-#include "mitkToolManagerProvider.h"
-#include "mitkOtsuSegmentationFilter.h"
-#include "mitkImageToSurfaceFilter.h"
-#include "mitkIOUtil.h"
-#include "mitkIRenderWindowPart.h"
-#include "mitkImage.h"
-#include "mitkImageStatisticsHolder.h"
+#include <mitkLabel.h>
+#include <mitkToolManagerProvider.h>
+#include <mitkOtsuSegmentationFilter.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkIOUtil.h>
+#include <mitkIRenderWindowPart.h>
+#include <mitkImage.h>
+#include <mitkImageStatisticsHolder.h>
 
 // us
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModuleResource.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
 
-#include "itkImageRegionIterator.h"
-#include "mitkImageCast.h"
+#include <itkImageRegionIterator.h>
+#include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkPaintbrushTool.h>
 
 #include <itkBinaryThresholdImageFilter.h>
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 #include <QmitkDataNodeSelectionProvider.h>
 #include <QmitkDataManagerView.h>
@@ -70,7 +72,7 @@ const string ToolsPlugin::VIEW_ID = "my.popeproject.views.toolsplugin";
 const int ToolsPlugin::STAT_TABLE_BASE_HEIGHT = 180;
 
 
-void set_childTreeWidgetItems_editable(QTreeWidgetItem* item, bool isEditable)
+void set_childTreeWidgetItems_editable(QTreeWidgetItem* item, bool isEditable, int level)
 {
 	for (int j = 0; j < item->childCount(); j++)
 	{
@@ -81,8 +83,10 @@ void set_childTreeWidgetItems_editable(QTreeWidgetItem* item, bool isEditable)
 		else
 			child_item->setFlags(item->flags() & (~Qt::ItemIsEditable));
 
-		set_childTreeWidgetItems_editable(child_item, isEditable);
+		set_childTreeWidgetItems_editable(child_item, isEditable, level + 1);
 	}
+	bool isExpanded = (level <= 3);
+	item->setExpanded(isExpanded);
 }
 
 ToolsPlugin::ToolsPlugin()
@@ -101,8 +105,6 @@ ToolsPlugin::~ToolsPlugin()
   delete this->m_CalculationThread;
 }
 
-#include <berryPlatformUI.h>
-#include <berryQtWorkbenchAdvisor.h>
 void ToolsPlugin::CreateQtPartControl(QWidget* parent)
 {
 	/// Setting up the UI is a true pleasure when using .ui files, isn't it?
@@ -292,9 +294,9 @@ void ToolsPlugin::updateTags()
 		else
 			item->setFlags(item->flags() & (~Qt::ItemIsEditable));
 		setTagCounts(item);
-		set_childTreeWidgetItems_editable(item, editable_text);
+		set_childTreeWidgetItems_editable(item, editable_text, 0 + 1);
 	}
-	ui.treeWidget_Tags->expandAll();
+	//ui.treeWidget_Tags->expandAll();
 }
 shared_ptr<QList<QTreeWidgetItem*>> ToolsPlugin::createTagItems(TagNode tree, const string& prefix)
 {
@@ -591,10 +593,15 @@ void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList
 	*nodes = dataNodes.toStdList();
 	auto dataNode = getFirstSelectedNode(nodes);
 
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+
 	if ((m_SelectedNode != dataNode) && m_SelectedNode != nullptr)
 	{// Disable autorotation for the current node
 		bool property_autorotation = false; // default value - is used when the property doesn't exist
-		m_SelectedNode->GetBoolProperty("autorotation", property_autorotation);
+		//m_SelectedNode->GetBoolProperty("autorotation", property_autorotation);
+		QString node_name = QString::fromStdString("/datanode.settings." + m_SelectedNode->GetName());
+		auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+		property_autorotation = settingsNode->GetBool("autorotation", property_autorotation);
 
 		if (property_autorotation)
 		{
@@ -608,10 +615,14 @@ void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList
 	m_SelectedNode = dataNode;
 
 	bool has_many_images = false;
-	
+
+	berry::IPreferences::Pointer settingsNode;
 	if (dataNode != nullptr)
 	{// dataNode == nullptr when nothing is selected or the selection doesn't contain an image.
 		//setLabelWidget();
+		/// Get the settings node.
+		QString node_name = QString::fromStdString("/datanode.settings." + dataNode->GetName());
+		settingsNode = prefService->GetSystemPreferences()->Node(node_name);
 
 		/// Chcek if it contains more than one-two images.
 		string tag = Elements::get_property("DICOM.0020.0013", "dicom.image.0020.0013", dataNode);
@@ -621,29 +632,21 @@ void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList
 		if (has_many_images)
 		{
 			// Check if it is selected for first time
-			bool property_autorotation;
-			bool is_autorotation_found = dataNode->GetBoolProperty("autorotation", property_autorotation);
-			if (!is_autorotation_found)
-			{
-				bool def_val = m_ToolsPluginPreferencesNode->GetBool("3D autorotation", true);
-				const_cast<mitk::DataNode*>(dataNode)->SetBoolProperty("autorotation", def_val);
-				//property_autorotation = true;
-				bool is_found = dataNode->GetBoolProperty("autorotation", property_autorotation);
-				assert(is_found && property_autorotation == def_val);
-			}
+			bool def_val = m_ToolsPluginPreferencesNode->GetBool("3D autorotation", true);
+			bool property_autorotation = settingsNode->GetBool("autorotation", def_val);
+			//bool is_autorotation_found = dataNode->GetBoolProperty("autorotation", property_autorotation);
 			if (property_autorotation)
-			{
-				// Enable 3D representation
 				enable3DRepresentation(true);
-			}
 		}
 	}
 	/// Update Volume Rendering.
 	ui.checkbox_EnableVolumeRendering->setEnabled(has_many_images);
-	bool is_volume_rendering_enabled = has_many_images; // default value if not specified
+	bool def_val = m_ToolsPluginPreferencesNode->GetBool("volume rendering", true);
+	bool is_volume_rendering_enabled = (has_many_images && def_val); // default value if not specified
 	if (dataNode != nullptr)
-	{
-		dataNode->GetBoolProperty("volumerendering", is_volume_rendering_enabled);
+	{// otherwise settingsNode is not initialized
+		//dataNode->GetBoolProperty("volumerendering", is_volume_rendering_enabled);
+		is_volume_rendering_enabled = settingsNode->GetBool("volumerendering", is_volume_rendering_enabled);
 		if (!has_many_images && is_volume_rendering_enabled)
 		{
 			is_volume_rendering_enabled = false;
@@ -735,15 +738,22 @@ void ToolsPlugin::OnPreferencesChanged(const berry::IBerryPreferences*)
 void ToolsPlugin::on_checkbox_EnableVolumeRendering_toggled(bool volRen)
 {
 	auto node = getFirstSelectedNode();
-	if (node)
-		node->SetBoolProperty("volumerendering", volRen);
-	if (node && !volRen)
+	if (node == nullptr)
+		return;
+
+	QString node_name = QString::fromStdString("/datanode.settings." + node->GetName());
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+
+	node->SetBoolProperty("volumerendering", volRen);
+	settingsNode->PutBool("volumerendering", volRen);
+	if (!volRen)
 	{
 		bool property_autorotation = false; // default value
-		bool is_autorotation_found = node->GetBoolProperty("autorotation", property_autorotation);
-		if (is_autorotation_found && property_autorotation)
+		property_autorotation = settingsNode->GetBool("autorotation", property_autorotation);
+		//bool is_autorotation_found = node->GetBoolProperty("autorotation", property_autorotation);
+		if (property_autorotation)
 		{
-			//node->SetBoolProperty("autorotation", false);
 			enable3DRepresentation(false);
 		}
 	}
@@ -773,7 +783,7 @@ void ToolsPlugin::on_histogram_PageSuccessfullyLoaded()
 	berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
 	auto m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
 	QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
-	QmitkChartWidget::ChartStyle current_style = (styleName == ":/org.blueberry.ui.qt/darkstyle.qss") ? QmitkChartWidget::ChartStyle::darkstyle : QmitkChartWidget::ChartStyle::defaultstyle;
+	QmitkChartWidget::ChartStyle current_style = (styleName == ":/org.blueberry.ui.qt/darkstyle.qss") ? QmitkChartWidget::ChartStyle::darkstyle : QmitkChartWidget::ChartStyle::lightstyle;//::defaultstyle;
 	ui.JSHistogram->SetTheme(current_style);
 }
 void ToolsPlugin::on_imageNavigator_timeChanged(const itk::EventObject& e)
@@ -885,6 +895,10 @@ void ToolsPlugin::on_MainWindow_Representation3D_changed(const ctkEvent& event)
 	bool enable3D = event.getProperty("enable3D").toBool();
 	if (m_SelectedNode)
 	{
+		QString node_name = QString::fromStdString("/datanode.settings." + m_SelectedNode->GetName());
+		berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+		auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+
 		if (enable3D)
 		{
 			// Chcek if it contains more than one-two images.
@@ -893,20 +907,23 @@ void ToolsPlugin::on_MainWindow_Representation3D_changed(const ctkEvent& event)
 			if (has_many_images)
 			{
 				// Enable volume rendering
-				bool property_volumerendering;
-				bool is_volume_rendering_property_found = m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
-				if (!is_volume_rendering_property_found || !property_volumerendering)
+				//bool property_volumerendering;
+				//bool is_volume_rendering_property_found = m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
+				//if (!is_volume_rendering_property_found || !property_volumerendering)
+				bool property_volumerendering = settingsNode->GetBool("volumerendering", false);
+				if (!property_volumerendering)
 				{
 					//m_SelectedNode->SetBoolProperty("volumerendering", true); --> will be called
 					ui.checkbox_EnableVolumeRendering->setChecked(true);
 				}
-				property_volumerendering = false;
-				m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
-				assert(property_volumerendering);
+				//property_volumerendering = false;
+				//m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
+				//assert(property_volumerendering);
 			}
 		}
 		// Enable/disable autorotation
-		m_SelectedNode->SetBoolProperty("autorotation", enable3D);
+		settingsNode->PutBool("autorotation", enable3D);
+		//m_SelectedNode->SetBoolProperty("autorotation", enable3D);
 	}
 }
 

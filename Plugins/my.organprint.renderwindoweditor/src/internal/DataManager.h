@@ -30,8 +30,6 @@ protected:
 
   std::vector<std::string> GetDICOMFilesInSameDirectory(const std::string &filePath);
 
-  mitk::Image::Pointer LoadImage(const std::string &path);
-
   mitk::DataStorage* m_DataStorage;
   QString m_PatientId;
   QString m_CurrentPath;

@@ -2,10 +2,10 @@
 #ifndef MAINAPPLICATIONPREFERENCEPAGE_H
 #define MAINAPPLICATIONPREFERENCEPAGE_H
 
-#include <PopeElements.h>
+#include "../../Classes/PluginDescriptors.h"
 
 #include <berryIPreferences.h>
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 
 using namespace std;
 
@@ -54,9 +54,9 @@ protected:
 	struct ViewDescriptor
 	{
 		QCheckBox* checkBox = nullptr;
-		const Elements::PluginDescriptor* plugin = nullptr;
+		const PluginDescriptor* plugin = nullptr;
 
-		ViewDescriptor(QCheckBox* checkBox, const Elements::PluginDescriptor* plugin);
+		ViewDescriptor(QCheckBox* checkBox, const PluginDescriptor* plugin);
 	};
 };
 

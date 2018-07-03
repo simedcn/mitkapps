@@ -1,8 +1,8 @@
 #include "QmitkStdMultiWidgetPartListener.h"
-
-#include <QmitkStdMultiWidget.h>
 #include "PopeRenderWindowEditorPrivate.h"
 #include "PopeRenderWindowEditor.h"
+
+#include <QmitkStdMultiWidget.h>
 
 
 QmitkStdMultiWidgetPartListener::QmitkStdMultiWidgetPartListener(PopeRenderWindowEditorPrivate* dd)

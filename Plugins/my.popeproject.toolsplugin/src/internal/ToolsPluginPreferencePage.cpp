@@ -39,7 +39,10 @@ void ToolsPluginPreferencePage::CreateQtControl(QWidget* parent)
 	displayOptionsLayout->addWidget(m_RadioButton_3DAutoRotation);
 	m_RadioButton_Std4ViewWidget = new QRadioButton("Enable standard 4-view widget when loading data", m_MainControl);
 	displayOptionsLayout->addWidget(m_RadioButton_Std4ViewWidget);
-	formLayout->addRow("Main window", displayOptionsLayout);
+	formLayout->addRow("View by default", displayOptionsLayout);
+
+	m_CheckBox_VolumeRendering = new QCheckBox("Enable Volume Rendering when loading data", m_MainControl);
+	formLayout->addRow("Volume by default", m_CheckBox_VolumeRendering);
 
 	auto viewOptionsLayout = new QVBoxLayout;
 	m_CheckBox_ShowPatientData = new QCheckBox("Show patient data", m_MainControl);
@@ -70,6 +73,7 @@ QWidget* ToolsPluginPreferencePage::GetQtControl() const
 bool ToolsPluginPreferencePage::PerformOk()
 {
 	m_ToolsPluginPreferencesNode->PutBool("3D autorotation", m_RadioButton_3DAutoRotation->isChecked());
+	m_ToolsPluginPreferencesNode->PutBool("volume rendering", m_CheckBox_VolumeRendering->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("show patient data", m_CheckBox_ShowPatientData->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("group tags", m_CheckBox_GroupTags->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("show statistics", m_CheckBox_ShowStatistics->isChecked());
@@ -90,6 +94,7 @@ void ToolsPluginPreferencePage::Update()
 	{
 		m_RadioButton_Std4ViewWidget->setChecked(true);
 	}
+	m_CheckBox_VolumeRendering->setChecked(m_ToolsPluginPreferencesNode->GetBool("volume rendering", true));
 	m_CheckBox_ShowPatientData->setChecked(m_ToolsPluginPreferencesNode->GetBool("show patient data", true));
 	m_CheckBox_GroupTags->setChecked(m_ToolsPluginPreferencesNode->GetBool("group tags", true));
 	m_CheckBox_ShowStatistics->setChecked(m_ToolsPluginPreferencesNode->GetBool("show statistics", false));

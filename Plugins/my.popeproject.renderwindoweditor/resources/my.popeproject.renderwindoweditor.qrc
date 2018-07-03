@@ -6,6 +6,6 @@
     <file alias="POPE_icon">POPE_icon.ico</file>
   </qresource>
   <qresource prefix="/images">
-    <file>logo.png</file>
+    <file>PopeIcon.png</file>
   </qresource>
 </RCC>

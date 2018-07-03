@@ -16,7 +16,7 @@
 #include <berryPlatform.h>
 
 
-MainApplicationPreferencePage::ViewDescriptor::ViewDescriptor(QCheckBox* checkBox, const Elements::PluginDescriptor* plugin)
+MainApplicationPreferencePage::ViewDescriptor::ViewDescriptor(QCheckBox* checkBox, const PluginDescriptor* plugin)
 	: checkBox(checkBox), plugin(plugin)
 {}
 
@@ -37,13 +37,13 @@ void MainApplicationPreferencePage::CreateQtControl(QWidget* parent)
 
 	auto formLayout = new QFormLayout;
 	formLayout->setHorizontalSpacing(8);
-	formLayout->setVerticalSpacing(24);
+	formLayout->setVerticalSpacing(16);
 
 	//m_CheckBox_ShowShortcut = new QCheckBox("Show the DICOM View in Menu and ToolBar", m_MainControl);
 	//formLayout->addRow("Shortcut", m_CheckBox_ShowShortcut);
 	auto viewOptionsLayout = new QVBoxLayout;
 	viewOptionsLayout->setSpacing(6);
-	for (auto plugin : *Elements::plugins_by_order())
+	for (auto plugin : *PluginDescriptors::plugins_by_order())
 	{
 		QCheckBox* checkBox = new QCheckBox(plugin->name, m_MainControl);
 		viewOptionsLayout->addWidget(checkBox);

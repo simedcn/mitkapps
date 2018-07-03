@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QEvent>
 
 //mitk headers
-#include "mitkImage.h"
-#include "mitkPlanarFigure.h"
-#include "mitkImageStatisticsCalculator.h"
+#include <mitkImage.h>
+#include <mitkPlanarFigure.h>
+#include <mitkImageStatisticsCalculator.h>
 
 // itk headers
 #ifndef __itkHistogram_h
