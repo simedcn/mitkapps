@@ -28,12 +28,15 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     QString stepSelectorId = "my.organprint.views.stepselector";
     layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, 0.3f, editorArea);
     layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.3f, editorArea);
+    layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::RIGHT,0.3f,stepSelectorId);
+    layout->SetEditorAreaVisible(false);
     QString prev_id = stepSelectorId;
     for (auto& viewId : MinimalApplication::VIEW_IDS)
     {
-        layout->AddStandaloneView(viewId, false, berry::IPageLayout::RIGHT, 0.3f, prev_id);
+        layout->AddStandaloneViewPlaceholder(viewId,berry::IPageLayout::RIGHT, 0.3f, stepSelectorId,false);
         auto view = layout->GetViewLayout(viewId);
         prev_id = viewId;
+
     }
 
     ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
@@ -45,6 +48,7 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
         //berry::IQtStyleManager::StyleList styles;
         //styleManager->GetStyles(styles);
         //styleManager->SetStyle(styles.last().fileName);
-        styleManager->SetStyle(":/my.organprint.minimalapplication/inoflat2.qss");
+        styleManager->AddStyle(":/my.organprint.minimalapplication/inoflat.qss","Inoflat 2");
+        styleManager->SetStyle(":/my.organprint.minimalapplication/inoflat.qss");
     }
 }

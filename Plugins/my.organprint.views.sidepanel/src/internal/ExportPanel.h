@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef IMPORTPANEL_H
-#define IMPORTPANEL_H
+#ifndef ExportPanel_H
+#define ExportPanel_H
 
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // header file prefixed with "ui_", which is located in the build directory.
 // Use Qt Creator to view and edit .ui files. The generated header file
 // provides a class that contains all of the UI widgets.
-#include <ui_ImportPanelControls.h>
+#include <ui_ExportPanelControls.h>
 
 // All views in MITK derive from QmitkAbstractView. You have to override
 // at least the two methods CreateQtPartControl() and SetFocus().
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace orgpnt {
 
 
-class ImportPanel : public QmitkAbstractView
+class ExportPanel : public QmitkAbstractView
 {
     // As QmitkAbstractView derives from QObject and we want to use the Qt
     // signal and slot mechanism, we must not forget the Q_OBJECT macro.
@@ -53,8 +53,8 @@ public:
     void CreateQtPartControl(QWidget* parent) override;
 
 protected slots:
-    void ExportInSTL();
-    void SaveProject();
+    void OpenImageFromDisk();
+    void QueryPacs();
 
 private:
     // Typically a one-liner. Set the focus to the default widget.
@@ -64,7 +64,7 @@ private:
 
     // Generated from the associated UI file, it encapsulates all the widgets
     // of our view.
-    Ui::OrganPrintImportPanelControls m_Controls;
+    Ui::OrganPrintExportPanelControls m_Controls;
 };
 }
 

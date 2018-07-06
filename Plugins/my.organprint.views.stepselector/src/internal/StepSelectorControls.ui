@@ -35,11 +35,17 @@
    <item>
     <widget class="QPushButton" name="pushButton_1">
      <property name="styleSheet">
-      <string notr="true">background-color: #3399cc</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>1
 Import</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -49,6 +55,9 @@ Import</string>
       <string>2
 Segment</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
@@ -57,6 +66,9 @@ Segment</string>
       <string>3
 Configure</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
@@ -64,6 +76,9 @@ Configure</string>
      <property name="text">
       <string>4
 Export</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -86,8 +101,6 @@ Export</string>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="../../resources/StepSelector.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

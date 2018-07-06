@@ -1,36 +1,20 @@
-/*===================================================================
-
-BlueBerry Platform
-
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
-
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
-
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
 
 /*
   iconColor       = #c7c7c7 <- This line is parsed by MITK
   iconAccentColor = #d4821e <- This line is parsed by MITK
 */
 
+
+
 QWidget {
-  background-color: #2d2d30;
-  border: none;
-  color: #f1f1f1;
-  margin:none;
-  padding:none;
-  background-color:#00FF00;
+  background-color:  #260D17;
+  border: 0;
+  color:  #f1f1f1;
 }
 
 QWidget:disabled {
-  background-color: #2d2d30;
-  border-color: #434346;
+  background-color:  #260D17;
+  border-color:  #732654;
   color: #656565;
 }
 
@@ -39,24 +23,26 @@ QStackedWidget {
 }
 
 QAbstractButton:hover, QComboBox:hover, QLineEdit:hover, QAbstractSpinBox:hover {
-  background-color: #3f3f46;
+  background-color:  #7E2A65;
 }
 
 QAbstractButton:pressed, QAbstractButton:checked {
-  background-color: #434346;
+  background-color:  #732654;
 }
 
 QPushButton {
-  border: 0px solid #3f3f46;
+  border: 0;
   padding: 8px 14px;
+  background-color: #AC3975;
 }
 
 QPushButton:pressed {
-  border: 0px solid #434346;
+  border: 0;
 }
 
 QPushButton:checked, QToolButton:checked {
-  border: 0px solid #007acc;
+  border: 0;
+  background-color:@primary-button-checked;
 }
 
 QToolButton {
@@ -69,18 +55,18 @@ QToolBar QToolButton {
 
 QToolButton#qt_toolbar_ext_button {
   background-color: transparent;
-  border: none;
+  border: 0;
   min-width: 12px;
   padding: 0;
   qproperty-icon: url(:/org.blueberry.ui.qt/dark/tight-right-arrow-textcolor.svg);
 }
 
 QToolBox::tab {
-  border: px solid #3f3f46;
+  border: 0px solid  #7E2A65;
 }
 
 QToolBox::tab:hover {
-  background-color: #434346;
+  background-color:  #732654;
 }
 
 QToolBox::tab:selected {
@@ -94,7 +80,7 @@ QAbstractItemView {
 }
 
 QAbstractItemView::item {
-  color: #f1f1f1;
+  color:  #f1f1f1;
 }
 
 QHeaderView::section {
@@ -103,11 +89,11 @@ QHeaderView::section {
 }
 
 QHeaderView::section:horizontal {
-  border-right: 1px solid #3f3f46;
+  border-right: 1px solid  #7E2A65;
 }
 
 QHeaderView::section:vertical {
-  border-bottom: 1px solid #3f3f46;
+  border-bottom: 1px solid  #7E2A65;
 }
 
 QHeaderView::section:vertical:checked {
@@ -148,9 +134,10 @@ QHeaderView::up-arrow:pressed {
 }
 
 QGroupBox {
-  border: 0px solid #434346;
-  margin-top: 8px;
-  padding-top: 8px;
+  border: 0;
+  margin:0;
+  padding:0;
+  spacing:0;
 }
 
 QGroupBox, QGroupBox:disabled {
@@ -158,19 +145,19 @@ QGroupBox, QGroupBox:disabled {
 }
 
 QGroupBox::title {
-  padding: 0 4px;
+  padding:0px;
   subcontrol-origin: margin;
   subcontrol-position: top center;
 }
 
 QComboBox, QLineEdit, QAbstractSpinBox {
   background-color: #333337;
-  border: 0px solid #434346;
+  border: 0px solid  #732654;
 }
 
 QComboBox QAbstractItemView {
-  border: 1px solid #333337;
-  selection-background-color: #3f3f46;
+  border: 0;
+  selection-background-color:  #7E2A65;
 }
 
 QComboBox::drop-down {
@@ -179,7 +166,7 @@ QComboBox::drop-down {
   subcontrol-position: right;
   width: 12px;
 }
-
+ 
 QComboBox::drop-down:hover {
   background-color: #1f1f20;
   border-left: 1px solid #007acc;
@@ -384,12 +371,12 @@ QScrollBar::handle:pressed {
 
 QScrollBar::handle:horizontal {
   min-width: 18px;
-  margin: 4px 0 5px 0;
+  margin: 0px;
 }
 
 QScrollBar::handle:vertical {
   min-height: 18px;
-  margin: 0 5px 0 4px;
+  margin: 0;
 }
 
 QScrollBar::add-page, QScrollBar::sub-page {
@@ -491,12 +478,12 @@ QScrollBar::up-arrow:pressed {
 }
 
 QTabWidget::pane {
-  border: 1px solid #434346;
+  border: 1px solid  #732654;
 }
 
 QTabBar::tab {
   background-color: none;
-  border: 0px solid #434346;
+  border: 0px solid  #732654;
   border-bottom: none;
   padding: 9px;
 }
@@ -514,7 +501,7 @@ QTabBar::tab:next-selected {
 }
 
 QTabBar::tab:selected {
-  border: 0px solid #434346;
+  border: 0px solid  #732654;
   background-color:#000000;
   border-bottom: none;
 }
@@ -524,7 +511,7 @@ QTabBar::tab:!selected {
 }
 
 QTabBar::tab:!selected:hover {
-  background-color: #434346;
+  background-color:  #732654;
 }
 
 #TabCloseButton {
@@ -597,4 +584,19 @@ QTreeView::indicator:checked, QTreeView::indicator:indeterminate {
 
 QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:selected {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-hover.svg);
+}
+
+QSplitter {
+    background-color: #732654;
+}
+
+
+#QmitkSegmentationControls, #OrganPrintImportPanelControls {
+    background-color: #732654;
+}
+#QmitkSegmentationControls QAbstractButton {
+    background-color: #AC3975;
+}
+#OrganPrintImportPanelControls QAbstractButton {
+    background-color:transparent;
 }

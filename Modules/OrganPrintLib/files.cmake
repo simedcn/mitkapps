@@ -1,6 +1,7 @@
 set(CPP_FILES
   AwesomeImageFilter.cpp
   AwesomeImageInteractor.cpp
+  #STLExportService.cpp
 )
 
 set(RESOURCE_FILES

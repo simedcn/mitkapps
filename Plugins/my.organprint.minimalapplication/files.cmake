@@ -16,6 +16,7 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
+  resources/inoflat.qss
 )
 
 set(QRC_FILES

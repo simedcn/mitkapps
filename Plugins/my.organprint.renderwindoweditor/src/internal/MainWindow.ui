@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1180</width>
-    <height>758</height>
+    <width>600</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,11 +26,14 @@
    <string>Organ Print</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../../../my.organprint.minimalapplication/resources/my_organprint_minimalapplication.qrc">
     <normaloff>:/icons/Organ_print_icon</normaloff>:/icons/Organ_print_icon</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">qrc:/my.organprint.minimalapplication/inoflat2.qss</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="geometry">
@@ -93,38 +96,31 @@
         </property>
         <item>
          <widget class="QWidget" name="top_menu_widget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="sizeConstraint">
             <enum>QLayout::SetMinAndMaxSize</enum>
            </property>
            <property name="leftMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
-           <item>
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>80</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QPushButton" name="openButton">
              <property name="minimumSize">
@@ -215,19 +211,6 @@
             </spacer>
            </item>
            <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QPushButton" name="Viewall_pushbutton">
              <property name="minimumSize">
               <size>
@@ -266,6 +249,9 @@
       </item>
       <item>
        <widget class="QWidget" name="patient_images_widget" native="true">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -419,7 +405,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../my.organprint.minimalapplication/resources/my_organprint_minimalapplication.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <signal>setValue()</signal>

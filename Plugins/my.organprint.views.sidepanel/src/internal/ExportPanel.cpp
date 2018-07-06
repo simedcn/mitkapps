@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "ImportPanel.h"
+#include "ExportPanel.h"
 
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -32,11 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 
 // Don't forget to initialize the VIEW_ID.
-const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
+const std::string orgpnt::ExportPanel::VIEW_ID = "my.organprint.views.exportpanel";
 
 
 
-void orgpnt::ImportPanel::CreateQtPartControl(QWidget* parent)
+void orgpnt::ExportPanel::CreateQtPartControl(QWidget* parent)
 {
     // Setting up the UI is a true pleasure when using .ui files, isn't it?
     m_Controls.setupUi(parent);
@@ -46,14 +46,14 @@ void orgpnt::ImportPanel::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.queryPacsButton, SIGNAL(clicked()), this, SLOT(QueryPacs()));
 }
 
-void orgpnt::ImportPanel::SetFocus()
+void orgpnt::ExportPanel::SetFocus()
 {
     m_Controls.openImageButton->setFocus();
 }
 
 
 
-void orgpnt::ImportPanel::OpenImageFromDisk()
+void orgpnt::ExportPanel::OpenImageFromDisk()
 {
 
     cout << "Thank you for clicking" << endl;
@@ -73,7 +73,7 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
     cout << "I guess that's it" << endl;
 }
 
-void orgpnt::ImportPanel::QueryPacs() {
+void orgpnt::ExportPanel::QueryPacs() {
     cout << "Thank you for querying PACS" << endl;
 }
 

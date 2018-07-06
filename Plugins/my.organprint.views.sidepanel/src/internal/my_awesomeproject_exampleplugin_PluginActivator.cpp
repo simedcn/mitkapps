@@ -24,7 +24,7 @@ US_INITIALIZE_MODULE
 
 void my_awesomeproject_exampleplugin_PluginActivator::start(ctkPluginContext* context)
 {
-    BERRY_REGISTER_EXTENSION_CLASS(AwesomeView, context);
+    //BERRY_REGISTER_EXTENSION_CLASS(AwesomeView, context);
     BERRY_REGISTER_EXTENSION_CLASS(orgpnt::ImportPanel, context);
 }
 

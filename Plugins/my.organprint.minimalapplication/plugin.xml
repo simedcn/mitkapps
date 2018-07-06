@@ -3,7 +3,9 @@
 <plugin>
   <extension id="my.organprint.minimalapplication" point="org.blueberry.osgi.applications">
     <application>
-      <run class="MinimalApplication"/>
+      <run class="MinimalApplication"
+        styles="resources/inoflat2.qss"
+/>
     </application>
   </extension>
 
