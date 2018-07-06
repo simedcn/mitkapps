@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 
 #include <QFileDialog>
+#include <berryPlatformUI.h>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -63,14 +64,20 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
                             nullptr,
                             QmitkIOUtil::GetFileOpenFilterString());
 
+
     if (fileNames.empty())
         return;
-
+    cout << "Loading the the files..." << endl;
     //d->setLastFileOpenPath(fileNames.front());
-    mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(nullptr),
-                                   false);
 
-    cout << "I guess that's it" << endl;
+
+
+    berry::IWorkbenchWindow::Pointer window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+
+    mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(window),
+                                   true);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
 }
 
 void orgpnt::ImportPanel::QueryPacs() {

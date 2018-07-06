@@ -24,16 +24,19 @@ MinimalPerspective::MinimalPerspective()
 
 void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
+
+    float selectorSize = 0.35f;
     QString editorArea = layout->GetEditorArea();
     QString stepSelectorId = "my.organprint.views.stepselector";
-    layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, 0.3f, editorArea);
-    layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.3f, editorArea);
-    layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::RIGHT,0.3f,stepSelectorId);
+    layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, selectorSize, editorArea);
+    layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.3, editorArea);
+    layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.3, editorArea);
+    layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::RIGHT,selectorSize,stepSelectorId);
     layout->SetEditorAreaVisible(false);
     QString prev_id = stepSelectorId;
     for (auto& viewId : MinimalApplication::VIEW_IDS)
     {
-        layout->AddStandaloneViewPlaceholder(viewId,berry::IPageLayout::RIGHT, 0.3f, stepSelectorId,false);
+        layout->AddStandaloneViewPlaceholder(viewId,berry::IPageLayout::RIGHT, selectorSize, stepSelectorId,false);
         auto view = layout->GetViewLayout(viewId);
         prev_id = viewId;
 

@@ -27,6 +27,7 @@ protected:
 
     vector<DataNode*> GetNodesToExport(DataStorage * storage);
 
+    bool isParent(DataStorage * storage, DataNode * node);
 
 
 

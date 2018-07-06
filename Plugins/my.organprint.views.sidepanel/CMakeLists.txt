@@ -1,4 +1,4 @@
-project(my_organprint_sidepanel)
+project(my_organprint_views_sidepanel)
 
 mitk_create_plugin(
   EXPORT_DIRECTIVE ORGANPRINT_SIDEPANEL_EXPORTS

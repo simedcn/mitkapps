@@ -66,6 +66,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
         : d(dd)
     {}
 
+
     Events::Types GetPartEventTypes() const override
     {
         return Events::CLOSED | Events::HIDDEN | Events::VISIBLE | Events::OPENED;
@@ -73,6 +74,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 
     void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override
     {
+        cout << "QmitkAwesomeWindowRenderPartClosed" << endl;
         if (partRef->GetId() == QmitkAwesomeRenderWindowEditor::EDITOR_ID)
         {
             QmitkAwesomeRenderWindowEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkAwesomeRenderWindowEditor>();
@@ -87,6 +89,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 
     void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override
     {
+        cout << "[QmitkAwesomeWindowRender] " << "PartHidden" << endl;
         if (partRef->GetId() == QmitkAwesomeRenderWindowEditor::EDITOR_ID)
         {
             QmitkAwesomeRenderWindowEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkAwesomeRenderWindowEditor>();
@@ -100,6 +103,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 
     void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override
     {
+        cout << "[QmitkAwesomeWindowRender] " << "PartVisible" << endl;
         if (partRef->GetId() == QmitkAwesomeRenderWindowEditor::EDITOR_ID)
         {
             QmitkAwesomeRenderWindowEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkAwesomeRenderWindowEditor>();
@@ -113,6 +117,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 
     void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override
     {
+        cout << "[QmitkAwesomeWindowRender] " << "PartOpened" << endl;
         if (partRef->GetId() == QmitkAwesomeRenderWindowEditor::EDITOR_ID)
         {
             QmitkAwesomeRenderWindowEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkAwesomeRenderWindowEditor>();
@@ -150,16 +155,19 @@ QmitkAwesomeRenderWindowEditor::QmitkAwesomeRenderWindowEditor()
 
 QmitkAwesomeRenderWindowEditor::~QmitkAwesomeRenderWindowEditor()
 {
+    cout << "[QmitkAwesomeWindowRender] " << "DestroyingRenderWindowEditor" << endl;
     this->GetSite()->GetPage()->RemovePartListener(d->m_PartListener.data());
 }
 
 QmitkStdMultiWidget* QmitkAwesomeRenderWindowEditor::GetStdMultiWidget()
 {
+    cout << "[QmitkAwesomeWindowRender] " << "GetStdMultiWidget" << endl;
     return d->m_StdMultiWidget;
 }
 
 QmitkRenderWindow *QmitkAwesomeRenderWindowEditor::GetActiveQmitkRenderWindow() const
 {
+    cout << "[QmitkAwesomeWindowRender] " << "GetActiveQMitkRenderWindow" << endl;
     if (d->m_StdMultiWidget) return d->m_StdMultiWidget->GetRenderWindow1();
     return 0;
 }
@@ -171,6 +179,8 @@ QHash<QString, QmitkRenderWindow *> QmitkAwesomeRenderWindowEditor::GetQmitkRend
 
 QmitkRenderWindow *QmitkAwesomeRenderWindowEditor::GetQmitkRenderWindow(const QString &id) const
 {
+    cout << "[QmitkAwesomeWindowRender] " << "GetMitkRenderWindow" << endl;
+
     if (d->m_RenderWindows.contains(id))
         return d->m_RenderWindows[id];
 
@@ -179,16 +189,19 @@ QmitkRenderWindow *QmitkAwesomeRenderWindowEditor::GetQmitkRenderWindow(const QS
 
 mitk::Point3D QmitkAwesomeRenderWindowEditor::GetSelectedPosition(const QString & /*id*/) const
 {
+    //cout << "[QmitkAwesomeWindowRender] " << "GetSelectedPosition" << endl;
     return d->m_StdMultiWidget->GetCrossPosition();
 }
 
 void QmitkAwesomeRenderWindowEditor::SetSelectedPosition(const mitk::Point3D &pos, const QString &/*id*/)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "SetSelectionPositions" << endl;
     d->m_StdMultiWidget->MoveCrossToPosition(pos);
 }
 
 void QmitkAwesomeRenderWindowEditor::EnableDecorations(bool enable, const QStringList &decorations)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "EnableDecorations" << endl;
     if (decorations.isEmpty() || decorations.contains(DECORATION_BORDER))
     {
         enable ? d->m_StdMultiWidget->EnableColoredRectangles()
@@ -217,6 +230,7 @@ void QmitkAwesomeRenderWindowEditor::EnableDecorations(bool enable, const QStrin
 
 bool QmitkAwesomeRenderWindowEditor::IsDecorationEnabled(const QString &decoration) const
 {
+    cout << "[QmitkAwesomeWindowRender] " << "IsDecorationEnabled" << endl;
     if (decoration == DECORATION_BORDER)
     {
         return d->m_StdMultiWidget->IsColoredRectanglesEnabled();
@@ -243,6 +257,7 @@ bool QmitkAwesomeRenderWindowEditor::IsDecorationEnabled(const QString &decorati
 
 QStringList QmitkAwesomeRenderWindowEditor::GetDecorations() const
 {
+    cout << "[QmitkAwesomeWindowRender] " << "Getting decorations" << endl;
     QStringList decorations;
     decorations << DECORATION_BORDER << DECORATION_LOGO << DECORATION_MENU << DECORATION_BACKGROUND << DECORATION_CORNER_ANNOTATION;
     return decorations;
@@ -250,11 +265,13 @@ QStringList QmitkAwesomeRenderWindowEditor::GetDecorations() const
 
 void QmitkAwesomeRenderWindowEditor::EnableSlicingPlanes(bool enable)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "EnableSlicingPlanes" << endl;
     d->m_StdMultiWidget->SetWidgetPlanesVisibility(enable);
 }
 
 bool QmitkAwesomeRenderWindowEditor::IsSlicingPlanesEnabled() const
 {
+    cout << "[QmitkAwesomeWindowRender] " << "IsSlicingPlanesEnabled" << endl;
     mitk::DataNode::Pointer node = this->d->m_StdMultiWidget->GetWidgetPlane1();
     if (node.IsNotNull())
     {
@@ -270,8 +287,10 @@ bool QmitkAwesomeRenderWindowEditor::IsSlicingPlanesEnabled() const
 
 void QmitkAwesomeRenderWindowEditor::CreateQtPartControl(QWidget* parent)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "CreateQtPartControl" << endl;
     if (d->m_StdMultiWidget == 0)
     {
+        cout << "[QmitkAwesomeWindowRender] " << "d->m_StdMultiWidget == 0" << endl;
         QHBoxLayout* layout = new QHBoxLayout(parent);
         layout->setContentsMargins(0,0,0,0);
 
@@ -342,6 +361,7 @@ void QmitkAwesomeRenderWindowEditor::CreateQtPartControl(QWidget* parent)
 
 void QmitkAwesomeRenderWindowEditor::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "OnPreferencesChanged" << endl;
     //Update internal members
     this->FillMembersWithCurrentDecorations();
     this->GetPreferenceDecorations(prefs);
@@ -413,6 +433,7 @@ void QmitkAwesomeRenderWindowEditor::OnPreferencesChanged(const berry::IBerryPre
 
 mitk::Color QmitkAwesomeRenderWindowEditor::HexColorToMitkColor(const QString& widgetColorInHex)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "HexColorToMitkColor" << endl;
     QColor qColor(widgetColorInHex);
     mitk::Color returnColor;
     float colorMax = 255.0f;
@@ -434,6 +455,7 @@ mitk::Color QmitkAwesomeRenderWindowEditor::HexColorToMitkColor(const QString& w
 
 QString QmitkAwesomeRenderWindowEditor::MitkColorToHex(const mitk::Color& color)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "MitkColorToHex" << endl;
     QColor returnColor;
     float colorMax = 255.0f;
     returnColor.setRed(static_cast<int>(color[0]* colorMax + 0.5));
@@ -444,6 +466,7 @@ QString QmitkAwesomeRenderWindowEditor::MitkColorToHex(const mitk::Color& color)
 
 void QmitkAwesomeRenderWindowEditor::FillMembersWithCurrentDecorations()
 {
+    cout << "[QmitkAwesomeWindowRender] " << "FillMembersWithCurrentDecorations" << endl;
     //fill members with current values (or default values) from the std multi widget
     for(unsigned int i = 0; i < 4; ++i)
     {
@@ -456,6 +479,7 @@ void QmitkAwesomeRenderWindowEditor::FillMembersWithCurrentDecorations()
 
 void QmitkAwesomeRenderWindowEditor::GetPreferenceDecorations(const berry::IBerryPreferences * preferences)
 {
+    cout << "[QmitkAwesomeWindowRender] " << "GetPreferenceDecorations" << endl;
     //overwrite members with values from the preferences, if they the prefrence is defined
     d->m_WidgetBackgroundColor1[0] = preferences->Get("widget1 first background color", d->m_WidgetBackgroundColor1[0]);
     d->m_WidgetBackgroundColor2[0] = preferences->Get("widget1 second background color", d->m_WidgetBackgroundColor2[0]);
@@ -479,6 +503,8 @@ void QmitkAwesomeRenderWindowEditor::GetPreferenceDecorations(const berry::IBerr
 
 void QmitkAwesomeRenderWindowEditor::InitializePreferences(berry::IBerryPreferences * preferences)
 {
+
+    cout << "[QmitkAwesomeWindowRender] " << "InitializePreferences" << endl;
     this->FillMembersWithCurrentDecorations(); //fill members
     this->GetPreferenceDecorations(preferences); //overwrite if preferences are defined
 
@@ -524,4 +550,5 @@ void QmitkAwesomeRenderWindowEditor::RequestActivateMenuWidget(bool on)
         }
     }
 }
+
 

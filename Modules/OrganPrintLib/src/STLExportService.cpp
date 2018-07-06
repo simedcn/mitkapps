@@ -61,8 +61,15 @@ DataNode * STLExportService::GetSelectedNode(DataStorage*) {
 
 DataNode * STLExportService::GetParentNode(DataStorage *storage, DataNode *node) {
 
-    return nullptr;
+    SetOfObjects sources = storage->GetSource(node);
 
+    if(sources.size() ==0) {
+        return nullptr;
+
+    }
+    else {
+        return sources[0];
+    }
 }
 vector<DataNode*> STLExportService::GetNodesToExport(DataStorage *storage) {
 
@@ -74,8 +81,9 @@ vector<DataNode*> STLExportService::GetNodesToExport(DataStorage *storage) {
         return empty;
     }
 
-
-
+}
+bool STLExportService::isParent(DataStorage * storage, DataNode*node) {
+    return GetParentNode(storage,node) == nullptr;
 }
 
 

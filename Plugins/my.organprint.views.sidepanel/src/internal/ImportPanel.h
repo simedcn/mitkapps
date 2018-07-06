@@ -53,8 +53,8 @@ public:
     void CreateQtPartControl(QWidget* parent) override;
 
 protected slots:
-    void ExportInSTL();
-    void SaveProject();
+    void OpenImageFromDisk();
+    void QueryPacs();
 
 private:
     // Typically a one-liner. Set the focus to the default widget.
