@@ -30,7 +30,7 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     QString stepSelectorId = "my.organprint.views.stepselector";
     layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, selectorSize, editorArea);
     layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.3, editorArea);
-    layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.3, editorArea);
+    layout->AddStandaloneView("org.mitk.views.properties", true, berry::IPageLayout::BOTTOM, 0.5, "org.mitk.views.datamanager");
     layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::RIGHT,selectorSize,stepSelectorId);
     layout->SetEditorAreaVisible(false);
     QString prev_id = stepSelectorId;

@@ -13,5 +13,10 @@
       name="Import Panel"
       class="orgpnt::ImportPanel"
       icon="resources/AwesomeIcon.png" />
-  </extension>
+
+  <view id="my.organprint.views.exportpanel"
+        name="Export Panel"
+        class="orgpnt::ExportPanel"
+        icon="resources/AwesomeIcon.png" />
+    </extension>
 </plugin>

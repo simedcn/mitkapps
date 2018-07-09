@@ -78,6 +78,9 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
                                    true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
+
+
+
 }
 
 void orgpnt::ImportPanel::QueryPacs() {

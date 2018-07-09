@@ -17,10 +17,10 @@
    <item>
     <widget class="QLabel" name="selectImageLabel">
      <property name="styleSheet">
-      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+      <string notr="true"></string>
      </property>
      <property name="text">
-      <string>First, open some image data</string>
+      <string></string>
      </property>
     </widget>
    </item>
@@ -43,19 +43,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="openImageButton">
+    <widget class="QPushButton" name="exportSTLButton">
      <property name="toolTip">
-      <string>Process selected image</string>
+      <string>Export the segmentation into a 3D printable format.</string>
      </property>
      <property name="text">
-      <string>Open data from disk</string>
+      <string>Export in STL</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="queryPacsButton">
+    <widget class="QPushButton" name="saveButton">
      <property name="text">
-      <string>Query data from PACS</string>
+      <string>Save project</string>
+     </property>
+     <property name="toolTip">
+     <string>Save the project and open later if you desires</string>
      </property>
     </widget>
    </item>

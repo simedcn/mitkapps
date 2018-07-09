@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::vector<QString> MinimalApplication::VIEW_IDS =
 {
     "my.organprint.views.importpanel",
+    "my.organprint.views.exportpanel",
     "org.mitk.views.segmentation",
     "org.mitk.views.properties"
 };
@@ -44,33 +45,35 @@ public:
 
     void PostWindowCreate() override
     {
+
         berry::WorkbenchWindowAdvisor::PostWindowCreate();
 
         berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
         if (window == nullptr)
             return;
+        /*
+            berry::IWorkbenchPage::Pointer page = window->GetActivePage();
+            if (page == nullptr)
+                return;
 
-        berry::IWorkbenchPage::Pointer page = window->GetActivePage();
-        if (page == nullptr)
-            return;
+            /// Open the first view.
+            for (unsigned long i = 0; i < MinimalApplication::VIEW_IDS.size(); i++)
+            {
+                const auto& view_id = MinimalApplication::VIEW_IDS[i];
+                berry::IViewPart::Pointer view = page->FindView(view_id);
+                bool to_open = (i == 0);
+                if (view != nullptr && to_open)
+                {   // Show view
 
-        /// Open the first view.
-        for (unsigned long i = 0; i < MinimalApplication::VIEW_IDS.size(); i++)
-        {
-            const auto& view_id = MinimalApplication::VIEW_IDS[i];
-            berry::IViewPart::Pointer view = page->FindView(view_id);
-            bool to_open = (i == 0);
-            if (view != nullptr && to_open)
-            {   // Show view
-
-                view = page->ShowView(view_id);
-                //view->SetStyleSheets("backgroud-color:#ff0000");
+                    view = page->ShowView(view_id);
+                    //view->SetStyleSheets("backgroud-color:#ff0000");
+                }
+                else if (view != nullptr && !to_open)
+                {   // Hide view
+                    page->HideView(view);
+                }
             }
-            else if (view != nullptr && !to_open)
-            {   // Hide view
-                page->HideView(view);
-            }
-        }
+            */
 
         /// Maximize the window.
         auto shell = window->GetShell();

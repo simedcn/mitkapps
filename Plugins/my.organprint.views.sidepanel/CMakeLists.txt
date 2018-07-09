@@ -3,5 +3,5 @@ project(my_organprint_views_sidepanel)
 mitk_create_plugin(
   EXPORT_DIRECTIVE ORGANPRINT_SIDEPANEL_EXPORTS
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS PRIVATE MitkQtWidgetsExt OrganPrintLib MitkSegmentation MitkIOExt AppInteraction OrganPrintLib
+  MODULE_DEPENDS PUBLIC MitkQtWidgetsExt MitkSegmentation MitkIOExt AppInteraction
 )

@@ -1,18 +1,22 @@
 set(CPP_FILES
   src/internal/my_awesomeproject_exampleplugin_PluginActivator.cpp
+  src/internal/STLExportService.cpp
   #src/internal/AwesomeView.cpp
   src/internal/ImportPanel.cpp
+  src/internal/ExportPanel.cpp
 )
 
 set(UI_FILES
   #src/internal/AwesomeViewControls.ui
   src/internal/ImportPanelControls.ui
+  src/internal/ExportPanelControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/my_awesomeproject_exampleplugin_PluginActivator.h
   #src/internal/AwesomeView.h
   src/internal/ImportPanel.h
+  src/internal/ExportPanel.h
 )
 
 # List of resource files that can be used by the plugin system without loading

@@ -69,7 +69,7 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
         { "my.organprint.views.importpanel",		ui.pushButton_1 },
         { "org.mitk.views.segmentation",			ui.pushButton_2 },
         { "", 	ui.pushButton_3 },
-        { "org.mitk.views.properties", 				ui.pushButton_4 }
+        { "my.organprint.views.exportpanel", 				ui.pushButton_4 }
     };
 
     QButtonGroup * group = new QButtonGroup();
