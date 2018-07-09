@@ -52,10 +52,10 @@ public:
     // associated signals and slots.
     void CreateQtPartControl(QWidget* parent) override;
 
-protected slots:
-    void OpenImageFromDisk();
-    void QueryPacs();
 
+protected slots:
+    void ExportInSTL();
+    void SaveProject();
 private:
     // Typically a one-liner. Set the focus to the default widget.
     void SetFocus() override;

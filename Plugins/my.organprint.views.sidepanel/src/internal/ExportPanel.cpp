@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ExportPanel.h"
 
+
+#include "STLExportService.h"
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
@@ -31,6 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 
+
+
+
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ExportPanel::VIEW_ID = "my.organprint.views.exportpanel";
 
@@ -42,38 +47,26 @@ void orgpnt::ExportPanel::CreateQtPartControl(QWidget* parent)
     m_Controls.setupUi(parent);
 
     // Wire up the UI widgets with our functionality.
-    connect(m_Controls.openImageButton, SIGNAL(clicked()), this, SLOT(OpenImageFromDisk()));
-    connect(m_Controls.queryPacsButton, SIGNAL(clicked()), this, SLOT(QueryPacs()));
+    connect(m_Controls.exportSTLButton, SIGNAL(clicked()), this, SLOT(ExportInSTL()));
+    connect(m_Controls.saveButton, SIGNAL(clicked()), this, SLOT(SaveProject()));
 }
 
 void orgpnt::ExportPanel::SetFocus()
 {
-    m_Controls.openImageButton->setFocus();
+    //m_Controls.openImageButton->setFocus();
 }
 
 
 
-void orgpnt::ExportPanel::OpenImageFromDisk()
-{
+void orgpnt::ExportPanel::ExportInSTL() {
 
-    cout << "Thank you for clicking" << endl;
+    STLExportService * service = new STLExportService();
+    QString path("/home/cyril/");
+    service->exportTo(path,GetDataStorage());
 
-    // Ask the user for a list of files to open
-    QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Open",
-                            nullptr,
-                            QmitkIOUtil::GetFileOpenFilterString());
-
-    if (fileNames.empty())
-        return;
-
-    //d->setLastFileOpenPath(fileNames.front());
-    mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(nullptr),
-                                   false);
-
-    cout << "I guess that's it" << endl;
 }
 
-void orgpnt::ExportPanel::QueryPacs() {
-    cout << "Thank you for querying PACS" << endl;
+void orgpnt::ExportPanel::SaveProject() {
+
 }
 
