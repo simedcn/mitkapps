@@ -44,6 +44,8 @@ public:
 	// Also, don't forget to initialize it in the implementation file.
 	static const std::string VIEW_ID;
 
+	using DataNodeList = list<mitk::DataNode::Pointer>;
+
 	StepSelector();
 	~StepSelector();
 

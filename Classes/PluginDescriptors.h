@@ -14,6 +14,7 @@ struct PluginDescriptor
 {
 public:
 	enum PluginPosistion;
+	enum PluginRole;
 
 public:
 	PluginDescriptor(initializer_list<QString> params);
@@ -23,7 +24,7 @@ public:
 	int order = -1;
 	QString id;
 	QString name;
-	bool is_main = false;
+	PluginRole role = PluginRole::PluginRole_secondary;
 	bool show_title = false;
 	PluginPosistion position = PluginPosistion_right;
 	bool is_open = true;
@@ -43,6 +44,12 @@ public:
 		PluginPosistion_bottom_right,
 		PluginPosistion_bottom,
 		PluginPosistion_bottom_left
+	};
+	enum PluginRole
+	{
+		PluginRole_main,
+		PluginRole_secondary,
+		PluginRole_pacs,
 	};
 };
 

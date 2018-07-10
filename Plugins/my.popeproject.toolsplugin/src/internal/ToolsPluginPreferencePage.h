@@ -51,7 +51,6 @@ protected:
 	QCheckBox* m_CheckBox_ShowPatientData;
 	QCheckBox* m_CheckBox_GroupTags;
 	QCheckBox* m_CheckBox_ShowStatistics;
-	QCheckBox* m_CheckBox_ShowHistogram;
 
 	QCheckBox* m_CheckBox_EditableText;
 };

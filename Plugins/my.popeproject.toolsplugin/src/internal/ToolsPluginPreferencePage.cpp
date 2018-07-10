@@ -51,8 +51,6 @@ void ToolsPluginPreferencePage::CreateQtControl(QWidget* parent)
 	viewOptionsLayout->addWidget(m_CheckBox_GroupTags);
 	m_CheckBox_ShowStatistics = new QCheckBox("Show statistics", m_MainControl);
 	viewOptionsLayout->addWidget(m_CheckBox_ShowStatistics);
-	m_CheckBox_ShowHistogram = new QCheckBox("Show histogram", m_MainControl);
-	viewOptionsLayout->addWidget(m_CheckBox_ShowHistogram);
 	formLayout->addRow("View", viewOptionsLayout);
 
 	m_CheckBox_EditableText = new QCheckBox("Set text editable", m_MainControl);
@@ -77,7 +75,6 @@ bool ToolsPluginPreferencePage::PerformOk()
 	m_ToolsPluginPreferencesNode->PutBool("show patient data", m_CheckBox_ShowPatientData->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("group tags", m_CheckBox_GroupTags->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("show statistics", m_CheckBox_ShowStatistics->isChecked());
-	m_ToolsPluginPreferencesNode->PutBool("show histogram", m_CheckBox_ShowHistogram->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("editable text", m_CheckBox_EditableText->isChecked());
 	return true;
 }
@@ -98,6 +95,5 @@ void ToolsPluginPreferencePage::Update()
 	m_CheckBox_ShowPatientData->setChecked(m_ToolsPluginPreferencesNode->GetBool("show patient data", true));
 	m_CheckBox_GroupTags->setChecked(m_ToolsPluginPreferencesNode->GetBool("group tags", true));
 	m_CheckBox_ShowStatistics->setChecked(m_ToolsPluginPreferencesNode->GetBool("show statistics", false));
-	m_CheckBox_ShowHistogram->setChecked(m_ToolsPluginPreferencesNode->GetBool("show histogram", false));
 	m_CheckBox_EditableText->setChecked(m_ToolsPluginPreferencesNode->GetBool("editable text", false));
 }

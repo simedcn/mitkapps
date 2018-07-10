@@ -7,6 +7,9 @@
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
 
+#include <service/event/ctkEventAdmin.h>
+#include <service/event/ctkEventConstants.h>
+
 #include <berryIPreferences.h>
 
 #include <list>
@@ -15,15 +18,19 @@ using namespace std;
 
 class DataManager : public QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  explicit DataManager(mitk::DataStorage* datastorage, QObject* parent = nullptr);
+	explicit DataManager(mitk::DataStorage* datastorage, QObject* parent = nullptr);
 
-//signals:
+signals:
+	void GonnaAddNewDataNode();
+	void NewDataNodeAdded();
 
 public slots:
 	int on_LoadImageSet(const QString& filenameAndDirectory);
 	int on_LoadImageFolder(const QString& directory);
+	void on_Action_OpenDICOMdataset_clicked(const ctkEvent& event);
+	void on_Action_OpenFolder_clicked(const ctkEvent& event);
 
 protected:
 	int AskAboutNewPatient();

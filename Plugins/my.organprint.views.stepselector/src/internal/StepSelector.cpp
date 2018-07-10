@@ -2,7 +2,7 @@
 #include "StepSelector.h"
 
 #include <berryISelectionService.h>
-#include "berryUIException.h"
+#include <berryUIException.h>
 #include <berryWorkbenchPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
@@ -16,19 +16,21 @@
 #include <QFile>
 #include <QFileDialog>
 
-#include "mitkLabel.h"
-#include "mitkToolManagerProvider.h"
-#include "mitkOtsuSegmentationFilter.h"
-#include "mitkImageToSurfaceFilter.h"
-#include "mitkIOUtil.h"
+#include <mitkLabel.h>
+#include <mitkToolManagerProvider.h>
+#include <mitkOtsuSegmentationFilter.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkIOUtil.h>
+#include <mitkIDataStorageService.h>
+#include <QmitkDataNodeSelectionProvider.h>
 
 // us
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModuleResource.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
 
-#include "itkImageRegionIterator.h"
-#include "mitkImageCast.h"
+#include <itkImageRegionIterator.h>
+#include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkPaintbrushTool.h>
 #include <QFile>
@@ -150,10 +152,35 @@ void StepSelector::SetFocus()
 {
 }
 
-void StepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& dataNodes)
+void StepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
 {
+	/// Make invisible all the nodes but the selected ones.
+	auto pluginContext = my_awesomeproject_stepselector_PluginActivator::GetPluginContext();
+	ctkServiceReference serviceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
+	mitk::IDataStorageService* storageService = pluginContext->getService<mitk::IDataStorageService>(serviceReference);
+	mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+	auto all_nodes = dataStorage->GetAll();
+	for (auto datanode : *all_nodes)
+	{
+		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+		if (!image)
+			continue;
 
-    cout << &dataNodes << endl;
+		bool is_selected_node = false;
+		for (auto selected_node : selectedDataNodes)
+		{
+			if (datanode.GetPointer() == selected_node.GetPointer())
+			{
+				is_selected_node = true;
+				break;
+			}
+		}
+		datanode->SetBoolProperty("visible", is_selected_node);
+	}
+	this->RequestRenderWindowUpdate();
+
+
+    cout << &selectedDataNodes << endl;
 
 }
 

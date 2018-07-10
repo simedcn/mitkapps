@@ -38,8 +38,9 @@ void sort_by_order(ViewDescriptors view_descs)
 }
 
 
-MainWorkbenchWindowAdvisor::MainWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor, berry::IWorkbenchWindowConfigurer::Pointer configurer, const initializer_list<PluginDescriptor>& plugins, const QString& preferencesNode)
+MainWorkbenchWindowAdvisor::MainWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor, berry::IWorkbenchWindowConfigurer::Pointer configurer, const initializer_list<PluginDescriptor>& plugins, const QString& preferencesNode, bool addProjectLabel)
 	: QmitkExtWorkbenchWindowAdvisor(wbAdvisor, configurer)
+	, addProjectLabel(addProjectLabel)
 {
 	// Set plugins
 	PluginDescriptors::set(plugins);
@@ -158,7 +159,7 @@ void MainWorkbenchWindowAdvisor::replaceViewActions(berry::IWorkbenchWindow::Poi
 		viewActions.push_back(viewAction);
 	}
 }
-void MainWorkbenchWindowAdvisor::createViewMenu(QMainWindow* mainWindow)
+void MainWorkbenchWindowAdvisor::createViewMenu()
 {
 	if (!showViewMenuItem)
 		return;
@@ -196,7 +197,7 @@ void MainWorkbenchWindowAdvisor::createViewMenu(QMainWindow* mainWindow)
 		MITK_WARN << "Failed to populate the menu Window-->Show_View.";
 	}
 }
-void MainWorkbenchWindowAdvisor::updateMainToolbar(QMainWindow* mainWindow)
+void MainWorkbenchWindowAdvisor::updateMainToolbar()
 {
 /*	/// Delete text labels of SaveProject, closeProject and openDicomEditor actions.
 	if (fileSaveProjectAction != nullptr)
@@ -218,7 +219,7 @@ void MainWorkbenchWindowAdvisor::updateMainToolbar(QMainWindow* mainWindow)
 		return;
 
 	/// Find the main toolbar.
-	QList<QToolBar*> toolbars = mainWindow->findChildren<QToolBar *>();
+	QList<QToolBar*> toolbars = mainWindow->findChildren<QToolBar*>();
 	QToolBar* mainActionsToolBar = nullptr;
 	for (auto& toolbar : toolbars)
 	{
@@ -228,10 +229,35 @@ void MainWorkbenchWindowAdvisor::updateMainToolbar(QMainWindow* mainWindow)
 			break;
 		}
 	}
-	/// Find fileOpen action and delete its text.
+
 	if (mainActionsToolBar != nullptr)
 	{
+		auto actions = mainActionsToolBar->actions();
 		mainActionsToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+		
+		if (addProjectLabel)
+		{
+			///// Delete all actions and save them.
+			//for (auto action : mainActionsToolBar->actions())
+			//{
+			//	mainActionsToolBar->removeAction(action);
+			//}
+
+			/// Add the label "Project:".
+			auto labelButton = new QToolButton;
+			labelButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+			labelButton->setText("Project:");
+			labelButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
+			if (false && actions.size() == 0)
+				mainActionsToolBar->addWidget(labelButton);
+			else
+				mainActionsToolBar->insertWidget(actions.front(), labelButton);
+
+			///// Add all the saved actions.
+			//mainActionsToolBar->addActions(actions);
+		}
+
+		/// Find fileOpen action and delete its text.
 		QAction* fileOpenAction = nullptr;
 		for (auto& action : mainActionsToolBar->actions())
 		{
@@ -256,7 +282,7 @@ void MainWorkbenchWindowAdvisor::updateMainToolbar(QMainWindow* mainWindow)
 		MITK_WARN << "Failed to set the main toolbar";
 	}
 }
-void MainWorkbenchWindowAdvisor::createViewToolbar(berry::IWorkbenchWindow::Pointer window, QMainWindow* mainWindow, ViewDescriptors viewDescriptors)
+void MainWorkbenchWindowAdvisor::createViewToolbar(berry::IWorkbenchWindow::Pointer window, ViewDescriptors viewDescriptors)
 {
 	if (!showViewToolbar)
 		return;
@@ -274,21 +300,21 @@ void MainWorkbenchWindowAdvisor::createViewToolbar(berry::IWorkbenchWindow::Poin
 	}
 
 	/// Add View toolbar.
-	QToolBar* toolbar = new QToolBar;
-	mainWindow->addToolBar(toolbar);
-	toolbar->setObjectName("View Toolbar");
+	this->viewToolbar = new QToolBar;
+	mainWindow->addToolBar(viewToolbar);
+	viewToolbar->setObjectName("ViewToolbar");
 
-	/// Add the label "Tabs:"
+	/// Add the label "Tabs:".
 	auto labelButton = new QToolButton;
 	labelButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
 	labelButton->setText("Tabs:");
 	labelButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
-	toolbar->addWidget(labelButton);
+	viewToolbar->addWidget(labelButton);
 
 	/// Add View actions.
-	toolbar->addActions(actions);
+	viewToolbar->addActions(actions);
 }
-void MainWorkbenchWindowAdvisor::findSubMenus(QMainWindow* mainWindow, QMenu** windowMenu, QMenu** editMenu)
+void MainWorkbenchWindowAdvisor::findSubMenus(QMenu** windowMenu, QMenu** editMenu)
 {
 	if (mainWindow == nullptr)
 		return;
@@ -360,7 +386,7 @@ void MainWorkbenchWindowAdvisor::setMenuPreferencesItem(QMenu* windowMenu, QMenu
 		MITK_WARN << "Failed to set the Preferences menu";
 	}
 }
-void MainWorkbenchWindowAdvisor::removeRedoAndUndo(QMainWindow* mainWindow, QMenu* editMenu)
+void MainWorkbenchWindowAdvisor::removeRedoAndUndo(QMenu* editMenu)
 {
 	if (mainWindow == nullptr)
 		return;
@@ -457,7 +483,7 @@ void MainWorkbenchWindowAdvisor::removeRedoAndUndo(QMainWindow* mainWindow, QMen
 	else
 		MITK_WARN << "Failed to set the redo action";
 }
-void MainWorkbenchWindowAdvisor::removeImageNavigatorToggle(QMainWindow* mainWindow)
+void MainWorkbenchWindowAdvisor::removeImageNavigatorToggle()
 {
 	if (mainWindow == nullptr)
 		return;
@@ -617,26 +643,26 @@ void MainWorkbenchWindowAdvisor::PostWindowCreate()
 
 	/// Create View menu.
 	// very bad hack...
-	QMainWindow* mainWindow = qobject_cast<QMainWindow*> (window->GetShell()->GetControl());
-	createViewMenu(mainWindow);
+	this->mainWindow = qobject_cast<QMainWindow*> (window->GetShell()->GetControl());
+	createViewMenu();
 
 	/// Update Main Toolbar.
-	updateMainToolbar(mainWindow);
+	updateMainToolbar();
 
 	/// Create View toolbar.
 	sort_by_order(viewDescriptors);
-	createViewToolbar(window, mainWindow, viewDescriptors);
+	createViewToolbar(window, viewDescriptors);
 
 	/// Move Preferences from Window menu to Edit menu.
 	QMenu* windowMenu = nullptr;
 	QMenu* editMenu = nullptr;
-	findSubMenus(mainWindow, &windowMenu, &editMenu);
+	findSubMenus(&windowMenu, &editMenu);
 	setMenuPreferencesItem(windowMenu, editMenu);
 
 	/// Remove the redo and undo actions.
-	removeRedoAndUndo(mainWindow, editMenu);
+	removeRedoAndUndo(editMenu);
 	/// Remove Image Navigator toggle
-	removeImageNavigatorToggle(mainWindow);
+	removeImageNavigatorToggle();
 
 	/// If the window state is restored:
 	if (!is_restored)

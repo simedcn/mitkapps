@@ -7,5 +7,7 @@
   </qresource>
   <qresource prefix="/images">
     <file>logo48.png</file>
+    <file>dicom.svg</file>
+    <file>preferences-system.png</file>
   </qresource>
 </RCC>

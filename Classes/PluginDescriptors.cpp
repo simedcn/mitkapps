@@ -61,7 +61,10 @@ PluginDescriptor::PluginDescriptor(initializer_list<QString> params)
 	this->name = *it++;
 
 	const QString& role = *it++;
-	this->is_main = (role.toLower() == "main");
+	this->role = 
+		(role.toLower() == "main") ? PluginRole_main :
+		(role.toLower() == "pacs") ? PluginRole_pacs :
+		PluginRole_secondary;
 
 	const QString& title_visibility = *it++;
 	this->show_title = (title_visibility.toLower() == "yes");
@@ -88,10 +91,6 @@ return id;
 const QString& PluginDescriptor::Name() const
 {
 return name;
-}
-bool PluginDescriptor::IsMain() const
-{
-return is_main;
 }
 bool PluginDescriptor::IsTitleVisible() const
 {

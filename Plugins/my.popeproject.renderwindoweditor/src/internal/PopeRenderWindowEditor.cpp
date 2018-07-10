@@ -203,6 +203,8 @@ void PopeRenderWindowEditor::CreateQtPartControl(QWidget* parent)
     connect(d->m_centralWindow, &MainWindow::ImageSetHasToBeLoaded, m_DataManager.get(), &DataManager::on_LoadImageSet);
 	connect(d->m_centralWindow, &MainWindow::ImageFolderHasToBeLoaded, m_DataManager.get(), &DataManager::on_LoadImageFolder);
     connect(d->m_centralWindow, &MainWindow::EnableAutoRotation, this, &PopeRenderWindowEditor::on_EnableAutoRotation);
+	connect(m_DataManager.get(), &DataManager::GonnaAddNewDataNode, d->m_centralWindow, &MainWindow::On_DataManager_GonnaAddNewDataNode);
+	connect(m_DataManager.get(), &DataManager::NewDataNodeAdded, d->m_centralWindow, &MainWindow::On_DataManager_NewDataNodeAdded);
 
     // Tell the multiWidget which (part of) the tree to render
     d->m_StdMultiWidget->SetDataStorage(ds);
@@ -217,6 +219,7 @@ void PopeRenderWindowEditor::CreateQtPartControl(QWidget* parent)
 
     // Enable standard handler for levelwindow-slider
     d->m_StdMultiWidget->EnableStandardLevelWindow();
+	d->m_centralWindow->RegisterLevelWindowObserver();
 
     // Add the displayed views to the tree to see their positions
     // in 2D and 3D
