@@ -33,6 +33,9 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     layout->AddStandaloneView("org.mitk.views.properties", true, berry::IPageLayout::BOTTOM, 0.5, "org.mitk.views.datamanager");
     layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::RIGHT,selectorSize,stepSelectorId);
     layout->SetEditorAreaVisible(false);
+
+
+
     QString prev_id = stepSelectorId;
     for (auto& viewId : MinimalApplication::VIEW_IDS)
     {

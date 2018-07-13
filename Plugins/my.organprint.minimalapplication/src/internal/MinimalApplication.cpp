@@ -51,6 +51,8 @@ public:
         berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
         if (window == nullptr)
             return;
+
+
         /*
             berry::IWorkbenchPage::Pointer page = window->GetActivePage();
             if (page == nullptr)

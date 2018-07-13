@@ -61,9 +61,14 @@ void orgpnt::ExportPanel::SetFocus()
 void orgpnt::ExportPanel::ExportInSTL() {
 
     STLExportService * service = new STLExportService();
-    QString path("/home/cyril/");
-    service->exportTo(path,GetDataStorage());
+    QString dir = QFileDialog::getExistingDirectory(nullptr, tr("Open Directory"),
+                  QString(), // standard path
+                  QFileDialog::ShowDirsOnly
+                  | QFileDialog::DontResolveSymlinks);
 
+    if(dir != nullptr) {
+        service->exportTo(dir,GetDataStorage());
+    }
 }
 
 void orgpnt::ExportPanel::SaveProject() {

@@ -74,7 +74,7 @@ Configure</string>
    <item>
     <widget class="QPushButton" name="pushButton_4">
      <property name="text">
-      <string>4
+      <string>3
 Export</string>
      </property>
      <property name="checkable">
