@@ -43,6 +43,9 @@ bool STLExportService::exportTo(QString & dir, const DataNode * dataNode) {
 
     mitk::IOUtil::Save(surface, sstr.str());
 
+    //writer->SetFileName(sstr.str().c_str());
+    //writer->SetInputData(surface->GetVtkPolyData());
+    //writer->Update();
     return true;
 
 }

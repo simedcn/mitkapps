@@ -34,7 +34,9 @@
 #include <QFile>
 #include <itkBinaryThresholdImageFilter.h>
 #include "my_awesomeproject_stepselector_PluginActivator.h"
-#include <QButtonGroup>
+
+
+
 // Don't forget to initialize the VIEW_ID.
 const string StepSelector::VIEW_ID = "my.organprint.views.stepselector";
 
@@ -72,7 +74,7 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
         { "my.organprint.views.exportpanel", 				ui.pushButton_4 }
     };
 
-    QButtonGroup * group = new QButtonGroup();
+    group = new QButtonGroup();
     // Connect Signals and Slots of the Plugin UI
     for (unsigned long i = 0; i < m_steps.size(); i++)
     {
@@ -83,12 +85,28 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
 
     }
 
+    group->setExclusive(true);
+
     connect(group,SIGNAL(buttonClicked(int)),this,SLOT(on_pushButton_clicked(int)));
 
     on_pushButton_clicked(0);
 
     // Initialize the first step
     m_steps[1].button->toggled(true);
+
+
+    // registering event
+
+    ctkDictionary propsForSlot;
+    propsForSlot[ctkEventConstants::EVENT_TOPIC] = "my/organprint/stepselector";
+    ctkPluginContext * pluginContext = my_awesomeproject_stepselector_PluginActivator::GetPluginContext();
+    ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();
+    if (ref)
+    {
+        ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
+        eventAdmin->subscribeSlot(this, SLOT(onChangeStepEvent(ctkEvent)), propsForSlot);
+    }
+
 }
 
 StepSelector::StepSelector()
@@ -125,9 +143,13 @@ void StepSelector::selectView(int n)
         {
 
             cout << "currentStep = " << m_currentStep << " | i = " << i << endl;
+
+
+
             if (i == m_currentStep && view == nullptr)
             {   // Open
-                step.button->toggled(true);
+                //step.button->checked(true);
+
                 page->ShowView(step.pluginId);
                 //step.button->setStyleSheet("background-color: #3399cc");
 
@@ -159,5 +181,14 @@ void StepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QLis
 
 void StepSelector::on_pushButton_clicked(int step)
 {
+    cout << "on_pushButton_clicked " << step << endl;
     selectView(step);
+}
+void StepSelector::onChangeStepEvent(const ctkEvent & event) {
+    cout << "onChangeStepEvent " << event.getProperty("step").toInt() << endl;
+    int id = event.getProperty("step").toInt();
+    //group->buttonClicked(id);
+    group->button(id)->setChecked(true);
+    selectView(id);
+
 }

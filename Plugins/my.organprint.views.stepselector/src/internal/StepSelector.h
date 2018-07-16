@@ -9,6 +9,9 @@
 
 #include <memory>
 #include <vector>
+#include <service/event/ctkEventConstants.h>
+#include <service/event/ctkEventAdmin.h>
+#include "my_awesomeproject_stepselector_PluginActivator.h"
 
 using namespace std;
 
@@ -19,15 +22,17 @@ using namespace std;
 // Use Qt Creator to view and edit .ui files. The generated header file
 // provides a class that contains all of the UI widgets.
 #include <ui_StepSelectorControls.h>
+#include <QButtonGroup>
+
 
 namespace mitk
 {
-	class LabelSetImage;
-	class LabelSet;
-	class Label;
-	class DataStorage;
-	class ToolManager;
-	class DataNode;
+class LabelSetImage;
+class LabelSet;
+class Label;
+class DataStorage;
+class ToolManager;
+class DataNode;
 }
 
 struct StepDescriptor;
@@ -37,45 +42,50 @@ struct StepDescriptor;
 // at least the two methods CreateQtPartControl() and SetFocus().
 class StepSelector : public QmitkAbstractView
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	// This is a tricky one and will give you some headache later on in your debug sessions if it has been forgotten.
-	// Also, don't forget to initialize it in the implementation file.
-	static const std::string VIEW_ID;
+    // This is a tricky one and will give you some headache later on in your debug sessions if it has been forgotten.
+    // Also, don't forget to initialize it in the implementation file.
+    static const std::string VIEW_ID;
 
-	StepSelector();
-	~StepSelector();
+    StepSelector();
+    ~StepSelector();
 
-	// In this method we initialize the GUI components and connect the associated signals and slots.
-	void CreateQtPartControl(QWidget* parent) override;
+    // In this method we initialize the GUI components and connect the associated signals and slots.
+    void CreateQtPartControl(QWidget* parent) override;
+
 
 private:
-	// Typically a one-liner. Set the focus to the default widget.
-	void SetFocus() override;
+    // Typically a one-liner. Set the focus to the default widget.
+    void SetFocus() override;
 
-	// This method is conveniently called whenever the selection of Data Manager items changes.
-	void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer>& dataNodes) override;
+    // This method is conveniently called whenever the selection of Data Manager items changes.
+    void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer>& dataNodes) override;
 
-	void selectView(int n);
+    void selectView(int n);
 
-	// Generated from the associated UI file, it encapsulates all the widgets of our view.
-	Ui::StepSelectorControls ui;
-	mitk::ToolManager *m_ToolManager;
-	int m_currentStep;
-	vector<StepDescriptor> m_steps;
+    // Generated from the associated UI file, it encapsulates all the widgets of our view.
+    Ui::StepSelectorControls ui;
+    mitk::ToolManager *m_ToolManager;
+    int m_currentStep;
+    vector<StepDescriptor> m_steps;
+
+    QButtonGroup * group;
 
 private slots:
-	void on_pushButton_clicked(int step);
+    void on_pushButton_clicked(int step);
+
+
+public slots:
+    void onChangeStepEvent(const ctkEvent&);
 };
-
-
 struct StepDescriptor
 {
-	QString pluginId;
-	QPushButton* button;
+    QString pluginId;
+    QPushButton* button;
 
-	StepDescriptor(const QString& pluginId, QPushButton* button);
+    StepDescriptor(const QString& pluginId, QPushButton* button);
 };
 
 #endif

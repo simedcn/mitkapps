@@ -621,3 +621,18 @@ QSplitter {
 #StepSelectorControls QPushButton:hover {
     background-color:  #260D17;
 }
+
+
+QProgressBar {
+    border:0;
+    border-radius: 0px;
+    text-align: center;
+    margin:0;
+    padding:0;
+    
+}
+QProgressBar::chunk {
+    background-color:  #7E2A65;
+    margin:0;
+
+}

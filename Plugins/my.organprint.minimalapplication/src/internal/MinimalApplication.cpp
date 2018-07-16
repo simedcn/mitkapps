@@ -22,9 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryWorkbenchPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
-
+#include <QStatusBar>
 #include <QPoint>
-
+#include <QmitkProgressBar.h>
+#include <QMainWindow>
+#include <QLayout>
+//#include <QmitkStatusBar.h>
 
 
 const std::vector<QString> MinimalApplication::VIEW_IDS =
@@ -49,9 +52,20 @@ public:
         berry::WorkbenchWindowAdvisor::PostWindowCreate();
 
         berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
+        QMainWindow* mainWindow = static_cast<QMainWindow*>(window->GetShell()->GetControl());
         if (window == nullptr)
             return;
 
+        auto   qStatusBar = new QStatusBar();
+        //auto  statusBar = new QmitkStatusBar(qStatusBar);
+        auto  progBar = new QmitkProgressBar();
+        //progBar->SetSizeGripEnabled(false);
+        qStatusBar->addPermanentWidget(progBar, 100);
+        qStatusBar->setSizeGripEnabled(false);
+        //progBar->hide();
+        progBar->Progress(100);
+        mainWindow->setStatusBar(qStatusBar);
+        mainWindow->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
 
         /*
             berry::IWorkbenchPage::Pointer page = window->GetActivePage();

@@ -23,13 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 US_INITIALIZE_MODULE
 
+ctkPluginContext * my_awesomeproject_exampleplugin_PluginActivator::context;
+
 void my_awesomeproject_exampleplugin_PluginActivator::start(ctkPluginContext* context)
 {
     //BERRY_REGISTER_EXTENSION_CLASS(AwesomeView, context);
     BERRY_REGISTER_EXTENSION_CLASS(orgpnt::ImportPanel, context);
     BERRY_REGISTER_EXTENSION_CLASS(orgpnt::ExportPanel, context);
+    this->context = context;
 }
 
 void my_awesomeproject_exampleplugin_PluginActivator::stop(ctkPluginContext*)
 {
+}
+
+ctkPluginContext * my_awesomeproject_exampleplugin_PluginActivator::GetPluginContext() {
+    return context;
 }

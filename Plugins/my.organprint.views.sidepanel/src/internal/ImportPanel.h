@@ -61,6 +61,7 @@ private:
     void SetFocus() override;
 
 
+    void next();
 
     // Generated from the associated UI file, it encapsulates all the widgets
     // of our view.

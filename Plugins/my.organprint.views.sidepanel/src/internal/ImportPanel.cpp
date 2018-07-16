@@ -31,6 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <berryPlatformUI.h>
+#include "my_awesomeproject_exampleplugin_PluginActivator.h"
+#include <QVariant>
+#include <service/event/ctkEventConstants.h>
+#include <service/event/ctkEventAdmin.h>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -79,11 +83,24 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 
-
+    next();
 
 }
 
 void orgpnt::ImportPanel::QueryPacs() {
     cout << "Thank you for querying PACS" << endl;
+}
+
+void orgpnt::ImportPanel::next() {
+    ctkPluginContext * context = my_awesomeproject_exampleplugin_PluginActivator::GetPluginContext();
+    ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
+    if (ref)
+    {
+        ctkEventAdmin* eventAdmin = context->getService<ctkEventAdmin>(ref);
+        ctkDictionary properties;
+        properties["step"] = QVariant(1);
+        ctkEvent changeStepEvent("my/organprint/stepselector", properties);
+        eventAdmin->sendEvent(changeStepEvent);
+    }
 }
 
