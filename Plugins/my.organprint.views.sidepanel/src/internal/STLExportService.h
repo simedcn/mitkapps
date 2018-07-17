@@ -18,6 +18,8 @@ public:
     typedef mitk::DataStorage::SetOfObjects SetOfObjects;
     bool exportTo(QString & path, const DataNode * dataNode);
     int exportTo(QString & path, DataStorage * storage);
+    void exportToCsv(QString & path, DataStorage * storage, const DataNode *);
+
 
 protected:
 
@@ -26,6 +28,8 @@ protected:
     const DataNode * GetParentNode(DataStorage * storage, const DataNode * node);
 
     SetOfObjects::ConstPointer GetNodesToExport(DataStorage * storage,const DataNode * selection);
+
+    SetOfObjects::ConstPointer GetVisibleParentNodes(DataStorage * storage);
 
     bool isParent(DataStorage * storage, const DataNode * node);
 public:
