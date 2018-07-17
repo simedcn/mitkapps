@@ -111,7 +111,7 @@ public:
         // Set an individual initial size
         configurer->SetInitialSize(QPoint(1200, 800));
         // Set an individual title
-        configurer->SetTitle("Minimal Application");
+        configurer->SetTitle("OrganPrint App");
         // Enable or disable the perspective bar
         configurer->SetShowPerspectiveBar(false);
         configurer->SetShowMenuBar(true);
