@@ -4,8 +4,11 @@
 #include <QTextStream>
 #include <mitkIOUtil.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateFirstLevel.h>
 #include <QFile>
-
+#include "itkImageRegionIterator.h"
+#include "mitkImageCast.h"
 STLExportService::STLExportService()
 {
 
@@ -56,6 +59,7 @@ int STLExportService::exportTo(QString & path, DataStorage * storage) {
 
     const DataNode * selection = GetSelectedNode(storage);
 
+    // gets all the segmented area of the data storage depending on the selection
     SetOfObjects::ConstPointer exportList = GetNodesToExport(storage,selection);
 
     if(!exportList) {
@@ -66,11 +70,13 @@ int STLExportService::exportTo(QString & path, DataStorage * storage) {
     const DataNode * dataNode;
     SetOfObjects::ConstIterator it = exportList->Begin();
     while(it != exportList->End()) {
-
-
-
         dataNode = it->Value();
         exportTo(path,dataNode);
+        std::stringstream outputFile;
+        outputFile << path.toStdString() << "/" << dataNode->GetName() << ".csv";
+        // export the value of all the visible pixels inside the selection
+        QString finalPath = QString::fromStdString(outputFile.str());
+        exportToCsv(finalPath,storage,dataNode);
         it++;
         count++;
     }
@@ -127,7 +133,113 @@ void STLExportService::Log(const char msg[]) {
     cout << "[STLExportService] " << msg << endl;
 }
 
+void STLExportService::exportToCsv(QString & imagePath, DataStorage * storage, const DataNode * node) {
+    QFile data(imagePath);
+
+    cout << "Exportin in CSV " << imagePath.toStdString() << endl;
+
+    if (!data.open(QFile::WriteOnly | QFile::Truncate))
+        return;
+
+    QTextStream output(&data);
+
+
+    QString segmentationName = QString::fromStdString(node->GetName());
+    cout << "segmentationName: " << segmentationName.toStdString();
+    //QModelIndex index = m_Controls.listWidget->currentIndex();
+    //QString itemText = index.data(Qt::DisplayRole).toString();
+    //MITK_INFO << itemText;
+    QString header = "x,y,z";
+    header = header + "," + segmentationName;
+    //for(int row = 0; row < m_Controls.listWidget->count(); row++)
+    // {
+    //     QListWidgetItem *item = m_Controls.listWidget->item(row);
+    //     header = header + "," + item->text();
+    // }
+    output << header << "\n";
+    cout << header.toStdString() << endl;
+    // Now iterate through image and write down all voxel positions and image values
+    // Here we use ITK to do this
+    typedef itk::Image<unsigned char, 3> TSegmentationImage;
+    typedef itk::Image<double, 3> TFeatureImage;
+    typedef TFeatureImage::Pointer PTFeatureImage;
+
+
+
+    mitk::Image* img = dynamic_cast<mitk::Image*>(node->GetData());
+    // Create a new ITK image and assign the content of the MITK image to it
+    TSegmentationImage::Pointer itkImg = TSegmentationImage::New();
+    mitk::CastToItkImage(img,itkImg);
+
+    std::vector<PTFeatureImage> featImgs;
+    SetOfObjects::ConstPointer visibleParents = GetVisibleParentNodes(storage);
+    SetOfObjects::ConstIterator iterator = visibleParents->Begin();
+    DataNode::ConstPointer parent;
+    while(iterator != visibleParents->End()) {
+
+
+        parent = iterator->Value();
+
+
+        cout << "Parent: " << parent->GetName() << endl;
+        //for(int row = 0; row < m_Controls.listWidget->count(); row++)
+        //{
+
+        //  QListWidgetItem *item = m_Controls.listWidget->item(row);
+        if(storage->GetSources(parent)->Size() == 0) {
+            mitk::Image* img = dynamic_cast<mitk::Image*>(parent->GetData());
+            PTFeatureImage itkImg = TFeatureImage::New();
+            mitk::CastToItkImage(img,itkImg);
+            featImgs.push_back(itkImg);
+        }
+        iterator++;
+    }
+
+    // Use an itk image iterator to walk through all voxel of the segmentation
+    itk::ImageRegionIterator<TSegmentationImage> it(itkImg, itkImg->GetLargestPossibleRegion());
+    while (!it.IsAtEnd())
+    {
+        QString voxelValues;
+        if (it.Get() != 0)
+        {
+            // the position of the iterator in index position
+            TSegmentationImage::IndexType index =  it.GetIndex();
+            // using the segmentation images geometry the index is mapped to a point in world coordinates
+            itk::Point<double, 3> worldPos;
+            itkImg->TransformIndexToPhysicalPoint(index, worldPos);
+            voxelValues = voxelValues + QString::number(worldPos[0]) + "," + QString::number(worldPos[1]) + "," + QString::number(worldPos[2]);
+            voxelValues = voxelValues + "," + QString::number(it.Get());
+            // mapping the world coordinates to index coordinates for each image separately
+            // NOTE: this is only necesary when we cannot be sure that all images match perfectly
+            // Index Coordinates can be used directly if the following is given:
+            // - Images all have the same dimensions, i.e. same resolution in each direction AND
+            // - origin, spacing and orientation are exactly the same.
+            for (auto featureImg : featImgs )
+            {
+                TFeatureImage::IndexType fIndex;
+                featureImg->TransformPhysicalPointToIndex(worldPos, fIndex);
+                // check if this position exists in the current image
+                if (featureImg->GetLargestPossibleRegion().IsInside(fIndex))
+                    voxelValues = voxelValues + "," + QString::number(featureImg->GetPixel(fIndex));
+                else
+                    voxelValues = voxelValues + ",0";
+            }
+            output << voxelValues << "\n";
+        }
+        ++it;
+    }
+
+}
+
 IsSelectedPredicate::IsSelectedPredicate()  {
+
+}
+
+
+STLExportService::SetOfObjects::ConstPointer STLExportService::GetVisibleParentNodes(DataStorage * storage) {
+
+
+    return storage->GetSubset(mitk::NodePredicateProperty::New("visible",mitk::BoolProperty::New(true)));
 
 }
 
