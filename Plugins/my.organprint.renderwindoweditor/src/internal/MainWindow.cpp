@@ -42,7 +42,7 @@ MainWindow::MainWindow(QmitkStdMultiWidget* multiWidget, QWidget *parent) :
     // Tell the multiWidget which DataStorage to render
 
     ui->Patient_display_layout->addWidget(m_MultiWidget);
-
+    multiWidget->DisableDepartmentLogo();
     //  bool flag = true;
 
 

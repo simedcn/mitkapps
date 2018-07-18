@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkProgressBar.h>
 #include <QMainWindow>
 #include <QLayout>
+#include <mitkWorkbenchUtil.h>
+#include "my_organprint_minimalapplication_Activator.h"
 //#include <QmitkStatusBar.h>
 
 
@@ -116,6 +118,8 @@ public:
         configurer->SetShowPerspectiveBar(false);
         configurer->SetShowMenuBar(true);
         //return new berry::WorkbenchWindowAdvisor(configurer);
+        ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
+        mitk::WorkbenchUtil::SetDepartmentLogoPreference(":/images/logo.png", context);
         return new OrganPrintWorkbenchWindowAdvisor(configurer);
     }
 
