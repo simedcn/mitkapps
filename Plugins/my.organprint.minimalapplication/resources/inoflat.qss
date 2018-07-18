@@ -7,7 +7,7 @@
 
 
 QWidget {
-  background-color:  #04060f;
+  background-color:  #262626;
   border: 0;
   color:  #ffffff;
   font-size:12px;
@@ -16,7 +16,7 @@ QWidget {
 
 QWidget:disabled {
   background-color:  #04060f;
-  border-color:  #c1403d;
+  border-color:  #AEAFB0;
   color: #656565;
 }
 
@@ -25,20 +25,22 @@ QStackedWidget {
 }
 
 QAbstractButton:hover, QComboBox:hover, QLineEdit:hover, QAbstractSpinBox:hover,QPushButton:hover {
-  background-color:  #03353e;
+  background-color:  #AEAFB0;
+ 
 }
 
 QAbstractButton:pressed, QAbstractButton:checked, QAbstractButton::toggled {
-  background-color:  #c1403d;
+  background-color:  #AEAFB0;
 }
 
 QPushButton, #QmitkSegmentationControls QPushButton {
-  border: 0;
+  border: 1px;
   padding: 15px 15px;
   font-size:14px;
   font-weight:bold;
   color:white;
-  background-color: #0294a5;
+  background-color: transparent;
+  border-radius:6px;
 }
 
 QPushButton:pressed {
@@ -47,7 +49,7 @@ QPushButton:pressed {
 
 QPushButton:checked,QPushButton:toggled, QToolButton:checked {
   border: 0;
-  background-color: #c1403d;
+  background-color: #AEAFB0;
 }
 
 QToolButton {
@@ -67,11 +69,11 @@ QToolButton#qt_toolbar_ext_button {
 }
 
 QToolBox::tab {
-  border: 0px solid  #03353e;
+  border: 0px solid  #AEAFB0;
 }
 
 QToolBox::tab:hover {
-  background-color:  #c1403d;
+  background-color:  #AEAFB0;
 }
 
 QToolBox::tab:selected {
@@ -94,11 +96,11 @@ QHeaderView::section {
 }
 
 QHeaderView::section:horizontal {
-  border-right: 1px solid  #03353e;
+  border-right: 1px solid  #AEAFB0;
 }
 
 QHeaderView::section:vertical {
-  border-bottom: 1px solid  #03353e;
+  border-bottom: 1px solid  #AEAFB0;
 }
 
 QHeaderView::section:vertical:checked {
@@ -157,12 +159,12 @@ QGroupBox::title {
 
 QComboBox, QLineEdit, QAbstractSpinBox {
   background-color: #333337;
-  border: 0px solid  #c1403d;
+  border: 0px solid  #AEAFB0;
 }
 
 QComboBox QAbstractItemView {
   border: 0;
-  selection-background-color:  #03353e;
+  selection-background-color:  #AEAFB0;
 }
 
 QComboBox::drop-down {
@@ -222,6 +224,7 @@ QAbstractSpinBox::down-arrow:pressed {
 
 QCheckBox, QCheckBox:hover, QCheckBox:disabled, QCheckBox:checked, QRadioButton, QRadioButton:hover, QRadioButton:disabled, QRadioButton:checked {
   background-color: none;
+  color:  #353535;
 }
 
 QCheckBox::indicator, QRadioButton::indicator {
@@ -278,11 +281,11 @@ QRadioButton::indicator:checked:disabled {
 }
 
 QSlider::groove {
-  background-color:  #0294a5;
+  background-color:  transparent;
 }
 
 QSlider::groove:hover {
-  background-color:  #c1403d;
+  background-color:  #AEAFB0;
 }
 
 QSlider::groove:horizontal {
@@ -294,15 +297,15 @@ QSlider::groove:vertical {
 }
 
 QSlider::handle {
-  background-color:  #0294a5;
+  background-color:  transparent;
 }
 
 QSlider::handle:hover {
-  background-color:  #03353e;
+  background-color:  #AEAFB0;
 }
 
 QSlider::handle:pressed {
-  background-color:  #0294a5;
+  background-color:  transparent;
 }
 
 QSlider::handle:horizontal {
@@ -483,12 +486,12 @@ QScrollBar::up-arrow:pressed {
 }
 
 QTabWidget::pane {
-  border: 1px solid  #c1403d;
+  border: 1px solid  #AEAFB0;
 }
 
 QTabBar::tab {
   background-color: none;
-  border: 0px solid  #c1403d;
+  border: 0px solid  #AEAFB0;
   border-bottom: none;
   padding: 9px;
 }
@@ -506,7 +509,7 @@ QTabBar::tab:next-selected {
 }
 
 QTabBar::tab:selected {
-  border: 0px solid  #c1403d;
+  border: 0px solid  #AEAFB0;
   background-color:#000000;
   border-bottom: none;
 }
@@ -516,7 +519,7 @@ QTabBar::tab:!selected {
 }
 
 QTabBar::tab:!selected:hover {
-  background-color:  #c1403d;
+  background-color:  #AEAFB0;
 }
 
 #TabCloseButton {
@@ -592,25 +595,28 @@ QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:select
 }
 
 QSplitter {
-    background-color: #c1403d;
+    background-color: #AEAFB0;
 }
 
 
 #QmitkSegmentationControls, #OrganPrintImportPanelControls {
-    background-color:  #04060f;
+    background-color:  #262626;
 }
 #QmitkSegmentationControls QAbstractButton {
-    background-color: #0294a5;
+    background-color: transparent;
+    border-radius:4px;
+    padding:5px;
+    font-size:14px;
 }
 #QmitkSegmentationControls QAbstractButton:hover {
-    background-color: #03353e;
+    background-color: #AEAFB0;
 }
 #QmitkSegmentationControls QAbstractButton:checked {
-    background-color: #c1403d;
+    background-color: #AEAFB0;
 }
 
 #StepSelectorControls {
-    background-color: #c1403d;
+    background-color: #1F1F1F;
     padding-top:10px;
 }
 #StepSelectorControls QPushButton {
@@ -620,12 +626,13 @@ QSplitter {
     font-size:18px;
     color:white;
     font-weight:bold;
+ 
 }
 #StepSelectorControls QPushButton:checked {
-    background-color:  #04060f;
+    background-color:  #262626;
 }
 #StepSelectorControls QPushButton:hover {
-    background-color:  #04060f;
+    background-color:  #262626;
 }
 
 
@@ -638,7 +645,7 @@ QProgressBar {
     
 }
 QProgressBar::chunk {
-    background-color:  #03353e;
+    background-color:  #AEAFB0;
     margin:0;
 
 }
@@ -656,6 +663,6 @@ QTreeView::item {
 }
 
 QTreeView::branch:selected, QTreeView::item:selected {
-    background-color: #c1403d;
+    background-color: #AEAFB0;
 }
 
