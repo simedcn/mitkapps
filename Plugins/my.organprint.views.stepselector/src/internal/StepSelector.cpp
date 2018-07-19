@@ -44,8 +44,8 @@
 const string StepSelector::VIEW_ID = "my.organprint.views.stepselector";
 
 
-StepDescriptor::StepDescriptor(const QString& pluginId, QPushButton* button,bool requireData = false)
-    : pluginId(pluginId), button(button),requireData(requireData)
+StepDescriptor::StepDescriptor(const QString& pluginId, QPushButton* button,bool requireData = false,bool hideEditor = false)
+    : pluginId(pluginId), button(button),requireData(requireData),hideEditor(hideEditor)
 {}
 
 
@@ -72,8 +72,8 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     m_steps =
     {
         { "my.organprint.views.importpanel",		ui.pushButton_1 },
+        { "my.pacs.views.dicomview", 	ui.pushButton_1,false,true },
         { "org.mitk.views.segmentation",			ui.pushButton_2,true},
-        { "", 	ui.pushButton_3 },
         { "my.organprint.views.exportpanel", 				ui.pushButton_4,true }
     };
 
@@ -128,6 +128,9 @@ StepSelector::~StepSelector()
 void StepSelector::selectView(int n)
 {
     cout << "Selecting view " << n << endl;
+
+    const std::string editorArea = "org.mitk.editors.stdmultiwidget";
+
     if (n < 0 || n >= (int)m_steps.size())
         return;
     auto site = this->GetSite();
@@ -156,6 +159,15 @@ void StepSelector::selectView(int n)
                 //step.button->checked(true);
 
                 page->ShowView(step.pluginId);
+
+                if(step.hideEditor) {
+                    cout<< "Hiding the editor !" << endl;
+                    page->HideView(page->FindView(QString::fromStdString(editorArea)));
+                }
+                else {
+                    page->ShowView(QString::fromStdString(editorArea));
+                }
+
                 //step.button->setStyleSheet("background-color: #3399cc");
 
                 // step.button->SetDisabled(false);
@@ -165,6 +177,9 @@ void StepSelector::selectView(int n)
                 page->HideView(view);
                 // step.button->setStyleSheet("");
             }
+
+
+
         }
         catch (const berry::PartInitException& e)
         {
@@ -180,35 +195,38 @@ void StepSelector::SetFocus()
 
 }
 
-void StepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
+void StepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&)
 {
-	/// Make invisible all the nodes but the selected ones.
-	auto pluginContext = my_awesomeproject_stepselector_PluginActivator::GetPluginContext();
-	ctkServiceReference serviceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
-	mitk::IDataStorageService* storageService = pluginContext->getService<mitk::IDataStorageService>(serviceReference);
-	mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
-	auto all_nodes = dataStorage->GetAll();
-	for (auto datanode : *all_nodes)
-	{
-		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
-		if (!image)
-			continue;
 
-		bool is_selected_node = false;
-		for (auto selected_node : selectedDataNodes)
-		{
-			if (datanode.GetPointer() == selected_node.GetPointer())
-			{
-				is_selected_node = true;
-				break;
-			}
-		}
-		datanode->SetBoolProperty("visible", is_selected_node);
-	}
-	this->RequestRenderWindowUpdate();
+    /*
+    /// Make invisible all the nodes but the selected ones.
+    auto pluginContext = my_awesomeproject_stepselector_PluginActivator::GetPluginContext();
+    ctkServiceReference serviceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
+    mitk::IDataStorageService* storageService = pluginContext->getService<mitk::IDataStorageService>(serviceReference);
+    mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+    auto all_nodes = dataStorage->GetAll();
+    for (auto datanode : *all_nodes)
+    {
+        mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+        if (!image)
+            continue;
+
+        bool is_selected_node = false;
+        for (auto selected_node : selectedDataNodes)
+        {
+            if (datanode.GetPointer() == selected_node.GetPointer())
+            {
+                is_selected_node = true;
+                break;
+            }
+        }
+        datanode->SetBoolProperty("visible", is_selected_node);
+    }
+    this->RequestRenderWindowUpdate();
 
 
     cout << &selectedDataNodes << endl;
+    */
 
 }
 

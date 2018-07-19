@@ -83,22 +83,23 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 
-    next();
+    next(2);
 
 }
 
 void orgpnt::ImportPanel::QueryPacs() {
     cout << "Thank you for querying PACS" << endl;
+    next(1);
 }
 
-void orgpnt::ImportPanel::next() {
+void orgpnt::ImportPanel::next(int step = 2) {
     ctkPluginContext * context = my_awesomeproject_exampleplugin_PluginActivator::GetPluginContext();
     ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
     if (ref)
     {
         ctkEventAdmin* eventAdmin = context->getService<ctkEventAdmin>(ref);
         ctkDictionary properties;
-        properties["step"] = QVariant(1);
+        properties["step"] = QVariant(step);
         ctkEvent changeStepEvent("my/organprint/stepselector", properties);
         eventAdmin->sendEvent(changeStepEvent);
     }

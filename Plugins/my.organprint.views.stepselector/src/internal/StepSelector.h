@@ -91,7 +91,8 @@ struct StepDescriptor
     QString pluginId;
     QPushButton* button;
     bool requireData;
-    StepDescriptor(const QString& pluginId, QPushButton* button, bool requireData);
+    bool hideEditor;
+    StepDescriptor(const QString& pluginId, QPushButton* button, bool requireData,bool hideEditor);
 
 };
 

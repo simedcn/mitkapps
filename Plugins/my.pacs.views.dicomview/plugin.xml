@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-
+    <!--
   <extension point="org.blueberry.ui.views">
     <view id="my.pacs.views.dicomview"
           name="PACS Browser"
@@ -9,6 +9,7 @@
           icon="resources/CreateSurface.png"
     />
   </extension>
+  -->
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.gui.qt.application.DicomViewPreferencePage" name="PACS" class="DicomViewPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords">

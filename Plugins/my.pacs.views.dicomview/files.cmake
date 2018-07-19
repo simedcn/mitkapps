@@ -3,10 +3,12 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   DicomView.cpp
+  DicomViewDialog.cpp
   WindowListener.cpp
   my_pacs_views_dicomview_Activator.cpp
   DicomViewPreferencePage.cpp
   UploadToPACSAction.cpp
+
 )
 
 set(MOC_H_FILES

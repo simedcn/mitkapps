@@ -36,7 +36,7 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     layout->AddStandaloneView("org.mitk.views.properties", true, berry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
     //layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::LEFT,panelSize,editorArea);
     layout->AddStandaloneView("org.mitk.views.statusbar",false,berry::IPageLayout::BOTTOM,0.1,editorArea);
-
+    //layout->AddStandaloneView("my.pacs.views.dicomview",false,berry::IPageLayout::BOTTOM,0.1,editorArea);
 
 
 
