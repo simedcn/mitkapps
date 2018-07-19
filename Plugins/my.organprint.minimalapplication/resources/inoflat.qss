@@ -6,8 +6,9 @@
 
 
 
+
 QWidget {
-  background-color:  #262626;
+  background-color:  #353535;
   border: 0;
   color:  #ffffff;
   font-size:12px;
@@ -280,8 +281,18 @@ QRadioButton::indicator:checked:disabled {
   image: url(:/org.blueberry.ui.qt/dark/radiobutton-checked-disabled.svg);
 }
 
+QSlider:disabled {
+    background-color:transparent;
+}
+QSlider::groove:disabled {
+    background-color: #04060f;
+}
+QSlider::handle:disabled {
+    background-color: #04060f;
+}
+
 QSlider::groove {
-  background-color:  transparent;
+  background-color:  #AEAFB0;
 }
 
 QSlider::groove:hover {
@@ -297,15 +308,15 @@ QSlider::groove:vertical {
 }
 
 QSlider::handle {
-  background-color:  transparent;
-}
-
-QSlider::handle:hover {
   background-color:  #AEAFB0;
 }
 
+QSlider::handle:hover {
+  background-color:  #ffffff;;
+}
+
 QSlider::handle:pressed {
-  background-color:  transparent;
+  background-color:  #ffffff;;
 }
 
 QSlider::handle:horizontal {
@@ -600,19 +611,23 @@ QSplitter {
 
 
 #QmitkSegmentationControls, #OrganPrintImportPanelControls {
-    background-color:  #262626;
+    background-color:  #353535;
 }
 #QmitkSegmentationControls QAbstractButton {
     background-color: transparent;
-    border-radius:4px;
+    border-radius:0px;
     padding:5px;
     font-size:14px;
+    border-bottom:1px solid  #AEAFB0;
+
 }
 #QmitkSegmentationControls QAbstractButton:hover {
     background-color: #AEAFB0;
+    border-radius:4px;
 }
 #QmitkSegmentationControls QAbstractButton:checked {
     background-color: #AEAFB0;
+    border-radius:4px;
 }
 
 #StepSelectorControls {
@@ -629,10 +644,13 @@ QSplitter {
  
 }
 #StepSelectorControls QPushButton:checked {
-    background-color:  #262626;
+    background-color:  #353535;
 }
 #StepSelectorControls QPushButton:hover {
-    background-color:  #262626;
+    background-color:  #353535;
+}
+#StepSelectorControls QPushButton:disabled {
+    color:  #353535;
 }
 
 
