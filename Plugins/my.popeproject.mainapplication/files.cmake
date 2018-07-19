@@ -21,6 +21,7 @@ set(INTERNAL_CPP_FILES
   DicomPerspective.cpp
   MainWorkbenchAdvisor.cpp
   MainApplicationPreferencePage.cpp
+  PopeWorkbenchWindowAdvisor.cpp
 )
 
 set(MOC_H_FILES
@@ -30,6 +31,7 @@ set(MOC_H_FILES
   src/internal/DicomPerspective.h
   src/internal/MainWorkbenchAdvisor.h
   src/internal/MainApplicationPreferencePage.h
+  src/internal/PopeWorkbenchWindowAdvisor.h
   ../../Classes/MainWorkbenchWindowAdvisor.h
   ../../Classes/ShowViewAction.h
 )

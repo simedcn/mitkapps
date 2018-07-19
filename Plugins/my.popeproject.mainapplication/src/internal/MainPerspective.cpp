@@ -96,8 +96,11 @@ void MainPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 	for (const auto& plugin : PluginDescriptors::get())
 	{
 		auto view = layout->GetViewLayout(plugin.id);
-		bool closeable = plugin.is_main ? is_main_closeable : is_closeable;
-		bool moveable = plugin.is_main ? is_main_moveable : is_moveable;
+		bool closeable = 
+			(plugin.role == PluginDescriptor::PluginRole_main) ? is_main_closeable :
+			(plugin.role == PluginDescriptor::PluginRole_secondary) ? is_closeable :
+			true;
+		bool moveable = (plugin.role == PluginDescriptor::PluginRole_main) ? is_main_moveable : is_moveable;
 		view->SetCloseable(closeable);
 		view->SetMoveable(moveable);
 	}

@@ -44,7 +44,10 @@ protected:
 public:
 	ShowViewAction(berry::IWorkbenchWindow::Pointer window, pViewInfo viewInfo);
 
-	protected slots:
+	QString Id() const;
+	void ShowView() const;
+
+protected slots:
 	void Run();
 };
 

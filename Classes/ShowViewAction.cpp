@@ -74,6 +74,31 @@ ShowViewAction::ShowViewAction(berry::IWorkbenchWindow::Pointer window, pViewInf
 	// Connect
 	this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
+QString ShowViewAction::Id() const
+{
+	if (m_Info == nullptr)
+		return "";
+	return m_Info->Id();
+}
+void ShowViewAction::ShowView() const
+{
+	berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
+	if (page == nullptr)
+		return;
+
+	QString view_id = m_Info->Id();
+	auto view = page->FindView(view_id);
+	// If this view is already visible, give it focus.
+	try
+	{
+		view = page->ShowView(view_id);
+		m_Info->ConfigureTitle(view);
+	}
+	catch (const berry::PartInitException& e)
+	{
+		BERRY_ERROR << "Error: " << e.what();
+	}
+}
 void ShowViewAction::Run()
 {
 	berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();

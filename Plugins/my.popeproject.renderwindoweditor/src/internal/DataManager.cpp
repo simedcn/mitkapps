@@ -1,6 +1,7 @@
 #include "DataManager.h"
 #include "PatientSelector.h"
 #include <PopeElements.h>
+#include "my_popeproject_renderwindoweditor_Activator.h"
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -58,6 +59,19 @@ DataManager::DataManager(mitk::DataStorage *datastorage, QObject *parent)
 {
 	//bool load_nrrd = false;
 	//m_Settings.setValue("AppSettings/LoadRNND", load_nrrd); //??
+
+	/// CTK signals.
+	auto pluginContext = my_popeproject_renderwindoweditor_Activator::GetPluginContext();
+	ctkDictionary propsForSlot;
+	ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();
+	if (ref)
+	{
+		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/data/OPENDICOMDATASET";
+		eventAdmin->subscribeSlot(this, SLOT(on_Action_OpenDICOMdataset_clicked(ctkEvent)), propsForSlot);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/data/OPENFOLDER";
+		eventAdmin->subscribeSlot(this, SLOT(on_Action_OpenFolder_clicked(ctkEvent)), propsForSlot);
+	}
 }
 
 int DataManager::AskAboutNewPatient()
@@ -79,12 +93,16 @@ int DataManager::AskAboutNewPatient()
 	default:
 		break;
 	}
-	m_DataStorage->Remove(this->m_DataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)))));
+	auto condition = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+	m_DataStorage->Remove(this->m_DataStorage->GetSubset(condition));
 	return 0;
 }
 
 int DataManager::on_LoadImageSet(const QString &filenameAndDirectory)
 {
+	if (filenameAndDirectory.size() == 0)
+		return -9;
+
 	/// Check the file if it is readable
 	string filepath = filenameAndDirectory.toStdString();
 	QString patientId = Elements::get_patientId_or_patientName(filepath);
@@ -147,6 +165,9 @@ int DataManager::on_LoadImageSet(const QString &filenameAndDirectory)
 }
 int DataManager::on_LoadImageFolder(const QString& directory)
 {
+	if (directory.size() == 0)
+		return -19;
+
 	/// Get all subfolders if needed
 	list<QDir> dirs;
 	QDir main_dir(directory);
@@ -235,7 +256,8 @@ int DataManager::on_LoadImageFolder(const QString& directory)
 		QString str_id = QString::fromStdString(id);
 		const auto& baseDataList = patient.second;
 		string name = Elements::find_patientName(baseDataList);
-		QString str_name = QString::fromStdString(name);
+		string patientName = Elements::recognize_name(name);
+		QString str_name = QString::fromStdString(patientName);
 		auto images = Elements::get_imageNames(baseDataList);
 		patientDescriptors[i] = make_shared<PatientDescription>(str_id, str_name, images);
 		i++;
@@ -293,6 +315,16 @@ int DataManager::on_LoadImageFolder(const QString& directory)
 
 	return 0;
 }
+void DataManager::on_Action_OpenDICOMdataset_clicked(const ctkEvent& event)
+{
+	QString imagePath = event.getProperty("imagePath").toString();
+	on_LoadImageSet(imagePath);
+}
+void DataManager::on_Action_OpenFolder_clicked(const ctkEvent& event)
+{
+	QString imagePath = event.getProperty("imagePath").toString();
+	on_LoadImageFolder(imagePath);
+}
 
 mitk::DataNode::Pointer DataManager::AddImage(const string& name, mitk::Image::Pointer image)
 {
@@ -303,6 +335,9 @@ mitk::DataNode::Pointer DataManager::AddImage(const string& name, mitk::Image::P
 	{
 		mitk::DataNode::Pointer datanode = iterator->Value();
 		++iterator;
+		mitk::Image* image_i = dynamic_cast<mitk::Image*>(datanode->GetData());
+		if (!image_i)
+			continue;
 		if (datanode->GetName().compare(name) == 0)
 		{
 			isInDS = true;
@@ -313,7 +348,9 @@ mitk::DataNode::Pointer DataManager::AddImage(const string& name, mitk::Image::P
 	mitk::DataNode::Pointer dn = mitk::DataNode::New();
 	dn->SetName(name);
 	dn->SetData(image);
+	emit GonnaAddNewDataNode();
 	this->m_DataStorage->Add(dn);
+	emit NewDataNodeAdded();
 	return dn;
 }
 
@@ -342,7 +379,6 @@ void DataManager::SaveDataOfCurrentPatient()
 		}
 	}
 }
-
 std::vector<std::string> DataManager::LoadDataOfCurrentPatient()
 {
 	std::vector<std::string> loadedFiles;
@@ -391,5 +427,5 @@ QString DataManager::GetWorkDirectory()
 void DataManager::SetWorkDirectory(const QString& dir_path)
 {
 	//m_Settings.setValue("AppSettings/WorkDirectory", dir_path);
-	m_PreferencesNode->Put("data folder", dir_path);
+	getPreferencesNode()->Put("data folder", dir_path);
 }

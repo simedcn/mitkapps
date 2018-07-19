@@ -106,7 +106,7 @@ QLabel#logo_label
      <item>
       <widget class="QLabel" name="label_SelectedImage">
        <property name="text">
-        <string>&lt;b&gt;Selected image&lt;/b&gt;:</string>
+        <string>Selected image:</string>
        </property>
       </widget>
      </item>
@@ -164,13 +164,6 @@ background-color: #efef95;</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="checkbox_EnableVolumeRendering">
-         <property name="text">
-          <string>Enable Volume Rendering</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item>
@@ -179,23 +172,16 @@ background-color: #efef95;</string>
         <number>3</number>
        </property>
        <item>
+        <widget class="QCheckBox" name="checkbox_EnableVolumeRendering">
+         <property name="text">
+          <string>Enable Volume Rendering</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBox_ShowStatistics">
          <property name="text">
           <string>Show statistics</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_ShowHistogram">
-         <property name="text">
-          <string>Show histogram</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string/>
          </property>
         </widget>
        </item>
@@ -382,6 +368,9 @@ background-color: #efef95;</string>
         <attribute name="headerDefaultSectionSize">
          <number>200</number>
         </attribute>
+        <attribute name="headerMinimumSectionSize">
+         <number>200</number>
+        </attribute>
         <column>
          <property name="text">
           <string>Tag</string>
@@ -558,36 +547,6 @@ background-color: #efef95;</string>
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="StatisticsWidgetStack">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QmitkChartWidget" name="JSHistogram">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>236</height>
-       </size>
-      </property>
-     </widget>
-    </widget>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -598,7 +557,7 @@ background-color: #efef95;</string>
      <property name="sizeHint" stdset="0">
       <size>
        <width>10</width>
-       <height>20</height>
+       <height>10</height>
       </size>
      </property>
     </spacer>
@@ -620,13 +579,6 @@ background-color: #efef95;</string>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QmitkChartWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkChartWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -229,16 +229,18 @@ string Elements::get_imageName(mitk::BaseData* baseData, const string& def_value
 		return def_value;
 
 	stringstream imageName;
-	auto prop_SeriesInstanceUID = baseData->GetProperty("dicom.series.SeriesInstanceUID");
-	if (prop_SeriesInstanceUID)
-		imageName << prop_SeriesInstanceUID->GetValueAsString();
+	//auto prop_SeriesInstanceUID = baseData->GetProperty("dicom.series.SeriesInstanceUID");
+	string seriesInstanceUID = get_property("DICOM.0008.0018", "dicom.series.SeriesInstanceUID", baseData);
+	if (!seriesInstanceUID.empty())
+		imageName << seriesInstanceUID; // prop_SeriesInstanceUID->GetValueAsString();
 	else
 		imageName << "image";
-	auto prop_Modality = baseData->GetProperty("dicom.series.Modality");
-	if (prop_Modality)
+	//auto prop_Modality = baseData->GetProperty("dicom.series.Modality");
+	string modality = get_property("DICOM.0008.0060", "dicom.series.Modality", baseData);
+	if (!modality.empty())
 	{
 		imageName << "_";
-		imageName << prop_Modality->GetValueAsString();
+		imageName << modality; // prop_Modality->GetValueAsString();
 	}
 	return imageName.str();
 }
@@ -422,6 +424,6 @@ bool Elements::split_properties(const string& str_prop, QStringList* properties,
 	}
 
 	assert(props.size() >= 1);
-	assert(nums == nullptr || (props.size() == (int) nums->size()));
+	assert(nums == nullptr || (props.size() == (int)nums->size()));
 	return isOK;
 }

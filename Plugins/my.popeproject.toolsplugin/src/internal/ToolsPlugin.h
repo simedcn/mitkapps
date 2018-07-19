@@ -73,9 +73,7 @@ public:
 	void updateTagRepresentation();
 	void updateShowPatientData();
 	void updateShowStatistics();
-	void updateShowHistogram();
 	void updateEditableControls(bool update_tags = true);
-	void displayHistogram(int time_step = 0);
 
 protected:
 	void NodeAdded(const mitk::DataNode* node) override;
@@ -92,6 +90,11 @@ protected:
 	// This method is conveniently called whenever the selection of Data Manager items changes.
 	void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer>& dataNodes) override;
 	void OnPreferencesChanged(const berry::IBerryPreferences*) override;
+
+protected:
+	void SelectionChanged(mitk::DataNode* dataNode);
+	/// Method called when itkModifiedEvent is called by selected data.
+	void SelectedDataModified();
 
 private:
 	//mitk::DataNode* GetWorkingNode();
@@ -110,6 +113,9 @@ private:
 	us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
 	long m_TimeObserverTag;
 	mitk::Image* m_StatisticsImage = nullptr;
+	bool m_StatisticsUpdatePending;
+	bool m_DataNodeSelectionChanged;
+	//bool m_Visible;
 
 	static const int num_percentiles = 100 + 1;
 
@@ -123,19 +129,25 @@ signals:
 	void Representation3DHasToBeInitiated(const ctkDictionary&);
 	void NodeHasManyImages(const ctkDictionary&);
 	void SetLevelWindowRange(const ctkDictionary&);
+	void SelecedDataNodeChanged(const ctkDictionary&);
+
+	/// Method to set the data to the member and start the threaded statistics update
+	void StatisticsUpdate();
 
 public slots:
 	void on_pixel_selected(QVector<double> point);
 	void on_MainWindow_Representation3D_changed(const ctkEvent& event);
+
+protected slots:
 	void on_ThreadedStatisticsCalculation_ends();
+	/// Checks if update is possible and calls StatisticsUpdate() possible
+	void RequestStatisticsUpdate();
 
 private slots:
 	void on_checkbox_EnableVolumeRendering_toggled(bool volRen);
 	void on_checkBox_ShowPatientData_toggled(bool);
 	void on_checkBox_GroupTags_toggled(bool);
 	void on_checkBox_ShowStatistics_toggled(bool);
-	void on_checkBox_ShowHistogram_toggled(bool);
-	void on_histogram_PageSuccessfullyLoaded();
 	/// Is called from the image navigator once the time step has changed
 	void on_imageNavigator_timeChanged(const itk::EventObject&);
 };

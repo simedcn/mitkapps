@@ -66,6 +66,7 @@ public:
 	~MainWindow();
 
 	QmitkStdMultiWidget* getStdMultiWidget();
+	void RegisterLevelWindowObserver();
 
 protected:
 	void enable3DRepresentation(bool flag);
@@ -75,6 +76,7 @@ signals:
 	void ImageFolderHasToBeLoaded(const QString& filename);
 	void EnableAutoRotation(bool);
 	void Representation3D_changed(const ctkDictionary&);
+	void ShowPACS_triggered(const ctkDictionary&);
 	
 public slots:
 	void on_pushButton_OpenDICOM_clicked();
@@ -86,10 +88,32 @@ public slots:
 	void On_ToolsPlugin_Representation3DHasToBeInitiated(const ctkEvent& event);
 	void On_ToolsPlugin_NodeHasManyImages(const ctkEvent& event);
 	void On_ToolsPlugin_SetRange(const ctkEvent& event);
+	void On_ToolsPlugin_SelectedNodeChanged(const ctkEvent& event);
+
+	void On_DataManager_GonnaAddNewDataNode();
+	void On_DataManager_NewDataNodeAdded();
+
+public:
+	void on_levelWindow_modified(const itk::EventObject&);
 
 private:
 	Ui::mainwindow& ui;
 	QmitkStdMultiWidget* multiWidget;
+	mitk::LevelWindowManager* levelWindowManager = nullptr;
+	bool is_LevelWindowObserver_registered = false;
+	QString selectedNodeName;
+	enum StatusChangesInLevelWindow;
+	StatusChangesInLevelWindow status_changesInLevelWindow = StatusChangesInLevelWindow::DontSaveAnyChanges;
+	double savedLevelWindow_min; //= numeric_limits<double>::max();
+	double savedLevelWindow_max; //= numeric_limits<double>::max();
+
+private:
+	enum StatusChangesInLevelWindow
+	{
+		SaveAllChanges,
+		SaveUIChanges,
+		DontSaveAnyChanges
+	};
 };
 
 #endif // MAINWINDOW_H

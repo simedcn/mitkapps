@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>400</height>
+    <width>362</width>
+    <height>381</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,7 +26,7 @@
    <string>POPE</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../../resources/my.popeproject.renderwindoweditor.qrc">
     <normaloff>:/icons/POPE_icon</normaloff>:/icons/POPE_icon</iconset>
   </property>
   <property name="autoFillBackground">
@@ -77,6 +77,9 @@ Please select the patient ID, data of which should be loaded:</string>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
        </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::SingleSelection</enum>
