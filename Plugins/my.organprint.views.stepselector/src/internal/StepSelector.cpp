@@ -34,15 +34,16 @@
 #include <QFile>
 #include <itkBinaryThresholdImageFilter.h>
 #include "my_awesomeproject_stepselector_PluginActivator.h"
-
-
+#include <mitkImage.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
 
 // Don't forget to initialize the VIEW_ID.
 const string StepSelector::VIEW_ID = "my.organprint.views.stepselector";
 
 
-StepDescriptor::StepDescriptor(const QString& pluginId, QPushButton* button)
-    : pluginId(pluginId), button(button)
+StepDescriptor::StepDescriptor(const QString& pluginId, QPushButton* button,bool requireData = false)
+    : pluginId(pluginId), button(button),requireData(requireData)
 {}
 
 
@@ -69,9 +70,9 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     m_steps =
     {
         { "my.organprint.views.importpanel",		ui.pushButton_1 },
-        { "org.mitk.views.segmentation",			ui.pushButton_2 },
+        { "org.mitk.views.segmentation",			ui.pushButton_2,true},
         { "", 	ui.pushButton_3 },
-        { "my.organprint.views.exportpanel", 				ui.pushButton_4 }
+        { "my.organprint.views.exportpanel", 				ui.pushButton_4,true }
     };
 
     group = new QButtonGroup();
@@ -89,7 +90,7 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
 
     connect(group,SIGNAL(buttonClicked(int)),this,SLOT(on_pushButton_clicked(int)));
 
-    on_pushButton_clicked(0);
+
 
     // Initialize the first step
     m_steps[1].button->toggled(true);
@@ -107,10 +108,14 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
         eventAdmin->subscribeSlot(this, SLOT(onChangeStepEvent(ctkEvent)), propsForSlot);
     }
 
+    onNodeListChanged(nullptr);
+    initListeners();
+    on_pushButton_clicked(0);
+
 }
 
 StepSelector::StepSelector()
-    : m_currentStep(0)
+    : m_currentStep(-1)
 {
 }
 
@@ -133,7 +138,7 @@ void StepSelector::selectView(int n)
     if (page == nullptr)
         return;
 
-    m_currentStep = n;
+    if(n ==m_currentStep) return;
 
     for (int i = 0; i < (int) m_steps.size(); i++)
     {
@@ -142,11 +147,9 @@ void StepSelector::selectView(int n)
         try
         {
 
-            cout << "currentStep = " << m_currentStep << " | i = " << i << endl;
-
-
-
-            if (i == m_currentStep && view == nullptr)
+            cout << "requested step = " << n << " | i = " << i << endl;
+            //cout << "view :" << view << endl;
+            if (i == n)
             {   // Open
                 //step.button->checked(true);
 
@@ -155,7 +158,7 @@ void StepSelector::selectView(int n)
 
                 // step.button->SetDisabled(false);
             }
-            else if (i != m_currentStep && view != nullptr)
+            else if (i != n && view != nullptr)
             {   // Close
                 page->HideView(view);
                 // step.button->setStyleSheet("");
@@ -166,10 +169,13 @@ void StepSelector::selectView(int n)
             BERRY_ERROR << "Error: " << e.what();
         }
     }
+
+    m_currentStep = n;
 }
 
 void StepSelector::SetFocus()
 {
+
 }
 
 void StepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& dataNodes)
@@ -190,5 +196,51 @@ void StepSelector::onChangeStepEvent(const ctkEvent & event) {
     //group->buttonClicked(id);
     group->button(id)->setChecked(true);
     selectView(id);
+
+}
+
+void StepSelector::onNodeListChanged(const mitk::DataNode*) {
+
+    cout << "The list has changed ! " << endl;
+
+    SetOfObjects::ConstPointer nodes = GetDataStorage()->GetSubset(mitk::NodePredicateProperty::New("visible",mitk::BoolProperty::New(true)));
+
+    SetOfObjects::ConstIterator it = nodes->Begin();
+
+    int count = 0;
+
+    for(mitk::DataNode::Pointer node = it->Value(); it!= nodes->End(); it++) {
+
+        node = it->Value();
+
+        mitk::Image * image = dynamic_cast<mitk::Image*>(node->GetData());
+
+        if(image!=nullptr) {
+            count++;
+        }
+
+    }
+
+    cout << "Number of nodes : " << nodes->Size() << endl;
+
+    for (int i = 0; i < (int) m_steps.size(); i++) {
+
+
+        StepDescriptor step = m_steps[i];
+
+        step.button->setEnabled(!step.requireData || count > 0);
+
+    }
+}
+
+void StepSelector::initListeners() {
+
+    mitk::DataStorage * storage = GetDataStorage();
+
+    storage->AddNodeEvent.AddListener(
+        mitk::MessageDelegate1<StepSelector, const mitk::DataNode *>(this, &StepSelector::onNodeListChanged));
+
+    storage->RemoveNodeEvent.AddListener(
+        mitk::MessageDelegate1<StepSelector, const mitk::DataNode *>(this, &StepSelector::onNodeListChanged));
 
 }

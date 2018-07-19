@@ -36,8 +36,7 @@ const std::vector<QString> MinimalApplication::VIEW_IDS =
 {
     "my.organprint.views.importpanel",
     "my.organprint.views.exportpanel",
-    "org.mitk.views.segmentation",
-    "org.mitk.views.properties"
+    "org.mitk.views.segmentation"
 };
 
 

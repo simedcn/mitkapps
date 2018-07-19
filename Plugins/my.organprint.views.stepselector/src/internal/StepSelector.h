@@ -12,7 +12,7 @@
 #include <service/event/ctkEventConstants.h>
 #include <service/event/ctkEventAdmin.h>
 #include "my_awesomeproject_stepselector_PluginActivator.h"
-
+#include <mitkDataStorage.h>
 using namespace std;
 
 
@@ -44,10 +44,13 @@ class StepSelector : public QmitkAbstractView
 {
     Q_OBJECT
 
+
 public:
     // This is a tricky one and will give you some headache later on in your debug sessions if it has been forgotten.
     // Also, don't forget to initialize it in the implementation file.
     static const std::string VIEW_ID;
+
+    typedef mitk::DataStorage::SetOfObjects SetOfObjects;
 
     StepSelector();
     ~StepSelector();
@@ -72,20 +75,24 @@ private:
     vector<StepDescriptor> m_steps;
 
     QButtonGroup * group;
-
+public:
+    void onNodeListChanged(const mitk::DataNode*);
 private slots:
     void on_pushButton_clicked(int step);
+    void initListeners();
 
 
 public slots:
     void onChangeStepEvent(const ctkEvent&);
+
 };
 struct StepDescriptor
 {
     QString pluginId;
     QPushButton* button;
+    bool requireData;
+    StepDescriptor(const QString& pluginId, QPushButton* button, bool requireData);
 
-    StepDescriptor(const QString& pluginId, QPushButton* button);
 };
 
 #endif

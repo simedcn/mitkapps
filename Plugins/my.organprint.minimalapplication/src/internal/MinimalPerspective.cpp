@@ -25,27 +25,38 @@ MinimalPerspective::MinimalPerspective()
 void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
 
-    float selectorSize = 0.35f;
-    float panelSize = 0.35f;
+    float selectorSize = 0.4;
+    float panelSize = 0.3;
     QString editorArea = layout->GetEditorArea();
     QString stepSelectorId = "my.organprint.views.stepselector";
+    layout->SetEditorAreaVisible(true);
     layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, selectorSize, editorArea);
+    //layout->AddStandaloneViewPlaceholder(stepSelectorId,berry::IPageLayout::LEFT, selectorSize, editorArea,false);
     layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.6f, editorArea);
     layout->AddStandaloneView("org.mitk.views.properties", true, berry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
-    layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::RIGHT,panelSize,stepSelectorId);
+    //layout->AddStandaloneView("my.organprint.views.importpanel",false,berry::IPageLayout::LEFT,panelSize,editorArea);
     layout->AddStandaloneView("org.mitk.views.statusbar",false,berry::IPageLayout::BOTTOM,0.1,editorArea);
-    layout->SetEditorAreaVisible(false);
+
 
 
 
     QString prev_id = stepSelectorId;
     for (auto& viewId : MinimalApplication::VIEW_IDS)
     {
-        layout->AddStandaloneViewPlaceholder(viewId,berry::IPageLayout::RIGHT, panelSize, stepSelectorId,false);
-        auto view = layout->GetViewLayout(viewId);
-        prev_id = viewId;
+        if(viewId == MinimalApplication::VIEW_IDS[0]) {
+            layout->AddStandaloneView(viewId,false,berry::IPageLayout::RIGHT,panelSize,stepSelectorId);
+        }
+        else {
+            layout->AddStandaloneViewPlaceholder(viewId,berry::IPageLayout::RIGHT, panelSize, stepSelectorId,false);
+        }
+        //auto view = layout->GetViewLayout(viewId);
+        //prev_id = viewId;
 
     }
+
+    layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, selectorSize, editorArea);
+
+    //layout->ShowView("my.organprint.views.importpanel");
 
     ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
 
