@@ -132,6 +132,8 @@ Plugins/my.pacs.views.dicomview/resources/DicomView.qrc
 Plugins/my.pacs.views.dicomview/src/internal/DicomView.cpp
 Plugins/my.pacs.views.dicomview/src/internal/DicomView.h
 Plugins/my.pacs.views.dicomview/src/internal/DicomViewControls.ui
+Plugins/my.pacs.views.dicomview/src/internal/DicomViewDialog.cpp
+Plugins/my.pacs.views.dicomview/src/internal/DicomViewDialog.h
 Plugins/my.pacs.views.dicomview/src/internal/DicomViewPreferencePage.cpp
 Plugins/my.pacs.views.dicomview/src/internal/DicomViewPreferencePage.h
 Plugins/my.pacs.views.dicomview/src/internal/UploadToPACSAction.cpp
