@@ -161,7 +161,7 @@ void DicomView::CreateQtPartControl(QWidget *parent)
 	connect(this->ui.pushButton_LocalFolderPath, SIGNAL(clicked()), this, SLOT(on_pushButton_LocalFolderPath_clicked()));
 	connect(this->ui.pushButton_SetTemporaryLocalFolderPath, SIGNAL(clicked()), this, SLOT(on_pushButton_SetTemporaryLocalFolderPath_clicked()));
 	connect(this->ui.lineEdit_LocalStorageIP, SIGNAL(textChanged(QString)), this, SLOT(on_lineEdit_LocalStorageIP_textChanged(QString)));
-	connect(this->ui.spinBox_LocalStoragePort, SIGNAL(valueChanged(int)), this, SLOT(on_spinBox_localStoragePort_valueChanged(int)));
+	connect(this->ui.spinBox_LocalStoragePort, SIGNAL(valueChanged(int)), this, SLOT(on_spinBox_LocalStoragePort_valueChanged(int)));
 	connect(this->ui.lineEdit_StorageAETitle, SIGNAL(textChanged(QString)), this, SLOT(on_lineEdit_StorageAETitle_textChanged(QString)));
 	// UI
 	connect(this->ui.dicomTableManager->studiesTable(), SIGNAL(selectionChanged(const QStringList&)), this, SLOT(on_table_Studies_selectionChanged(const QStringList&)));
@@ -172,7 +172,7 @@ void DicomView::CreateQtPartControl(QWidget *parent)
 
 	/// UI customization.
 	// Find tables
-		array<ctkDICOMTableView*, 3> tables;
+	array<ctkDICOMTableView*, 3> tables;
 	tables[0] = ui.dicomTableManager->patientsTable();
 	tables[1] = ui.dicomTableManager->studiesTable();
 	tables[2] = ui.dicomTableManager->seriesTable();

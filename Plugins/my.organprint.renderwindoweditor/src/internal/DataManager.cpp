@@ -31,7 +31,7 @@ DataManager::DataManager(mitk::DataStorage *datastorage, QObject *parent) :
 	{
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "data/OPENDICOMSERIES";
-		eventAdmin->subscribeSlot(this, SLOT(on_Action_OpenDICOMSeries_clicked(ctkEvent)), propsForSlot);
+		eventAdmin->subscribeSlot(this, SLOT(OpenDICOMSeries(ctkEvent)), propsForSlot);
 	}
 }
 

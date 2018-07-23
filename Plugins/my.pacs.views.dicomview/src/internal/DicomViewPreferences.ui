@@ -420,7 +420,7 @@ QHeaderView::section
            </size>
           </property>
           <property name="toolTip">
-           <string>Use temporary folder</string>
+           <string>Use a temporary folder</string>
           </property>
           <property name="text">
            <string>-&gt; temporary</string>
@@ -496,6 +496,9 @@ QHeaderView::section
             <width>30</width>
             <height>24</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Select a local folder</string>
           </property>
           <property name="text">
            <string>...</string>
