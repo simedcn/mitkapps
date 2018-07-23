@@ -41,6 +41,7 @@ public:
 	static string get_patientId_or_patientName(mitk::DataNode* dataNode, const string& def_value = "");
 	static QString get_patientId_or_patientName(const string& filename, const QString& def_value = "");
 	static QString get_patientId_or_patientName(const QString& filename, const QString& def_value = "");
+	static QString get_seriesInstanceUID(const string& filename, const QString& def_value = "");
 	static string get_patientName(mitk::BaseData* baseData, const string& def_value = "");
 	static string get_patientName(mitk::BaseData::Pointer baseData, const string& def_value = "");
 	static string get_patientName(mitk::DataNode* dataNode, const string& def_value = "");

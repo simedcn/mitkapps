@@ -1,4 +1,5 @@
 #include "DicomViewDialog.h"
+#include <QLayout>
 
 DicomViewDialog::DicomViewDialog(QWidget * parent = 0) : QDialog(parent) {
     dicomView = new DicomView();

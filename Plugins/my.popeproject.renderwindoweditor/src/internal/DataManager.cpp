@@ -67,10 +67,12 @@ DataManager::DataManager(mitk::DataStorage *datastorage, QObject *parent)
 	if (ref)
 	{
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
-		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/data/OPENDICOMDATASET";
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "data/OPENDICOMDATASET";
 		eventAdmin->subscribeSlot(this, SLOT(on_Action_OpenDICOMdataset_clicked(ctkEvent)), propsForSlot);
-		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/data/OPENFOLDER";
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "data/OPENFOLDER";
 		eventAdmin->subscribeSlot(this, SLOT(on_Action_OpenFolder_clicked(ctkEvent)), propsForSlot);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "data/OPENDICOMSERIES";
+		eventAdmin->subscribeSlot(this, SLOT(on_Action_OpenDICOMSeries_clicked(ctkEvent)), propsForSlot);
 	}
 }
 
@@ -315,6 +317,43 @@ int DataManager::on_LoadImageFolder(const QString& directory)
 
 	return 0;
 }
+int DataManager::on_LoadImageSeries(const QStringList& files, const QStringList& series)
+{
+	int error_code = 0;
+	for (const auto& file : files)
+	{
+		if (error_code != 0)
+		{
+			QString text = "Do you want to continue reading the files retrieved and saved on the disk?";
+			auto msg_res = QMessageBox::question(nullptr, tr("Add to Data Manager"), text, QMessageBox::Yes | QMessageBox::No);
+			if (msg_res != QMessageBox::Yes)
+				return error_code;
+		}
+		string filepath = file.toStdString();
+		QString seriesInstanceUID = Elements::get_seriesInstanceUID(filepath);
+		if (seriesInstanceUID.isEmpty())
+		{//??
+			//continue;
+			MITK_INFO << "Unable to read seriesInstanceUID from the file \"" << filepath << "\". Solution: load all files from the folder.";
+			QString dir_path = QFileInfo(file).absolutePath();
+			error_code = on_LoadImageFolder(dir_path);
+			return error_code;
+		}
+		bool is_in_list = false;
+		for (const auto& s : series)
+		{
+			if (s == seriesInstanceUID)
+			{
+				is_in_list = true;
+				break;
+			}
+		}
+		if (!is_in_list)
+			continue;
+		error_code = on_LoadImageSet(file);
+	}
+	return 0;
+}
 void DataManager::on_Action_OpenDICOMdataset_clicked(const ctkEvent& event)
 {
 	QString imagePath = event.getProperty("imagePath").toString();
@@ -324,6 +363,12 @@ void DataManager::on_Action_OpenFolder_clicked(const ctkEvent& event)
 {
 	QString imagePath = event.getProperty("imagePath").toString();
 	on_LoadImageFolder(imagePath);
+}
+void DataManager::on_Action_OpenDICOMSeries_clicked(const ctkEvent& event)
+{
+	QStringList files = event.getProperty("files").toStringList();
+	QStringList series = event.getProperty("series").toStringList();
+	on_LoadImageSeries(files, series);
 }
 
 mitk::DataNode::Pointer DataManager::AddImage(const string& name, mitk::Image::Pointer image)

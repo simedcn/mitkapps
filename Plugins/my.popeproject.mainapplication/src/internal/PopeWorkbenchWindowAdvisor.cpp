@@ -41,8 +41,8 @@ void PopeWorkbenchWindowAdvisor::setCTKSignals()
 	if (ref)
 	{
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
-		eventAdmin->publishSignal(this, SIGNAL(OpenDICOMdataset(const ctkDictionary&)), "pope/data/OPENDICOMDATASET", Qt::DirectConnection);
-		eventAdmin->publishSignal(this, SIGNAL(OpenDataFolder(const ctkDictionary&)), "pope/data/OPENFOLDER", Qt::DirectConnection);
+		eventAdmin->publishSignal(this, SIGNAL(OpenDICOMdataset(const ctkDictionary&)), "data/OPENDICOMDATASET", Qt::DirectConnection);
+		eventAdmin->publishSignal(this, SIGNAL(OpenDataFolder(const ctkDictionary&)), "data/OPENFOLDER", Qt::DirectConnection);
 	}
 }
 shared_ptr<vector<QAction*>> PopeWorkbenchWindowAdvisor::createDataActions()

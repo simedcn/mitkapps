@@ -99,6 +99,7 @@ void MainPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 		bool closeable = 
 			(plugin.role == PluginDescriptor::PluginRole_main) ? is_main_closeable :
 			(plugin.role == PluginDescriptor::PluginRole_secondary) ? is_closeable :
+			(plugin.role == PluginDescriptor::PluginRole_pacs) ? true :
 			true;
 		bool moveable = (plugin.role == PluginDescriptor::PluginRole_main) ? is_main_moveable : is_moveable;
 		view->SetCloseable(closeable);

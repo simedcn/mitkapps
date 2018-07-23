@@ -3,7 +3,7 @@ PROJECT(my_organprint_renderwindoweditor)
 mitk_create_plugin(
   EXPORT_DIRECTIVE ORGANPRINT_RENDERWINDOWEDITOR
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkQtWidgets MitkDICOMReader OrganPrintLib
+  MODULE_DEPENDS MitkQtWidgets MitkDICOMReader OrganPrintLib PopeLib
     PACKAGE_DEPENDS
     PUBLIC Qt5|Xml GDCM
     PRIVATE ITK|ITKIOImageBase+ITKIOGDCM DCMTK

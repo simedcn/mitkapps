@@ -2,6 +2,8 @@
 #ifndef DICOMVIEWPREFERENCEPAGE_H
 #define DICOMVIEWPREFERENCEPAGE_H
 
+#include "ui_DicomViewPreferences.h"
+
 #include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
 
@@ -14,6 +16,7 @@ class QDoubleSpinBox;
 class QLineEdit;
 class QSpinBox;
 class QComboBox;
+class QPushButton;
 
 
 class DicomViewPreferencePage : public QObject, public berry::IQtPreferencePage
@@ -31,24 +34,26 @@ public:
 	/// \see IPreferencePage::Update()
 	virtual void Update() override;
 
-
 	void Init(berry::IWorkbench::Pointer workbench) override;
 	void CreateQtControl(QWidget* widget) override;
 	QWidget* GetQtControl() const override;
 
+protected:
+	void updateProtocolInUI();
+
 protected slots:
-	//void OnVolumeRenderingCheckboxChecked(int);
-	//void OnSmoothingCheckboxChecked(int);
+	void on_pushButton_PublicPACS_MedicalConnections_clicked();
+	void on_pushButton_PublicPACS_PixelMed_clicked();
+	void on_lineEdit_LocalFolderPath_textChanged(QString);
+	void on_pushButton_LocalFolderPath_clicked();
+	void on_pushButton_SetTemporaryLocalFolderPath_clicked();
+	void on_buttonGroup_Protocol_buttonToggled(QAbstractButton*, bool);
 
 protected:
-	QWidget* m_MainControl = nullptr;
-	bool m_Initializing = false;
+	QWidget* m_Control = nullptr;
 	berry::IPreferences::Pointer m_DicomViewPreferencesNode;
+	bool is_savedDestination_LocalFolder = false;
 
-	QLineEdit *m_lineEdit_IP;
-	QSpinBox *m_spinBox_Port;
-	QLineEdit *m_lineEdit_AETitle;
-	QComboBox *m_comboBox_Protocol;
-	QLineEdit *m_lineEdit_StorageAETitle;
+	Ui::DicomViewPreferences ui;
 };
 #endif // DICOMVIEWPREFERENCEPAGE_H

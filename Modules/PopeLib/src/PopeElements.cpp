@@ -140,6 +140,23 @@ QString Elements::get_patientId_or_patientName(const QString& filename, const QS
 	string name = filename.toStdString();
 	return get_patientId_or_patientName(name, def_value);
 }
+QString Elements::get_seriesInstanceUID(const string& filename, const QString& def_value)
+{
+	try
+	{
+		itk::GDCMImageIO::Pointer reader = itk::GDCMImageIO::New();
+		if (!reader->CanReadFile(filename.c_str()))
+			return def_value;
+		reader->SetFileName(filename);
+		reader->ReadImageInformation();
+		QString seriesInstanceUID = reader->GetSeriesInstanceUID();
+		return seriesInstanceUID;
+	}
+	catch (...)
+	{
+		return def_value;
+	}
+}
 string Elements::get_patientName(mitk::BaseData* baseData, const string& def_value)
 {
 	return get_property("dicom.patient.PatientsName", "DICOM.0010.0010", baseData, def_value);

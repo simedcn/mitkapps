@@ -76,7 +76,7 @@ MainWindow::MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent) :
 		eventAdmin->subscribeSlot(this, SLOT(On_ToolsPlugin_NodeHasManyImages(ctkEvent)), propsForSlot);
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/representation/SETRANGE";
 		eventAdmin->subscribeSlot(this, SLOT(On_ToolsPlugin_SetRange(ctkEvent)), propsForSlot);
-		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/data/SELECTEDNODE";
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "data/SELECTEDNODE";
 		eventAdmin->subscribeSlot(this, SLOT(On_ToolsPlugin_SelectedNodeChanged(ctkEvent)), propsForSlot);
 	}
 	/// Creating an Event Publisher.
