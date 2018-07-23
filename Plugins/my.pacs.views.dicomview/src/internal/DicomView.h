@@ -64,7 +64,8 @@ public:
     /// Creates the view control widgets provided by the QmitkDicomExternalDataWidget class.
     /// Widgets associated with unused functionality are being removed and DICOM import and data storage transfer funcionality being connected to the appropriate slots.
     void CreateQtPartControl(QWidget *parent);
-
+signals:
+    void addedToDataManager();
 protected:
     void updateSettings();
     void addSeriesToDataManager(const QStringList& listOfFilesForSeries, const shared_ptr<QString> modality);
@@ -89,6 +90,8 @@ protected slots:
     void on_lineEdit_AETitle_textChanged(QString);
     void on_comboBox_Protocol_currentIndexChanged(int);
     void on_lineEdit_StorageAETitle_textChanged(QString);
+
+
 
 protected:
     Ui::DicomViewControls ui;

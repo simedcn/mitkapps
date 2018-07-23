@@ -599,6 +599,8 @@ void DicomView::on_pushButton_AddToDataManager_clicked()
         addSeriesToDataManager(filesForSeries, pModality);
     }
 
+    emit addedToDataManager();
+
 
 }
 //void DicomView::on_UploadToPACSAction_run(const string& path)
