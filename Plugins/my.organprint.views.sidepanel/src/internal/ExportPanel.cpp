@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 
-
+#include <QmitkExtFileSaveProjectAction.h>
 
 
 // Don't forget to initialize the VIEW_ID.
@@ -72,6 +72,9 @@ void orgpnt::ExportPanel::ExportInSTL() {
 }
 
 void orgpnt::ExportPanel::SaveProject() {
+
+    QmitkExtFileSaveProjectAction * action = new QmitkExtFileSaveProjectAction(this->GetSite()->GetWorkbenchWindow());
+    action->Run();
 
 }
 
