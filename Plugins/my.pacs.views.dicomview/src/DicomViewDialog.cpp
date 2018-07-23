@@ -1,8 +1,8 @@
 #include "DicomViewDialog.h"
 
-DicomViewDialog::DicomViewDialog(QWidget * parent = 0) : QDialog(parent){
+DicomViewDialog::DicomViewDialog(QWidget * parent = 0) : QDialog(parent) {
     dicomView = new DicomView();
-    dicomView->CreateQtPartControl(parent);
+    dicomView->CreateQtPartControl(this);
     layout()->addWidget(dicomView);
 };
 

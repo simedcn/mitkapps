@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVariant>
 #include <service/event/ctkEventConstants.h>
 #include <service/event/ctkEventAdmin.h>
-//#include <internal/DicomView.h>
+#include <DicomViewDialog.h>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -86,18 +86,19 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 
-    next(2);
+    next(1);
 
 }
 
 void orgpnt::ImportPanel::QueryPacs() {
 
-
+    DicomViewDialog * dialog = new DicomViewDialog(parent);
+    dialog->exec();
     //DicomView * view = new DicomView();
     //view->CreateQtPartControl(parent);
 }
 
-void orgpnt::ImportPanel::next(int step = 2) {
+void orgpnt::ImportPanel::next(int step = 1) {
     ctkPluginContext * context = my_awesomeproject_exampleplugin_PluginActivator::GetPluginContext();
     ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
     if (ref)

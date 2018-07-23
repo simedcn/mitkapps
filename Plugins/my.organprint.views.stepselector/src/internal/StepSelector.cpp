@@ -72,7 +72,6 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     m_steps =
     {
         { "my.organprint.views.importpanel",		ui.pushButton_1 },
-        { "my.pacs.views.dicomview", 	ui.pushButton_1,false,true },
         { "org.mitk.views.segmentation",			ui.pushButton_2,true},
         { "my.organprint.views.exportpanel", 				ui.pushButton_4,true }
     };
@@ -143,12 +142,30 @@ void StepSelector::selectView(int n)
     if (page == nullptr)
         return;
 
-    if(n ==m_currentStep) return;
+    cout << "Settting step to " << n << endl;
+    const auto& current = m_steps[m_currentStep];
 
+    if(m_currentStep >= 0) {
+        berry::IViewPart::Pointer view = page->FindView(current.pluginId);
+
+        if(view !=nullptr) {
+            page->HideView(view);
+        }
+    }
+
+
+    page->ShowView(m_steps[n].pluginId);
+    m_currentStep = n;
+    /*
     for (int i = 0; i < (int) m_steps.size(); i++)
     {
+
+        cout << "requested step = " << n << " | i = " << i << endl;
         const auto& step = m_steps[i];
         berry::IViewPart::Pointer view = page->FindView(step.pluginId);
+
+
+
         try
         {
 
@@ -160,13 +177,6 @@ void StepSelector::selectView(int n)
 
                 page->ShowView(step.pluginId);
 
-                if(step.hideEditor) {
-                    cout<< "Hiding the editor !" << endl;
-                    page->HideView(page->FindView(QString::fromStdString(editorArea)));
-                }
-                else {
-                    page->ShowView(QString::fromStdString(editorArea));
-                }
 
                 //step.button->setStyleSheet("background-color: #3399cc");
 
@@ -186,8 +196,8 @@ void StepSelector::selectView(int n)
             BERRY_ERROR << "Error: " << e.what();
         }
     }
+    */
 
-    m_currentStep = n;
 }
 
 void StepSelector::SetFocus()

@@ -45,6 +45,7 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     {
         if(viewId == MinimalApplication::VIEW_IDS[0]) {
             layout->AddStandaloneView(viewId,false,berry::IPageLayout::RIGHT,panelSize,stepSelectorId);
+            // layout->AddStandaloneViewPlaceholder(viewId,berry::IPageLayout::RIGHT, panelSize, stepSelectorId,false);
         }
         else {
             layout->AddStandaloneViewPlaceholder(viewId,berry::IPageLayout::RIGHT, panelSize, stepSelectorId,false);
