@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 US_INITIALIZE_MODULE
 
+ctkPluginContext* my_awesomeproject_renderwindoweditor_Activator::context;
+
 void
 my_awesomeproject_renderwindoweditor_Activator::start(ctkPluginContext* context)
 {
@@ -34,6 +36,11 @@ void
 my_awesomeproject_renderwindoweditor_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+}
+
+ctkPluginContext* my_awesomeproject_renderwindoweditor_Activator::GetPluginContext()
+{
+	return context;
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

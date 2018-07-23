@@ -188,9 +188,9 @@ void ToolsPlugin::CreateQtPartControl(QWidget* parent)
 		eventAdmin->publishSignal(this, SIGNAL(Representation3DHasToBeInitiated(const ctkDictionary&)), "pope/representation/START3D", Qt::DirectConnection);
 		eventAdmin->publishSignal(this, SIGNAL(NodeHasManyImages(const ctkDictionary&)), "pope/representation/ENABLED3D", Qt::DirectConnection);
 		eventAdmin->publishSignal(this, SIGNAL(SetLevelWindowRange(const ctkDictionary&)), "pope/representation/SETRANGE", Qt::DirectConnection);
-		eventAdmin->publishSignal(this, SIGNAL(SelecedDataNodeChanged(const ctkDictionary&)), "pope/data/SELECTEDNODE", Qt::DirectConnection);
+		eventAdmin->publishSignal(this, SIGNAL(SelecedDataNodeChanged(const ctkDictionary&)), "data/SELECTEDNODE", Qt::DirectConnection);
 	}
-  
+
 	/// Create the DisplayCoordinate Supplier and provide it with the function name it should call.
 	m_DisplayCoordinateSupplier = make_unique<DisplayCoordinateSupplier>();
 	QString functionName = "on_pixel_selected";
@@ -579,7 +579,7 @@ void ToolsPlugin::SetFocus()
 	// default focus --> one line to set focus for the default widget
 }
 
-void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& dataNodes)
+void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
 {
 	if (m_StatisticsUpdatePending)
 	{
@@ -589,7 +589,7 @@ void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList
 
 	// Get the first selected node
 	auto nodes = shared_ptr<DataNodeList>(new DataNodeList);
-	*nodes = dataNodes.toStdList();
+	*nodes = selectedDataNodes.toStdList();
 	auto firstSelectedNode = getFirstSelectedNode(nodes);
 
 	// Make invisible all the nodes but the first selected node
@@ -604,12 +604,23 @@ void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList
 		if (!image)
 			continue;
 
-		bool is_visible = false;
-		bool is_property_found = datanode->GetBoolProperty("visible", is_visible);
-		bool is_selected_node = (datanode.GetPointer() == firstSelectedNode);
+		//bool is_visible = false;
+		//bool is_property_found = datanode->GetBoolProperty("visible", is_visible);
+		//bool is_selected_node = (datanode.GetPointer() == firstSelectedNode);
 		//if (is_property_found && is_visible)
-			datanode->SetBoolProperty("visible", is_selected_node);
+		//	datanode->SetBoolProperty("visible", is_selected_node);
+		bool is_selected_node = false;
+		for (auto selected_node : selectedDataNodes)
+		{
+			if (datanode.GetPointer() == selected_node.GetPointer())
+			{
+				is_selected_node = true;
+				break;
+			}
+		}
+		datanode->SetBoolProperty("visible", is_selected_node);
 	}
+	this->RequestRenderWindowUpdate();
 
 	// Process the event in SelectionChanged()
 	SelectionChanged(firstSelectedNode);

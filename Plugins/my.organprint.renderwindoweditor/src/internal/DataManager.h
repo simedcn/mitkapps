@@ -6,6 +6,9 @@
 #include <memory>
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
+#include <service/event/ctkEventAdmin.h>
+#include <service/event/ctkEventConstants.h>
+
 
 class DataManager : public QObject
 {
@@ -15,8 +18,7 @@ public:
 signals:
 
 public slots:
-
-  int LoadImageSet(const QString& filenameAndDirectory);
+	void OpenDICOMSeries(const ctkEvent& event);
 
 protected:
 
@@ -28,7 +30,11 @@ protected:
 
   void AddImage(const std::string &name, mitk::Image::Pointer image);
 
-  std::vector<std::string> GetDICOMFilesInSameDirectory(const std::string &filePath);
+  int LoadImageSet(const QString &filenameAndDirectory);
+
+  int AskAboutNewPatient();
+  int LoadImageDataSet(const QString& filenameAndDirectory);
+  int LoadImageFolder(const QString& directory);
 
   mitk::DataStorage* m_DataStorage;
   QString m_PatientId;

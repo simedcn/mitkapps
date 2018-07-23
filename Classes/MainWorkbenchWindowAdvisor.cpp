@@ -10,6 +10,7 @@
 #include <berryIPreferencesService.h>
 #include <berryIBerryPreferences.h>
 #include <berryQtPreferences.h>
+#include <berryQtStyleManager.h>
 
 #include <mitkLogMacros.h>
 
@@ -282,6 +283,22 @@ void MainWorkbenchWindowAdvisor::updateMainToolbar()
 		MITK_WARN << "Failed to set the main toolbar";
 	}
 }
+void MainWorkbenchWindowAdvisor::updateViewToolbar()
+{
+	bool showTabShortcuts = mainApplicationPreferencesNode->GetBool("show shortcuts", false);
+	auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
+	const QIcon& icon = showTabShortcuts ? berry::QtStyleManager::ThemeIcon(basePath + "go-previous.svg") : berry::QtStyleManager::ThemeIcon(basePath + "go-next.svg");
+	tabsToolButton->setIcon(icon);
+	//QSize size = tabsToolButton->iconSize();
+	QSize size(20, 20);
+	tabsToolButton->setFixedSize(size);
+	tabsToolButton->setIconSize(size);
+
+	for (auto action : viewToolbarActions)
+	{
+		action->setVisible(showTabShortcuts);
+	}
+}
 void MainWorkbenchWindowAdvisor::createViewToolbar(berry::IWorkbenchWindow::Pointer window, ViewDescriptors viewDescriptors)
 {
 	if (!showViewToolbar)
@@ -292,11 +309,10 @@ void MainWorkbenchWindowAdvisor::createViewToolbar(berry::IWorkbenchWindow::Poin
 		return;
 
 	/// Find View actions.
-	QList<QAction*> actions;
 	for (auto viewInfo : *viewDescriptors)
 	{
 		QAction* viewAction = new ShowViewAction(window, viewInfo);
-		actions.push_back(viewAction);
+		viewToolbarActions.push_back(viewAction);
 	}
 
 	/// Add View toolbar.
@@ -310,9 +326,26 @@ void MainWorkbenchWindowAdvisor::createViewToolbar(berry::IWorkbenchWindow::Poin
 	labelButton->setText("Tabs:");
 	labelButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
 	viewToolbar->addWidget(labelButton);
+	if (addShowTabsButton)
+	{
+		tabsToolButton = new QToolButton;
+		tabsToolButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+		QObject::connect(tabsToolButton, SIGNAL(clicked(bool)), this, SLOT(on_tabsToolButton_triggered()));
+		viewToolbar->addWidget(tabsToolButton);
+		/*tabsAction = new QAction();
+		//tabsAction->setText("Tabs:");
+		tabsAction->setToolTip("Show/hide tab shortcuts");
+		//tabsAction->setIconVisibleInMenu(true);
+		QObject::connect(tabsAction, SIGNAL(triggered(bool)), this, SLOT(on_tabsAction_triggered()));
+		viewToolbar->addAction(tabsAction);*/
+	}
 
 	/// Add View actions.
-	viewToolbar->addActions(actions);
+	viewToolbar->addActions(viewToolbarActions);
+
+	/// Show/hide tab shortcuts.
+	if (addShowTabsButton)
+		updateViewToolbar();
 }
 void MainWorkbenchWindowAdvisor::findSubMenus(QMenu** windowMenu, QMenu** editMenu)
 {
@@ -762,11 +795,21 @@ void MainWorkbenchWindowAdvisor::OnPreferencesChanged(const berry::IBerryPrefere
 	berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
 	berry::IWorkbenchPage::Pointer page = window->GetActivePage();
 	manageViews(page);
+	updateViewToolbar();
 }
-
 //void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
 //{
 //	auto   aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), nullptr);
 //	std::string str = aboutDialog->GetAboutText().toStdString();
 //	aboutDialog->open();
 //}
+void MainWorkbenchWindowAdvisor::on_tabsToolButton_triggered()
+{
+	if (tabsToolButton == nullptr)
+		return;
+
+	bool showTabShortcuts = mainApplicationPreferencesNode->GetBool("show shortcuts", false);
+	showTabShortcuts = !showTabShortcuts;
+	mainApplicationPreferencesNode->PutBool("show shortcuts", showTabShortcuts);
+	updateViewToolbar();
+}

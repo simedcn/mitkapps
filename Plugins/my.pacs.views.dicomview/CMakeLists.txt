@@ -4,6 +4,7 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE MY_PACS_VIEWS_DICOMVIEW_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src internal
   MODULE_DEPENDS MitkCore MitkQtWidgetsExt MitkDicomUI MitkDicomRT MitkDicomRTIO MitkRTUI MitkDICOMReader PopeLib
+  PACKAGE_DEPENDS PRIVATE DCMTK
 )
 
 install(DIRECTORY "${BOOST_ROOT}/src/DCMTK-build/bin/Release/" DESTINATION "bin/bin")

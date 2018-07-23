@@ -1,5 +1,6 @@
 
 #include "DicomViewPreferencePage.h"
+#include "DicomView.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -11,12 +12,13 @@
 #include <QDoubleSpinBox>
 #include <QLineEdit>
 #include <QComboBox>
+#include <QFileDialog>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
 
-DicomViewPreferencePage::DicomViewPreferencePage(QWidget*, Qt::WindowFlags)
+DicomViewPreferencePage::DicomViewPreferencePage(QWidget* parent, Qt::WindowFlags f)
 //	: m_MainControl(nullptr), m_Initializing(false)
 {}
 
@@ -25,71 +27,188 @@ void DicomViewPreferencePage::Init(berry::IWorkbench::Pointer)
 
 void DicomViewPreferencePage::CreateQtControl(QWidget* parent)
 {
-    m_Initializing = true;
-    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	m_Control = new QWidget(parent);
+	ui.setupUi(m_Control);
 
-    m_DicomViewPreferencesNode = prefService->GetSystemPreferences()->Node("/my.pacs.views.dicomview");
+	connect(this->ui.pushButton_PublicPACS_MedicalConnections, SIGNAL(clicked()), this, SLOT(on_pushButton_PublicPACS_MedicalConnections_clicked()));
+	connect(this->ui.pushButton_PublicPACS_PixelMed, SIGNAL(clicked()), this, SLOT(on_pushButton_PublicPACS_PixelMed_clicked()));
+	connect(this->ui.buttonGroup_Protocol, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(on_buttonGroup_Protocol_buttonToggled(QAbstractButton*, bool)));
+	connect(this->ui.lineEdit_LocalFolderPath, SIGNAL(textChanged(QString)), this, SLOT(on_lineEdit_LocalFolderPath_textChanged(QString)));
+	connect(this->ui.pushButton_LocalFolderPath, SIGNAL(clicked()), this, SLOT(on_pushButton_LocalFolderPath_clicked()));
+	connect(this->ui.pushButton_SetTemporaryLocalFolderPath, SIGNAL(clicked()), this, SLOT(on_pushButton_SetTemporaryLocalFolderPath_clicked()));
 
-    m_MainControl = new QWidget(parent);
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	m_DicomViewPreferencesNode = prefService->GetSystemPreferences()->Node("/my.pacs.views.dicomview");
 
-    auto  formLayout = new QFormLayout;
-    formLayout->setHorizontalSpacing(8);
-    formLayout->setVerticalSpacing(24);
-
-    /*auto serverSettingsLayout = new QVBoxLayout;
-    m_lineEdit_IP = new QLineEdit("Host / IP address", m_MainControl);
-    serverSettingsLayout->addWidget(m_lineEdit_IP);
-    m_spinBox_Port = new QSpinBox(m_MainControl);
-    serverSettingsLayout->addWidget(m_spinBox_Port);
-    m_lineEdit_AETitle = new QLineEdit("AETitle", m_MainControl);
-    serverSettingsLayout->addWidget(m_lineEdit_AETitle);
-    m_comboBox_Protocol = new QComboBox(m_MainControl);
-    serverSettingsLayout->addWidget(m_comboBox_Protocol);
-    formLayout->addRow("Server Settings", serverSettingsLayout);*/
-    m_lineEdit_IP = new QLineEdit("Host / IP address", m_MainControl);
-    formLayout->addRow("Host / IP address", m_lineEdit_IP);
-    m_spinBox_Port = new QSpinBox(m_MainControl);
-    m_spinBox_Port->setMaximum(999999);
-    m_spinBox_Port->setValue(11112);
-    formLayout->addRow("Port", m_spinBox_Port);
-    m_lineEdit_AETitle = new QLineEdit("AETitle", m_MainControl);
-    formLayout->addRow("AETitle", m_lineEdit_AETitle);
-    m_comboBox_Protocol = new QComboBox(m_MainControl);
-    m_comboBox_Protocol->insertItems(0, QStringList() << "C-MOVE" << "C-GET");
-    m_comboBox_Protocol->setCurrentIndex(0);
-    formLayout->addRow("Retrieve protocol", m_comboBox_Protocol);
-    m_lineEdit_StorageAETitle = new QLineEdit("Storage AETitle", m_MainControl);
-    formLayout->addRow("Storage AETitle", m_lineEdit_StorageAETitle);
-
-    m_MainControl->setLayout(formLayout);
-    this->Update();
-    m_Initializing = false;
+	this->Update();
 }
 
 QWidget* DicomViewPreferencePage::GetQtControl() const
 {
-    return m_MainControl;
+	return m_Control;
 }
 
 
 /// Invoked when the OK button was clicked in the preferences dialog
 bool DicomViewPreferencePage::PerformOk()
 {
-    m_DicomViewPreferencesNode->Put("PACS IP", m_lineEdit_IP->text());
-    m_DicomViewPreferencesNode->PutInt("PACS port", m_spinBox_Port->value());
-    m_DicomViewPreferencesNode->Put("PACS AETitle", m_lineEdit_AETitle->text());
-    m_DicomViewPreferencesNode->PutInt("PACS protocol", m_comboBox_Protocol->currentIndex());
-    m_DicomViewPreferencesNode->Put("PACS storage AETitle", m_lineEdit_StorageAETitle->text());
-    return true;
+	m_DicomViewPreferencesNode->Put("PACS host IP", ui.lineEdit_IP->text());
+	m_DicomViewPreferencesNode->PutInt("PACS host port", ui.spinBox_Port->value());
+	m_DicomViewPreferencesNode->Put("PACS host AETitle", ui.lineEdit_HostAETitle->text());
+	int protocol = (ui.radioButton_Protocol_CGET->isChecked() ? PROTOCOL_CGET : PROTOCOL_CMOVE);
+	m_DicomViewPreferencesNode->PutInt("PACS protocol", protocol);
+	QString directory = ui.lineEdit_LocalFolderPath->text();
+	if (directory == NO_DIRECTORY_SPECIFIED)
+		directory = "";
+	m_DicomViewPreferencesNode->Put("PACS storage local folder", directory);
+	m_DicomViewPreferencesNode->Put("PACS storage local AETitle", ui.lineEdit_StorageAETitle->text());
+	m_DicomViewPreferencesNode->Put("PACS storage local IP", ui.lineEdit_LocalStorageIP->text());
+	m_DicomViewPreferencesNode->PutInt("PACS storage local port", ui.spinBox_LocalStoragePort->value());
+	int destination = 
+		is_savedDestination_LocalFolder ? DESTINATION_LOCALFOLDER
+		: ui.radioButton_DestinationLocalFolder->isChecked() ? DESTINATION_LOCALFOLDER : DESTINATION_PACS;
+	m_DicomViewPreferencesNode->PutInt("PACS destination", destination);
+	m_DicomViewPreferencesNode->Put("PACS destination AETitle", ui.lineEdit_DestinationAETitle->text());
+
+	return true;
 }
 /// Invoked when the Cancel button was clicked in the preferences dialog
 void DicomViewPreferencePage::PerformCancel()
 {}
 void DicomViewPreferencePage::Update()
 {
-    m_lineEdit_IP->setText(m_DicomViewPreferencesNode->Get("PACS IP", "127.0.0.1"));
-    m_spinBox_Port->setValue(m_DicomViewPreferencesNode->GetInt("PACS port", 11112));
-    m_lineEdit_AETitle->setText(m_DicomViewPreferencesNode->Get("PACS AETitle", "SERVERAE"));
-    m_comboBox_Protocol->setCurrentIndex(m_DicomViewPreferencesNode->GetInt("PACS protocol", 0));
-    m_lineEdit_StorageAETitle->setText(m_DicomViewPreferencesNode->Get("PACS storage AETitle", "SERVERAE"));
+	vector<QObject*> ui_elements =
+	{
+		ui.lineEdit_IP,
+		ui.spinBox_Port,
+		ui.lineEdit_HostAETitle,
+		ui.buttonGroup_Protocol,
+		ui.buttonGroup_Destination,
+		ui.lineEdit_DestinationAETitle,
+		ui.lineEdit_LocalFolderPath,
+		ui.pushButton_LocalFolderPath,
+		ui.pushButton_SetTemporaryLocalFolderPath,
+		ui.lineEdit_StorageAETitle,
+		ui.lineEdit_LocalStorageIP,
+		ui.spinBox_LocalStoragePort
+	};
+	for (auto ui_element : ui_elements)
+	{
+		ui_element->blockSignals(true);
+	}
+	QString text = m_DicomViewPreferencesNode->Get("PACS host IP", "184.73.255.26");
+	if (text != ui.lineEdit_IP->text())
+		ui.lineEdit_IP->setText(text);
+	int value = m_DicomViewPreferencesNode->GetInt("PACS host port", 11112);
+	if (value != ui.spinBox_Port->value())
+		ui.spinBox_Port->setValue(value);
+	text = m_DicomViewPreferencesNode->Get("PACS host AETitle", "AWSPIXELMEDPUB");
+	if (text != ui.lineEdit_HostAETitle->text())
+		ui.lineEdit_HostAETitle->setText(text);
+	int protocol = m_DicomViewPreferencesNode->GetInt("PACS protocol", PROTOCOL_CGET);
+	int destination = m_DicomViewPreferencesNode->GetInt("PACS destination", DESTINATION_LOCALFOLDER);
+	if (destination == 0) // ! before checking C-GET
+		ui.radioButton_DestinationLocalFolder->setChecked(true);
+	else
+		ui.radioButton_DestinationPACS->setChecked(true);
+	if (protocol == PROTOCOL_CGET)
+		ui.radioButton_Protocol_CGET->setChecked(true);
+	else
+		ui.radioButton_Protocol_CMOVE->setChecked(true);
+	QString directory = m_DicomViewPreferencesNode->Get("PACS storage local folder", "");
+	if (directory.isEmpty())
+		directory = NO_DIRECTORY_SPECIFIED;
+	if (directory != ui.lineEdit_LocalFolderPath->text())
+		ui.lineEdit_LocalFolderPath->setText(directory);
+	text = m_DicomViewPreferencesNode->Get("PACS storage local AETitle", "POPEAE");
+	if (text != ui.lineEdit_StorageAETitle->text())
+		ui.lineEdit_StorageAETitle->setText(text);
+	text = m_DicomViewPreferencesNode->Get("PACS storage local IP", "127.0.0.1");
+	if (text != ui.lineEdit_LocalStorageIP->text())
+		ui.lineEdit_LocalStorageIP->setText(text);
+	value = m_DicomViewPreferencesNode->GetInt("PACS storage local port", 11112);
+	if (value != ui.spinBox_LocalStoragePort->value())
+		ui.spinBox_LocalStoragePort->setValue(value);
+	text = m_DicomViewPreferencesNode->Get("PACS destination AETitle", "ARCHIVESTATIONAE");
+	if (text != ui.lineEdit_DestinationAETitle->text())
+		ui.lineEdit_DestinationAETitle->setText(text);
+	for (auto ui_element : ui_elements)
+	{
+		ui_element->blockSignals(false);
+	}
+	updateProtocolInUI();
+}
+void DicomViewPreferencePage::updateProtocolInUI()
+{
+	bool is_CGET = ui.radioButton_Protocol_CGET->isChecked();
+
+	ui.radioButton_DestinationLocalFolder->setEnabled(is_CGET);
+
+	if (!is_CGET && !is_savedDestination_LocalFolder)
+	{
+		int destination = (ui.radioButton_DestinationLocalFolder->isChecked() ? DESTINATION_LOCALFOLDER : DESTINATION_PACS);
+		is_savedDestination_LocalFolder = (destination == DESTINATION_LOCALFOLDER);
+		if (is_savedDestination_LocalFolder)
+			ui.radioButton_DestinationPACS->setChecked(true);
+	}
+	else if (is_CGET && is_savedDestination_LocalFolder)
+	{
+		ui.radioButton_DestinationLocalFolder->setChecked(true);
+		is_savedDestination_LocalFolder = false;
+	}
+}
+
+void DicomViewPreferencePage::on_pushButton_PublicPACS_MedicalConnections_clicked()
+{
+	QString ip = "dicomserver.co.uk";
+	int port = 104;
+	QString AETitle = "server";
+	if (ui.lineEdit_IP->text() != ip)
+		ui.lineEdit_IP->setText(ip);
+	if (ui.spinBox_Port->value() != port)
+		ui.spinBox_Port->setValue(port);
+	if (ui.lineEdit_HostAETitle->text() != AETitle)
+		ui.lineEdit_HostAETitle->setText(AETitle);
+}
+void DicomViewPreferencePage::on_pushButton_PublicPACS_PixelMed_clicked()
+{
+	QString ip = "184.73.255.26";
+	int port = 11112;
+	QString AETitle = "AWSPIXELMEDPUB";
+	if (ui.lineEdit_IP->text() != ip)
+		ui.lineEdit_IP->setText(ip);
+	if (ui.spinBox_Port->value() != port)
+		ui.spinBox_Port->setValue(port);
+	if (ui.lineEdit_HostAETitle->text() != AETitle)
+		ui.lineEdit_HostAETitle->setText(AETitle);
+}
+void DicomViewPreferencePage::on_lineEdit_LocalFolderPath_textChanged(QString)
+{
+	QString directory = ui.lineEdit_LocalFolderPath->text();
+	if (directory.isEmpty())
+	{
+		ui.lineEdit_LocalFolderPath->blockSignals(true);
+		ui.lineEdit_LocalFolderPath->setText(NO_DIRECTORY_SPECIFIED);
+		ui.lineEdit_LocalFolderPath->blockSignals(false);
+	}
+}
+void DicomViewPreferencePage::on_pushButton_LocalFolderPath_clicked()
+{
+	QString directory = ui.lineEdit_LocalFolderPath->text();
+	if (directory == NO_DIRECTORY_SPECIFIED)
+		directory = "";
+	QString new_directory = QFileDialog::getExistingDirectory(nullptr, tr("Set Local Storage Directory"), directory);
+	if (directory == new_directory || new_directory.isEmpty() || new_directory == NO_DIRECTORY_SPECIFIED)
+		return;
+	if (new_directory.isEmpty())
+		new_directory = NO_DIRECTORY_SPECIFIED;
+	ui.lineEdit_LocalFolderPath->setText(new_directory);
+}
+void DicomViewPreferencePage::on_pushButton_SetTemporaryLocalFolderPath_clicked()
+{
+	ui.lineEdit_LocalFolderPath->setText("");
+}
+void DicomViewPreferencePage::on_buttonGroup_Protocol_buttonToggled(QAbstractButton*, bool)
+{
+	updateProtocolInUI();
 }

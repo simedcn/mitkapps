@@ -29,6 +29,12 @@
     <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="PACS" />
     <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="preferences" />
     <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="settings" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="storage" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="application entry" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="AETitle" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="SCU" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="SCP" />
+    <keyword id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords" label="protocol" />
   </extension>
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
     <contextMenuAction nodeDescriptorName="Unknown" label="Upload to PACS" icon="" smoothed="false" class="UploadToPACSAction" />

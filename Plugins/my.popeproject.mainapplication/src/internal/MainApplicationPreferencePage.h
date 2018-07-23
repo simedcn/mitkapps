@@ -49,6 +49,7 @@ protected:
 	berry::IPreferences::Pointer m_MainApplicationPreferencesNode;
 
 	vector<ViewDescriptor> m_Views;
+	QCheckBox* checkBox_showShortucts = nullptr;
 
 protected:
 	struct ViewDescriptor

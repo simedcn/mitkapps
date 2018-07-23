@@ -51,6 +51,9 @@ void MainApplicationPreferencePage::CreateQtControl(QWidget* parent)
 	}
 	formLayout->addRow("Tabs", viewOptionsLayout);
 
+	checkBox_showShortucts = new QCheckBox("Show shortcuts", m_MainControl);
+	formLayout->addRow("ToolBar", checkBox_showShortucts);
+
 	m_MainControl->setLayout(formLayout);
 	this->Update();
 	m_Initializing = false;
@@ -69,6 +72,7 @@ bool MainApplicationPreferencePage::PerformOk()
 	{
 		m_MainApplicationPreferencesNode->PutBool(view.plugin->id, view.checkBox->isChecked());
 	}
+	m_MainApplicationPreferencesNode->PutBool("show shortcuts", checkBox_showShortucts->isChecked());
 	return true;
 }
 /// Invoked when the Cancel button was clicked in the preferences dialog
@@ -80,4 +84,5 @@ void MainApplicationPreferencePage::Update()
 	{
 		view.checkBox->setChecked(m_MainApplicationPreferencesNode->GetBool(view.plugin->id, view.plugin->is_open));
 	}
+	checkBox_showShortucts->setChecked(m_MainApplicationPreferencesNode->GetBool("show shortcuts", false));
 }

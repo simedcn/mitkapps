@@ -6,6 +6,7 @@ SET(INTERNAL_CPP_FILES
   QmitkAwesomeRenderWindowEditor.cpp
   MainWindow.cpp
   DataManager.cpp
+  PatientSelector.cpp
 )
 
 SET(MOC_H_FILES
@@ -13,10 +14,12 @@ SET(MOC_H_FILES
   src/internal/QmitkAwesomeRenderWindowEditor.h
   src/internal/MainWindow.h
   src/internal/DataManager.h
+  src/internal/PatientSelector.h
 )
 
 SET(UI_FILES
   src/internal/MainWindow.ui
+  src/internal/PatientSelector.ui
 )
 
 SET(CACHED_RESOURCE_FILES

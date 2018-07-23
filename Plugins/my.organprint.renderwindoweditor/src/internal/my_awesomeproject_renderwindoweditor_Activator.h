@@ -36,6 +36,10 @@ public:
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
+  static ctkPluginContext* GetPluginContext();
+
+private:
+	static ctkPluginContext* context;
 
 };
 

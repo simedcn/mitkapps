@@ -21,6 +21,7 @@ set(MOC_H_FILES
 
 set(UI_FILES
   src/internal/DicomViewControls.ui
+  src/internal/DicomViewPreferences.ui
 )
 
 set(QRC_FILES
