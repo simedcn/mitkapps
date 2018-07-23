@@ -66,6 +66,8 @@ private:
     // Generated from the associated UI file, it encapsulates all the widgets
     // of our view.
     Ui::OrganPrintImportPanelControls m_Controls;
+
+    QWidget * parent;
 };
 }
 

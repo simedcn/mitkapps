@@ -1,18 +1,18 @@
 set(SRC_CPP_FILES
+    DicomViewDialog.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  DicomView.cpp
-  DicomViewDialog.cpp
   WindowListener.cpp
   my_pacs_views_dicomview_Activator.cpp
   DicomViewPreferencePage.cpp
   UploadToPACSAction.cpp
-
+  DicomView.cpp
 )
 
 set(MOC_H_FILES
   src/internal/DicomView.h
+  src/DicomViewDialog.h
   src/internal/WindowListener.h
   src/internal/my_pacs_views_dicomview_Activator.h
   src/internal/DicomViewPreferencePage.h

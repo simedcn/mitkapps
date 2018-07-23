@@ -73,8 +73,6 @@ Plugins/my.organprint.minimalapplication/CMakeLists.txt
 Plugins/my.organprint.minimalapplication/files.cmake
 Plugins/my.organprint.minimalapplication/manifest_headers.cmake
 Plugins/my.organprint.minimalapplication/plugin.xml
-Plugins/my.organprint.minimalapplication/resources/StyleSheet.qss
-Plugins/my.organprint.minimalapplication/resources/inoflat.qss
 Plugins/my.organprint.minimalapplication/resources/my_organprint_minimalapplication.qrc
 Plugins/my.organprint.minimalapplication/src/internal/MinimalApplication.cpp
 Plugins/my.organprint.minimalapplication/src/internal/MinimalApplication.h
@@ -118,7 +116,6 @@ Plugins/my.organprint.views.stepselector/files.cmake
 Plugins/my.organprint.views.stepselector/manifest_headers.cmake
 Plugins/my.organprint.views.stepselector/plugin.xml
 Plugins/my.organprint.views.stepselector/resources/StepSelector.qrc
-Plugins/my.organprint.views.stepselector/resources/Styles.qss
 Plugins/my.organprint.views.stepselector/src/internal/StepSelector.cpp
 Plugins/my.organprint.views.stepselector/src/internal/StepSelector.h
 Plugins/my.organprint.views.stepselector/src/internal/StepSelectorControls.ui
@@ -146,7 +143,6 @@ Plugins/my.popeproject.mainapplication/CMakeLists.txt
 Plugins/my.popeproject.mainapplication/files.cmake
 Plugins/my.popeproject.mainapplication/manifest_headers.cmake
 Plugins/my.popeproject.mainapplication/plugin.xml
-Plugins/my.popeproject.mainapplication/resources/StyleSheet.qss
 Plugins/my.popeproject.mainapplication/resources/my_popeproject_mainapplication.qrc
 Plugins/my.popeproject.mainapplication/src/internal/DicomPerspective.cpp
 Plugins/my.popeproject.mainapplication/src/internal/DicomPerspective.h
@@ -166,7 +162,6 @@ Plugins/my.popeproject.renderwindoweditor/CMakeLists.txt
 Plugins/my.popeproject.renderwindoweditor/files.cmake
 Plugins/my.popeproject.renderwindoweditor/manifest_headers.cmake
 Plugins/my.popeproject.renderwindoweditor/plugin.xml
-Plugins/my.popeproject.renderwindoweditor/resources/StyleSheet.qss
 Plugins/my.popeproject.renderwindoweditor/resources/my.popeproject.renderwindoweditor.qrc
 Plugins/my.popeproject.renderwindoweditor/src/internal/DataManager.cpp
 Plugins/my.popeproject.renderwindoweditor/src/internal/DataManager.h
@@ -216,3 +211,4 @@ Plugins/my.popeproject.toolsplugin/src/internal/ToolsPluginPreferencePage.h
 Plugins/my.popeproject.toolsplugin/src/internal/my_popeproject_toolsplugin_PluginActivator.cpp
 Plugins/my.popeproject.toolsplugin/src/internal/my_popeproject_toolsplugin_PluginActivator.h
 SuperBuild.cmake
+mitkapps.files

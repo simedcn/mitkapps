@@ -10,6 +10,14 @@
     />
   </extension>
   -->
+
+<extension point="org.blueberry.ui.views">
+  <view id="my.pacs.views.dicomviewdialog"
+        name="PACS View Dialog"
+        class="DicomViewDialog"
+        icon="resources/CreateSurface.png"
+  />
+</extension>
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.gui.qt.application.DicomViewPreferencePage" name="PACS" class="DicomViewPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.DicomViewPreferencePageKeywords">

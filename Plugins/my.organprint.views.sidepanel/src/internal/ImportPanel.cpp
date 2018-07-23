@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVariant>
 #include <service/event/ctkEventConstants.h>
 #include <service/event/ctkEventAdmin.h>
+#include <internal/DicomView.h>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -43,6 +44,8 @@ const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpane
 
 void orgpnt::ImportPanel::CreateQtPartControl(QWidget* parent)
 {
+
+    this->parent = parent;
     // Setting up the UI is a true pleasure when using .ui files, isn't it?
     m_Controls.setupUi(parent);
 
@@ -88,8 +91,10 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
 }
 
 void orgpnt::ImportPanel::QueryPacs() {
-    cout << "Thank you for querying PACS" << endl;
-    next(1);
+
+
+    DicomView * view = new DicomView();
+    view->CreateQtPartControl(parent);
 }
 
 void orgpnt::ImportPanel::next(int step = 2) {

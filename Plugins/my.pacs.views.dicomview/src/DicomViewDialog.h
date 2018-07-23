@@ -2,18 +2,18 @@
 #define DICOMVIEWDIALOG_H
 
 #include <QObject>
-#include "DicomView.h"
+#include <internal/DicomView.h>
 #include <QDialog>
+
+
 class DicomViewDialog : public QDialog
 {
-
-    Q_OBJECT
-
-
+Q_OBJECT
 public:
     DicomViewDialog(QWidget * parent);
+    ~DicomViewDialog();
 
-
+    static void execute(QWidget * parent);
 private:
     DicomView * dicomView;
 };
