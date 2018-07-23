@@ -144,7 +144,7 @@ QHeaderView::up-arrow:pressed {
 QGroupBox {
   border: 0;
   margin:0;
-  padding:0;
+  padding:30 0 0 0;
   spacing:0;
 }
 
@@ -153,9 +153,12 @@ QGroupBox, QGroupBox:disabled {
 }
 
 QGroupBox::title {
-  padding:0px;
+  padding:8px;
+  font-weight:bold;
+    color:white;
   subcontrol-origin: margin;
   subcontrol-position: top center;
+  
 }
 
 QComboBox, QLineEdit, QAbstractSpinBox {
@@ -223,9 +226,16 @@ QAbstractSpinBox::down-arrow:pressed {
   image: url(:/org.blueberry.ui.qt/dark/tight-down-arrow-pressed.svg);
 }
 
-QCheckBox, QCheckBox:hover, QCheckBox:disabled, QCheckBox:checked, QRadioButton, QRadioButton:hover, QRadioButton:disabled, QRadioButton:checked {
+
+
+QCheckBox:disabled, QCheckBox:hover, QCheckBox:disabled, QRadioButton:disabled QRadioButton:disabled, QRadioButton:disabled {
   background-color: none;
   color:  #353535;
+}
+
+QCheckBox, QRadioButton, QCheckBox:checked, QRadioButton:checked, QCheckBox:hover, QRadioButton:hover {
+    background-color:transparent;
+    color: #ffffff;
 }
 
 QCheckBox::indicator, QRadioButton::indicator {
@@ -626,7 +636,7 @@ QSplitter {
     border-radius:4px;
 }
 #QmitkSegmentationControls QAbstractButton:checked {
-    background-color: #AEAFB0;
+    background-color: #AEAFB0;selected
     border-radius:4px;
 }
 

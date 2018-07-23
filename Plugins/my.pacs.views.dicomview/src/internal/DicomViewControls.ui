@@ -508,7 +508,7 @@ QHeaderView::section
              <property name="maximumSize">
               <size>
                <width>30</width>
-               <height>24</height>
+               <height>16777215</height>
               </size>
              </property>
              <property name="toolTip">

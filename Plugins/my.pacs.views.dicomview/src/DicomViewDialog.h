@@ -5,6 +5,7 @@
 #include <internal/DicomView.h>
 #include <QDialog>
 #include <my_pacs_views_dicomview_Export.h>
+#include <QLayout>
 
 class MY_PACS_VIEWS_DICOMVIEW_EXPORT DicomViewDialog : public QDialog
 {
