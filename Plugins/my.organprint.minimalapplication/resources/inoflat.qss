@@ -153,9 +153,10 @@ QGroupBox, QGroupBox:disabled {
 }
 
 QGroupBox::title {
-  padding:0px;
+  padding:10px;
   subcontrol-origin: margin;
   subcontrol-position: top center;
+  
 }
 
 QComboBox, QLineEdit, QAbstractSpinBox {
@@ -626,7 +627,7 @@ QSplitter {
     border-radius:4px;
 }
 #QmitkSegmentationControls QAbstractButton:checked {
-    background-color: #AEAFB0;
+    background-color: #AEAFB0;selected
     border-radius:4px;
 }
 
