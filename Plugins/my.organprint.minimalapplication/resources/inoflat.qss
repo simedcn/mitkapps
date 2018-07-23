@@ -618,7 +618,7 @@ QSplitter {
     border-radius:0px;
     padding:5px;
     font-size:14px;
-    border-bottom:1px solid  #AEAFB0;
+   
 
 }
 #QmitkSegmentationControls QAbstractButton:hover {
