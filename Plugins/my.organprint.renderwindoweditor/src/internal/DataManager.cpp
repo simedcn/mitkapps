@@ -190,7 +190,6 @@ std::vector<std::string> DataManager::LoadDataOfCurrentPatient()
 
 void DataManager::OpenDICOMSeries(const ctkEvent& event)
 {
-	cout << "444";
     QStringList files = event.getProperty("files").toStringList();
     QStringList series = event.getProperty("series").toStringList();
     int error_code = 0;

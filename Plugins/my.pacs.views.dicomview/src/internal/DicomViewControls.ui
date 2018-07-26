@@ -555,7 +555,7 @@ QHeaderView::section
               <string>Use a temporary folder</string>
              </property>
              <property name="text">
-              <string>-&gt; temporary</string>
+              <string>→ temporary</string>
              </property>
             </widget>
            </item>

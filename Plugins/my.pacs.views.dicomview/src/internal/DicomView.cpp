@@ -991,7 +991,6 @@ void DicomView::on_pushButton_Retrieve_clicked()
 }
 void DicomView::on_pushButton_AddToDataManager_clicked()
 {
-	cout << "111";
 	if (!ui.pushButton_AddToDataManager->isEnabled())
 		return;
 
@@ -1031,7 +1030,6 @@ void DicomView::on_pushButton_AddToDataManager_clicked()
 			addSeriesToDataManager(filesForSeries, pModality);
 		}
 	}
-	cout << "222";
 	if (total_files > 0)
 	{
 		MITK_INFO << "Finding the specified series among the retrieved files...";
@@ -1048,7 +1046,6 @@ void DicomView::on_pushButton_AddToDataManager_clicked()
 		ctkDictionary properties;
 		properties["files"] = files;
 		properties["series"] = ui.dicomTableManager->currentSeriesSelection();
-		cout << "333";
 		emit OpenDICOMSeries(properties);
 	}
 }
