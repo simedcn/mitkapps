@@ -1,6 +1,7 @@
 
 #include "PopeWorkbenchWindowAdvisor.h"
 #include "my_popeproject_mainapplication_Activator.h"
+#include <DicomViewDialog.h>
 
 #include <QmitkPreferencesDialog.h>
 #include <mitkLogMacros.h>
@@ -233,6 +234,12 @@ void PopeWorkbenchWindowAdvisor::on_MainWindow_ShowPACS_triggered(const ctkEvent
 {
 	if (viewToolbar == nullptr)
 		return;
+
+	DicomViewDialog * dialog = new DicomViewDialog(nullptr);
+	dialog->exec();
+	return;
+
+	// !Test code
 
 	// Find the PACS actions
 	ShowViewAction* dicomviewAction = nullptr;

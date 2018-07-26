@@ -17,7 +17,7 @@
 #include <berryPlatform.h>
 
 
-PopePreferencePage::PopePreferencePage(QWidget* parent, Qt::WindowFlags f)
+PopePreferencePage::PopePreferencePage(QWidget* /*parent*/, Qt::WindowFlags)
 //	: m_MainControl(nullptr), m_Initializing(false)
 {}
 

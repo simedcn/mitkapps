@@ -4,6 +4,7 @@ set(Plugin-Vendor "Inova DE")
 set(Plugin-ContactAddress "http://www.inova-de.eu")
 set(Require-Plugin
 	org.blueberry.ui.qt
+    my.pacs.views.dicomview
  #	org.mitk.gui.qt.extapplication
 	org.mitk.gui.qt.ext
  	#org.mitk.gui.qt.application # Initializes GlobalInteraction and registers MITK Core factories

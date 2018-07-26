@@ -13,6 +13,7 @@ mitk_create_plugin(
 #
 #   For Linux and MacOS, "*.dll" has to be replaced accordingly.
 #
+
 install(DIRECTORY "${Qt5_DIR}/../../../bin/" DESTINATION "bin/qt" FILES_MATCHING PATTERN "*.dll")
 install(DIRECTORY "${MITK_DIR}/bin/Release/" DESTINATION "bin/mitk" FILES_MATCHING PATTERN "*.dll")
 install(DIRECTORY "${MITK_DIR}/../ep/bin/" DESTINATION "bin/ep" FILES_MATCHING PATTERN "*.dll")

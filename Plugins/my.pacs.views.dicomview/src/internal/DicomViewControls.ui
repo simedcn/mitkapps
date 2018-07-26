@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>PACS</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QPushButton, QLineEdit, QGroupBox, QSpinBox, QComboBox, ctkDICOMTableManager, ctkDICOMQueryWidger, QTabWidget, QWidget, QTabWidget::pane, QTabWidget::tab-bar, QTabBar::tab
@@ -183,7 +183,7 @@ QHeaderView::section
          <item>
           <widget class="QGroupBox" name="verticalGroupBox">
            <property name="title">
-            <string>DICOM Public Servers:</string>
+            <string>Public DICOM Servers:</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
@@ -505,12 +505,6 @@ QHeaderView::section
            </item>
            <item row="1" column="3">
             <widget class="QPushButton" name="pushButton_LocalFolderPath">
-             <property name="maximumSize">
-              <size>
-               <width>30</width>
-               <height>16777215</height>
-              </size>
-             </property>
              <property name="toolTip">
               <string>Select a local folder</string>
              </property>

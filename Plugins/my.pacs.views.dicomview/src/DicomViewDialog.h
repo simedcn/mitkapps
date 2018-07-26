@@ -11,12 +11,13 @@ class MY_PACS_VIEWS_DICOMVIEW_EXPORT DicomViewDialog : public QDialog
 {
     Q_OBJECT
 public:
-    DicomViewDialog(QWidget * parent);
+    DicomViewDialog(QWidget* parent);
     ~DicomViewDialog();
 
-    static void execute(QWidget * parent);
+    static void execute(QWidget* parent);
+
 private:
-    DicomView * dicomView;
+    DicomView* dicomView;
 };
 
 #endif // DICOMVIEWDIALOG_H

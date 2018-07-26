@@ -34,7 +34,7 @@ const initializer_list<PluginDescriptor> plugins =
 	{ "04",		"org.mitk.views.properties",				"Properties",				"secondary",	"no",	"bottom_left",	"no"  },
 	{ "05",		"org.mitk.views.volumevisualization",		"Volume Visualization",		"secondary",	"no",	"bottom_left",	"no"  },
 	{ "12",		"org.mitk.gui.qt.dicominspector",			"DICOM Inspector",			"secondary",	"no",	"bottom_left",	"no"  },
-	{ "09",		"my.pacs.views.dicomview",					"PACS Browser",				"pacs",			"yes",	"bottom", 		"no"  },
+	//{ "09",		"my.pacs.views.dicomview",					"PACS Browser",				"pacs",			"yes",	"bottom", 		"no"  },
 	{ "10",		"org.mitk.views.xnat.treebrowser",			"XNAT Browser",				"pacs",			"yes",	"bottom", 		"no"  },
 };
 
