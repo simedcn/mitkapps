@@ -4,12 +4,14 @@ set(CPP_FILES
   #src/internal/AwesomeView.cpp
   src/internal/ImportPanel.cpp
   src/internal/ExportPanel.cpp
+  src/internal/TissuPanel.cpp
 )
 
 set(UI_FILES
   #src/internal/AwesomeViewControls.ui
   src/internal/ImportPanelControls.ui
   src/internal/ExportPanelControls.ui
+  src/internal/TissuPanelControls.ui
 )
 
 set(MOC_H_FILES
@@ -17,6 +19,7 @@ set(MOC_H_FILES
   #src/internal/AwesomeView.h
   src/internal/ImportPanel.h
   src/internal/ExportPanel.h
+  src/internal/TissuPanel.h
 )
 
 # List of resource files that can be used by the plugin system without loading
