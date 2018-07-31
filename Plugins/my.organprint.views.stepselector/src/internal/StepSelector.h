@@ -51,7 +51,6 @@ public:
     static const std::string VIEW_ID;
 
     typedef mitk::DataStorage::SetOfObjects SetOfObjects;
-
     StepSelector();
     ~StepSelector();
 
@@ -75,6 +74,10 @@ private:
     vector<StepDescriptor> m_steps;
 
     QButtonGroup * group;
+
+    const bool TRUE = true;
+    const bool FALSE = false;
+
 public:
     void onNodeListChanged(const mitk::DataNode*);
 private slots:

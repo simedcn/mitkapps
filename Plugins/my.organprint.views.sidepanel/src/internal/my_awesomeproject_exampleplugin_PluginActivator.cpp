@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "AwesomeView.h"
 #include "ImportPanel.h"
 #include "ExportPanel.h"
+#include "TissuPanel.h"
+
 #include <usModuleInitialization.h>
 #include <usGetModuleContext.h>
 
@@ -28,8 +30,11 @@ ctkPluginContext * my_awesomeproject_exampleplugin_PluginActivator::context;
 void my_awesomeproject_exampleplugin_PluginActivator::start(ctkPluginContext* context)
 {
     //BERRY_REGISTER_EXTENSION_CLASS(AwesomeView, context);
+
+    BERRY_REGISTER_EXTENSION_CLASS(orgpnt::TissuPanel, context);
     BERRY_REGISTER_EXTENSION_CLASS(orgpnt::ImportPanel, context);
     BERRY_REGISTER_EXTENSION_CLASS(orgpnt::ExportPanel, context);
+
     this->context = context;
 }
 

@@ -62,7 +62,7 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     QString styleSheet = QLatin1String(file.readAll());
     parent->setStyleSheet(styleSheet);
 
-    ui.pushButton_3->hide();
+    // ui.pushButton_3->hide();
 
     // Wire up the UI widgets with our functionality.
     m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -73,7 +73,8 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     {
         { "my.organprint.views.importpanel",		ui.pushButton_1 },
         { "org.mitk.views.segmentation",			ui.pushButton_2,true},
-        { "my.organprint.views.exportpanel", 				ui.pushButton_4,true }
+        { "my.organprint.views.tissupanel",          ui.pushButton_3,true},
+        { "my.organprint.views.exportpanel",        ui.pushButton_4,true }
     };
 
     group = new QButtonGroup();
@@ -270,7 +271,15 @@ void StepSelector::onNodeListChanged(const mitk::DataNode*) {
 
         mitk::Image * image = dynamic_cast<mitk::Image*>(node->GetData());
 
+
+
+        std::string path = "";
+        bool exists = node->GetStringProperty("path",path);
         if(image!=nullptr) {
+            count++;
+        }
+
+        else if(exists) {
             count++;
         }
 

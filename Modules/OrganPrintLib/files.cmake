@@ -4,6 +4,7 @@ set(CPP_FILES
   AwesomeImageFilter.cpp
   AwesomeImageInteractor.cpp
   TissuType.cpp
+  TissuTypeService.cpp
 )
 
 

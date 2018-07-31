@@ -37,6 +37,7 @@ const std::vector<QString> MinimalApplication::VIEW_IDS =
     "my.organprint.views.importpanel",
     "my.organprint.views.exportpanel",
     "org.mitk.views.segmentation",
+    "my.organprint.views.tissupanel",
     "my.pacs.views.dicomview"
 };
 
