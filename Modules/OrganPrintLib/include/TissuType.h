@@ -3,8 +3,9 @@
 
 #include <iostream>
 #include <vector>
+#include "OrganPrintLibExports.h"
 
-class TissuType
+class OrganPrintLib_EXPORT TissuType
 {
 
 
@@ -15,20 +16,27 @@ public:
     typedef std::string String;
 
 
-    TissuType(String & name);
+    TissuType(int id,String * name);
 
-    TissuType(String & name, float arr[]);
+    TissuType(int id,String name);
+
+    TissuType(int id,String name, float arr[]);
+
+    TissuType(int id,const char *);
+
+    String * GetName();
 
     void SetProperties(Properties *  properties);
-
+    TissuType * pushProperty(float f);
 
     void CopyWeightedVector(float weight, Properties & outputVector);
     Properties * GetWeightedVector(float weight);
 
-
+    static std::string PROPERTY_KEY;
 
 private:
-    String & name;
+    int id;
+    String * name;
     Properties * properties;
 };
 

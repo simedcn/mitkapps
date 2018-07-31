@@ -1,16 +1,40 @@
 #include "../include/TissuType.h"
 
-TissuType::TissuType(std::string & m_name):
+std::string TissuType::PROPERTY_KEY = "Tissu type";
+
+TissuType::TissuType(int id,TissuType::String * m_name):
+
+    id(id),
     name(m_name)
 {
+    properties = new Properties(10);
+}
+
+TissuType::TissuType(int id,String name):
+    id(id),name(nullptr)
+{
+
+    this->name = new String(name);
+
+    properties = new Properties(10);
 
 }
 
-TissuType::TissuType(String &name,float arr[]):  name(name) {
+TissuType::TissuType(int id,const char * m_name):
+    id(id)
+{
+
+    name = new String(m_name);
+    properties = new Properties(10);
+}
+
+TissuType::TissuType(int id,String name,float arr[]):
+    id(id)
+    ,name(new String(name))
+{
 
 
     uint size = sizeof(*arr);
-
 
     Properties * props = new Properties(size);
 
@@ -30,6 +54,17 @@ void TissuType::CopyWeightedVector(float weight, TissuType::Properties & outputV
         float p = properties->at(i);
         outputVector[i] = p * weight;
     }
+}
+
+TissuType::String * TissuType::GetName() {
+    return name;
+}
+
+TissuType * TissuType::pushProperty(float f) {
+
+    this->properties->push_back(f);
+    return this;
+
 }
 
 std::vector<float> * TissuType::GetWeightedVector(float weight) {
