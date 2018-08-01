@@ -20,12 +20,17 @@ const std::string orgpnt::TissuPanel::VIEW_ID = "my.organprint.views.tissupanel"
 
 
 orgpnt::TissuPanel::TissuPanel()
+    : listener(StorageListener(this, &TissuPanel::OnNodeChanged))
 {
 
 }
 
 orgpnt::TissuPanel::~TissuPanel() {
+    cout << "Destroying tissu panel" << endl;
 
+    mitk::DataStorage * storage = GetDataStorage();
+
+    storage->ChangedNodeEvent.RemoveListener(listener);
 }
 
 void orgpnt::TissuPanel::CreateQtPartControl(QWidget *parent) {
@@ -35,8 +40,7 @@ void orgpnt::TissuPanel::CreateQtPartControl(QWidget *parent) {
 
     mitk::DataStorage * storage = GetDataStorage();
 
-    storage->ChangedNodeEvent.AddListener(
-        mitk::MessageDelegate1<orgpnt::TissuPanel, const mitk::DataNode *>(this, &TissuPanel::OnNodeChanged));
+    storage->ChangedNodeEvent.AddListener(listener);
 
     UpdateComboBox();
 

@@ -6,11 +6,15 @@
 #include <a.out.h>
 #include <mitkDataNode.h>
 
+#include <mitkMessage.h>
+
 namespace orgpnt {
 
 
 class TissuPanel : public QmitkAbstractView
 {
+
+    typedef mitk::MessageDelegate1<orgpnt::TissuPanel, const mitk::DataNode *> StorageListener;
 
     Q_OBJECT
 public:
@@ -42,6 +46,7 @@ protected:
 
     mitk::DataNode * GetSelectedNode();
 
+    const StorageListener listener;
 };
 }
 #endif // TISSUPANEL_H
