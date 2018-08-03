@@ -56,7 +56,8 @@ public:
 
     // In this method we initialize the GUI components and connect the associated signals and slots.
     void CreateQtPartControl(QWidget* parent) override;
-
+protected:
+    void displayHelp(const char * group,const char * settingKey, const char * helpPath);
 
 private:
     // Typically a one-liner. Set the focus to the default widget.
@@ -80,9 +81,10 @@ private:
 
 public:
     void onNodeListChanged(const mitk::DataNode*);
-private slots:
+protected slots:
     void on_pushButton_clicked(int step);
     void initListeners();
+
 
 
 public slots:

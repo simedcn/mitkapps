@@ -9,6 +9,10 @@
         <file>logo.png</file>
         <file>organ-print_fullHD.png</file>
     </qresource>
+    <qresource prefix="/images">
+        <file>logo-color.png</file>
+        <file>organ-print_fullHD.png</file>
+    </qresource>
     <qresource prefix="/my.organprint.minimalapplication">
         <file>inoflat.qss</file>
     </qresource>

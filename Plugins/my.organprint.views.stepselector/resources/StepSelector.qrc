@@ -2,5 +2,9 @@
   <qresource prefix="/my.organprint.views.stepselector" >
     <file>AwesomeIcon.png</file>
     <file>Styles.qss</file>
+    <file>step2.html</file>
+    <file>step2.png</file>
   </qresource>
+  
+  
 </RCC>

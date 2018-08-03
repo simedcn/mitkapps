@@ -39,6 +39,8 @@
 #include <mitkImage.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
+#include <QPixmap>
+#include <QMessageDialogWithToggle.h>
 
 // Don't forget to initialize the VIEW_ID.
 const string StepSelector::VIEW_ID = "my.organprint.views.stepselector";
@@ -114,6 +116,12 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     initListeners();
     on_pushButton_clicked(0);
 
+
+    QPixmap logo(":/images/logo-color.png");
+
+    ui.logoLabel->setPixmap(logo.scaled(130,130,Qt::KeepAspectRatio));
+
+
 }
 
 StepSelector::StepSelector()
@@ -154,7 +162,9 @@ void StepSelector::selectView(int n)
         }
     }
 
-
+    if(n == 1) {
+        displayHelp("my.organpring.views.stepselector","skipHelpStep2",":/my.organprint.views.stepselector/step2.html");
+    }
     page->ShowView(m_steps[n].pluginId);
     m_currentStep = n;
     /*
@@ -306,5 +316,26 @@ void StepSelector::initListeners() {
 
     storage->RemoveNodeEvent.AddListener(
         mitk::MessageDelegate1<StepSelector, const mitk::DataNode *>(this, &StepSelector::onNodeListChanged));
+
+}
+
+void StepSelector::displayHelp(const char *group, const char * settingKey, const char *helpPath) {
+
+    bool skip = QMessageDialogWithToggle::getSettingValue(group,settingKey);
+
+    if(!skip) {
+
+        QMessageDialogWithToggle dialog(nullptr);
+        dialog.setMessageFromResource(helpPath);
+        dialog.setImage(":/images/logo-color.png");
+        dialog.setCheckBoxText("Don't remind me next time.");
+        dialog.setToggled(false);
+        bool skip = dialog.exec();
+
+        if(skip) {
+            QMessageDialogWithToggle::setSettingValue(group,settingKey,true);
+        }
+
+    }
 
 }
