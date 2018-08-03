@@ -165,49 +165,10 @@ void StepSelector::selectView(int n)
     if(n == 1) {
         displayHelp("my.organpring.views.stepselector","skipHelpStep2",":/my.organprint.views.stepselector/step2.html");
     }
+
     page->ShowView(m_steps[n].pluginId);
     m_currentStep = n;
-    /*
-    for (int i = 0; i < (int) m_steps.size(); i++)
-    {
 
-        cout << "requested step = " << n << " | i = " << i << endl;
-        const auto& step = m_steps[i];
-        berry::IViewPart::Pointer view = page->FindView(step.pluginId);
-
-
-
-        try
-        {
-
-            cout << "requested step = " << n << " | i = " << i << endl;
-            //cout << "view :" << view << endl;
-            if (i == n)
-            {   // Open
-                //step.button->checked(true);
-
-                page->ShowView(step.pluginId);
-
-
-                //step.button->setStyleSheet("background-color: #3399cc");
-
-                // step.button->SetDisabled(false);
-            }
-            else if (i != n && view != nullptr)
-            {   // Close
-                page->HideView(view);
-                // step.button->setStyleSheet("");
-            }
-
-
-
-        }
-        catch (const berry::PartInitException& e)
-        {
-            BERRY_ERROR << "Error: " << e.what();
-        }
-    }
-    */
 
 }
 
