@@ -694,3 +694,8 @@ QTreeView::branch:selected, QTreeView::item:selected {
     background-color: #AEAFB0;
 }
 
+#QMessageDialogWithToggle QWidget {
+    font-size:15px;
+    padding:10px;
+}
+
