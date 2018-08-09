@@ -76,8 +76,10 @@ private:
 
     QButtonGroup * group;
 
+#if defined(__APPLE__) ||  defined(__MACH__) || defined(__linux__)
     const bool TRUE = true;
     const bool FALSE = false;
+#endif
 
 public:
     void onNodeListChanged(const mitk::DataNode*);

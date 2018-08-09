@@ -1,6 +1,9 @@
 #include "../include/TissuType.h"
+#include <algorithm>
 
 std::string TissuType::PROPERTY_KEY = "Tissu type";
+
+using uint = unsigned long int;
 
 TissuType::TissuType(int id,TissuType::String * m_name):
 
@@ -49,8 +52,8 @@ void TissuType::SetProperties(TissuType::Properties  * properties) {
     this->properties = properties;
 }
 void TissuType::CopyWeightedVector(float weight, TissuType::Properties & outputVector) {
-    uint size = std::min<uint>(outputVector.size(),properties->size());
-    for(uint i = 0; i!= size; i++) {
+    size_t size = std::min<size_t>(outputVector.size(),properties->size());
+    for(size_t i = 0; i!= size; i++) {
         float p = properties->at(i);
         outputVector[i] = p * weight;
     }
