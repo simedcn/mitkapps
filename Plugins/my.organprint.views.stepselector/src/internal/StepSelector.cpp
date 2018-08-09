@@ -240,9 +240,10 @@ void StepSelector::onNodeListChanged(const mitk::DataNode*) {
 
         node = it->Value();
 
+        if(!node) continue;
+
+
         mitk::Image * image = dynamic_cast<mitk::Image*>(node->GetData());
-
-
 
         std::string path = "";
         bool exists = node->GetStringProperty("path",path);
@@ -266,6 +267,8 @@ void StepSelector::onNodeListChanged(const mitk::DataNode*) {
         step.button->setEnabled(!step.requireData || count > 0);
 
     }
+
+    cout << "Step selector over" << endl;
 }
 
 void StepSelector::initListeners() {
