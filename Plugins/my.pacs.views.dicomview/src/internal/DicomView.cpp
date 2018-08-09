@@ -136,10 +136,13 @@ void DicomView::CreateQtPartControl(QWidget *parent)
     /// Creating an Event Publisher.
     if (ref)
     {
+
         ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
         eventAdmin->publishSignal(this, SIGNAL(OpenDICOMSeries(const ctkDictionary&)), "data/OPENDICOMSERIES", Qt::DirectConnection);
     }
-
+    else {
+        cout << "Warnign ! there was no signal connection" << endl;
+    }
     /// Connections.
     connect(this->ui.pushButton_Query, SIGNAL(clicked()), this, SLOT(on_pushButton_Query_clicked()));
     connect(this->ui.pushButton_Retrieve, SIGNAL(clicked()), this, SLOT(on_pushButton_Retrieve_clicked()));
@@ -1048,6 +1051,9 @@ void DicomView::on_pushButton_AddToDataManager_clicked()
         properties["files"] = files;
         properties["series"] = ui.dicomTableManager->currentSeriesSelection();
         emit OpenDICOMSeries(properties);
+
+        emit addedToDataManager();
+
     }
 }
 //void DicomView::on_UploadToPACSAction_run(const string& path)

@@ -86,6 +86,7 @@ private:
 
 signals:
     void OpenDICOMSeries(const ctkDictionary&);
+    void addedToDataManager();
 
 protected slots:
     void on_pushButton_Query_clicked();
