@@ -1,5 +1,6 @@
 set(SRC_CPP_FILES
     DicomViewDialog.cpp
+    DicomViewConstants.h
 )
 
 set(INTERNAL_CPP_FILES

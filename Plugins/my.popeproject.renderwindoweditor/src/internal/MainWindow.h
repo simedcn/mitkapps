@@ -70,6 +70,7 @@ public:
 
 protected:
 	void enable3DRepresentation(bool flag);
+	void updateCrosshair(bool is_autorotation_enabled = false);
 
 signals:
 	void ImageSetHasToBeLoaded(const QString& filename);
@@ -86,6 +87,7 @@ public slots:
 	void on_pushButton_ViewAll_clicked();
 
 	void On_ToolsPlugin_Representation3DHasToBeInitiated(const ctkEvent& event);
+	void On_ToolsPlugin_UpdateCrosshair(const ctkEvent& event);
 	void On_ToolsPlugin_NodeHasManyImages(const ctkEvent& event);
 	void On_ToolsPlugin_SetRange(const ctkEvent& event);
 	void On_ToolsPlugin_SelectedNodeChanged(const ctkEvent& event);

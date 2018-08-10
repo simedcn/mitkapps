@@ -30,23 +30,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 class PopeLib_EXPORT PopeImageFilter final : public mitk::ImageToImageFilter
 {
 public:
-  // All classes that derive from an ITK-based MITK class need at least the
-  // following two macros. Make sure you don't declare the constructor public
-  // to force clients of your class to follow the ITK convention for
-  // instantiating classes via the static New() method.
-  mitkClassMacro(PopeImageFilter, mitk::ImageToImageFilter)
-  itkFactorylessNewMacro(Self)
+	// All classes that derive from an ITK-based MITK class need at least the
+	// following two macros. Make sure you don't declare the constructor public
+	// to force clients of your class to follow the ITK convention for
+	// instantiating classes via the static New() method.
+	mitkClassMacro(PopeImageFilter, mitk::ImageToImageFilter)
+	itkFactorylessNewMacro(Self)
 
-  itkSetMacro(Offset, int)
-  itkGetMacro(Offset, int)
+	itkSetMacro(Offset, int)
+	itkGetMacro(Offset, int)
 
 private:
-  PopeImageFilter();
-  ~PopeImageFilter();
+	PopeImageFilter();
+	~PopeImageFilter();
 
-  void GenerateData() override;
+	void GenerateData() override;
 
-  int m_Offset;
+public:
+	//virtual void SetFixedImage(mitk::Image* image);
+
+private:
+	int m_Offset;
 };
 
 #endif

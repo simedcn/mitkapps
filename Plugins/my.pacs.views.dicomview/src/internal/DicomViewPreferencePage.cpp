@@ -60,6 +60,7 @@ bool DicomViewPreferencePage::PerformOk()
 	QString directory = ui.lineEdit_LocalFolderPath->text();
 	if (directory == NO_DIRECTORY_SPECIFIED)
 		directory = "";
+	m_DicomViewPreferencesNode->PutBool("add to DataManager", ui.checkBox_AddToDataManager->isChecked());
 	m_DicomViewPreferencesNode->Put("PACS storage local folder", directory);
 	m_DicomViewPreferencesNode->Put("PACS storage local AETitle", ui.lineEdit_StorageAETitle->text());
 	m_DicomViewPreferencesNode->Put("PACS storage local IP", ui.lineEdit_LocalStorageIP->text());
@@ -85,6 +86,7 @@ void DicomViewPreferencePage::Update()
 		ui.buttonGroup_Protocol,
 		ui.buttonGroup_Destination,
 		ui.lineEdit_DestinationAETitle,
+		ui.checkBox_AddToDataManager,
 		ui.lineEdit_LocalFolderPath,
 		ui.pushButton_LocalFolderPath,
 		ui.pushButton_SetTemporaryLocalFolderPath,
@@ -115,6 +117,7 @@ void DicomViewPreferencePage::Update()
 		ui.radioButton_Protocol_CGET->setChecked(true);
 	else
 		ui.radioButton_Protocol_CMOVE->setChecked(true);
+	ui.checkBox_AddToDataManager->setChecked(m_DicomViewPreferencesNode->GetBool("add to DataManager", true));
 	QString directory = m_DicomViewPreferencesNode->Get("PACS storage local folder", "");
 	if (directory.isEmpty())
 		directory = NO_DIRECTORY_SPECIFIED;

@@ -56,13 +56,14 @@ public:
   void SetUseDefaultNBins(bool useDefault);
   /*!
   /brief Initializes the object with necessary data. */
-  void Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig );
+  void Initialize(mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig, std::string dataNodeName);
   /*!
   /brief returns the calculated image statistics. */
   std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> GetStatisticsData();
   /*!
   /brief */
   mitk::Image::Pointer GetStatisticsImage();
+  std::string GetStatisticsDataNodeName() const;
   /*!
   /brief Set the time step of the image you want to process. */
   void SetTimeStep( int times );
@@ -106,6 +107,7 @@ private:
   //member declaration
 
   mitk::Image::Pointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.
+  std::string m_dataNodeName;
   mitk::Image::Pointer m_BinaryMask;                              ///< member variable holds the binary mask image for segmentation image statistics calculation.
   mitk::PlanarFigure::Pointer m_PlanarFigureMask;                 ///< member variable holds the planar figure for segmentation image statistics calculation.
   std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> m_StatisticsVector; ///< member variable holds the result structs.

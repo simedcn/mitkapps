@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ImageStatisticsCalculationThread::ImageStatisticsCalculationThread()
   : QThread()
   , m_StatisticsImage(nullptr)
+  , m_dataNodeName("")
   , m_BinaryMask(nullptr)
   , m_PlanarFigureMask(nullptr)
   , m_TimeStep(0)
@@ -43,11 +44,12 @@ ImageStatisticsCalculationThread::~ImageStatisticsCalculationThread()
 {
 }
 
-void ImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig )
+void ImageStatisticsCalculationThread::Initialize(mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig, std::string dataNodeName)
 {
   // reset old values
   if( this->m_StatisticsImage.IsNotNull() )
     this->m_StatisticsImage = nullptr;
+  m_dataNodeName = "";
 
   if( this->m_BinaryMask.IsNotNull() )
     this->m_BinaryMask = nullptr;
@@ -58,6 +60,7 @@ void ImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer image, m
   // set new values if passed in
   if(image.IsNotNull())
     this->m_StatisticsImage = image->Clone();
+  m_dataNodeName = dataNodeName;
   if(binaryImage.IsNotNull())
     this->m_BinaryMask = binaryImage->Clone();
   if(planarFig.IsNotNull())
@@ -87,6 +90,11 @@ std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> Image
 mitk::Image::Pointer ImageStatisticsCalculationThread::GetStatisticsImage()
 {
   return this->m_StatisticsImage;
+}
+
+std::string ImageStatisticsCalculationThread::GetStatisticsDataNodeName() const
+{
+	return m_dataNodeName;
 }
 
 void ImageStatisticsCalculationThread::SetIgnoreZeroValueVoxel(bool _arg)

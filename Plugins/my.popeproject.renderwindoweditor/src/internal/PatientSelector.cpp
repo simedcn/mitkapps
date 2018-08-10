@@ -34,7 +34,7 @@ void PatientSelector::SetPatientData(const vector<shared_ptr<PatientDescription>
 	this->patients = patients;
 	ui.tableWidget_PatientsIDs->setRowCount((int)patients.size());
 	/// Fill out the table of patients
-	for (size_t i = 0; i < patients.size(); i++)
+	for (int i = 0; i < (int)patients.size(); i++)
 	{
 		QTableWidgetItem* item_1 = new QTableWidgetItem(patients[i]->id);
 		ui.tableWidget_PatientsIDs->setItem(i, 0, item_1);

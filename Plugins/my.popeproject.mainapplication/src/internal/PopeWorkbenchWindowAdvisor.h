@@ -38,6 +38,7 @@ signals:
 protected slots:
 	void on_action_OpenDICOM_triggered();
 	void on_action_OpenFolder_triggered();
+	void on_action_PACS_triggered();
 	void on_action_Settings_triggered();
 public slots:
 	void on_MainWindow_ShowPACS_triggered(const ctkEvent& event);

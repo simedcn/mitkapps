@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QDoubleSpinBox>
 #include <QComboBox>
+#include <QSpacerItem>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -39,6 +40,10 @@ void ToolsPluginPreferencePage::CreateQtControl(QWidget* parent)
 	displayOptionsLayout->addWidget(m_RadioButton_3DAutoRotation);
 	m_RadioButton_Std4ViewWidget = new QRadioButton("Enable standard 4-view widget when loading data", m_MainControl);
 	displayOptionsLayout->addWidget(m_RadioButton_Std4ViewWidget);
+	auto v_spacer = new QSpacerItem(0, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
+	displayOptionsLayout->addItem(v_spacer);
+	m_CheckBox_ShowCrosshair = new QCheckBox("Show crosshair", m_MainControl);
+	displayOptionsLayout->addWidget(m_CheckBox_ShowCrosshair);
 	formLayout->addRow("View by default", displayOptionsLayout);
 
 	m_CheckBox_VolumeRendering = new QCheckBox("Enable Volume Rendering when loading data", m_MainControl);
@@ -71,6 +76,7 @@ QWidget* ToolsPluginPreferencePage::GetQtControl() const
 bool ToolsPluginPreferencePage::PerformOk()
 {
 	m_ToolsPluginPreferencesNode->PutBool("3D autorotation", m_RadioButton_3DAutoRotation->isChecked());
+	m_ToolsPluginPreferencesNode->PutBool("show crosshair", m_CheckBox_ShowCrosshair->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("volume rendering", m_CheckBox_VolumeRendering->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("show patient data", m_CheckBox_ShowPatientData->isChecked());
 	m_ToolsPluginPreferencesNode->PutBool("group tags", m_CheckBox_GroupTags->isChecked());
@@ -91,6 +97,7 @@ void ToolsPluginPreferencePage::Update()
 	{
 		m_RadioButton_Std4ViewWidget->setChecked(true);
 	}
+	m_CheckBox_ShowCrosshair->setChecked(m_ToolsPluginPreferencesNode->GetBool("show crosshair", false));
 	m_CheckBox_VolumeRendering->setChecked(m_ToolsPluginPreferencesNode->GetBool("volume rendering", true));
 	m_CheckBox_ShowPatientData->setChecked(m_ToolsPluginPreferencesNode->GetBool("show patient data", true));
 	m_CheckBox_GroupTags->setChecked(m_ToolsPluginPreferencesNode->GetBool("group tags", true));

@@ -30,9 +30,12 @@ public slots:
 	int on_LoadImageSet(const QString& filenameAndDirectory);
 	int on_LoadImageFolder(const QString& directory);
 	int on_LoadImageSeries(const QStringList& files, const QStringList& series);
+	//int on_LoadImage(const string& name, mitk::Image::Pointer image);
 	void on_Action_OpenDICOMdataset_clicked(const ctkEvent& event);
 	void on_Action_OpenFolder_clicked(const ctkEvent& event);
 	void on_Action_OpenDICOMSeries_clicked(const ctkEvent& event);
+	void On_ToolsPlugin_AllNodesRemoved(const ctkEvent& event);
+	//void on_Action_LoadImage(const ctkEvent& event);
 
 protected:
 	int AskAboutNewPatient();

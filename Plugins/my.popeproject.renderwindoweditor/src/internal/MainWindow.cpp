@@ -72,6 +72,8 @@ MainWindow::MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent) :
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/representation/START3D"; //"pope/representation/*";
 		eventAdmin->subscribeSlot(this, SLOT(On_ToolsPlugin_Representation3DHasToBeInitiated(ctkEvent)), propsForSlot);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/representation/CROSSHAIR";
+		eventAdmin->subscribeSlot(this, SLOT(On_ToolsPlugin_UpdateCrosshair(ctkEvent)), propsForSlot);
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/representation/ENABLED3D";
 		eventAdmin->subscribeSlot(this, SLOT(On_ToolsPlugin_NodeHasManyImages(ctkEvent)), propsForSlot);
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/representation/SETRANGE";
@@ -163,13 +165,10 @@ void MainWindow::enable3DRepresentation(bool flag)
 		multiWidget->changeLayoutToDefault();
 	}
 	/// Start/stop rotation
-	emit this->EnableAutoRotation(flag);
+	emit EnableAutoRotation(flag);
 
 	/// Hide/show crosshair
-	mitk::DataNode *n;
-	n = multiWidget->GetWidgetPlane1(); if (n) n->SetVisibility(!flag);
-	n = multiWidget->GetWidgetPlane2(); if (n) n->SetVisibility(!flag);
-	n = multiWidget->GetWidgetPlane3(); if (n) n->SetVisibility(!flag);
+	updateCrosshair(flag);
 
 	ctkDictionary properties;
 	properties["enable3D"] = flag;
@@ -179,6 +178,16 @@ void MainWindow::enable3DRepresentation(bool flag)
 	renderer->RequestUpdateAll();
 
 	ui.pushButton_ViewAll->setText(flag ? "View all" : "View 3D");
+}
+void MainWindow::updateCrosshair(bool is_autorotation_enabled)
+{
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	auto settingsNode = prefService->GetSystemPreferences()->Node("/my.popeproject.views.toolsplugin");
+	bool is_crosshair_visible = !is_autorotation_enabled && settingsNode->GetBool("show crosshair", false);
+	mitk::DataNode* n;
+	n = multiWidget->GetWidgetPlane1(); if (n) n->SetVisibility(is_crosshair_visible);
+	n = multiWidget->GetWidgetPlane2(); if (n) n->SetVisibility(is_crosshair_visible);
+	n = multiWidget->GetWidgetPlane3(); if (n) n->SetVisibility(is_crosshair_visible);
 }
 
 //LOAD DATA FROM EXPLORER
@@ -353,6 +362,11 @@ void MainWindow::On_ToolsPlugin_Representation3DHasToBeInitiated(const ctkEvent&
 	//QString reportPath = event.getProperty("path").toString();
 	bool enable3D = event.getProperty("enable3D").toBool();
 	enable3DRepresentation(enable3D);
+}
+void MainWindow::On_ToolsPlugin_UpdateCrosshair(const ctkEvent& event)
+{
+	//bool is_crosshair_visible = event.getProperty("showCrosshair").toBool();
+	updateCrosshair();
 }
 void MainWindow::On_ToolsPlugin_NodeHasManyImages(const ctkEvent& event)
 {

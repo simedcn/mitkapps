@@ -45,6 +45,7 @@ protected:
 
 	QRadioButton* m_RadioButton_3DAutoRotation;
 	QRadioButton* m_RadioButton_Std4ViewWidget;
+	QCheckBox* m_CheckBox_ShowCrosshair;
 
 	QCheckBox* m_CheckBox_VolumeRendering;
 

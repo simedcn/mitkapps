@@ -46,7 +46,7 @@ wstring Elements::trim_string(const wstring& str, const wstring& whitespace)
 	return str.substr(strBegin, strRange);
 }
 
-string Elements::get_property(const char* prop_a, const char* prop_b, const mitk::BaseData* data, const string& def_value)
+string Elements::get_property(const char* prop_a, const char* prop_b, const mitk::BaseData* data, bool show_warning, const string& def_value)
 {
 	if (data == nullptr)
 		return def_value;
@@ -59,64 +59,65 @@ string Elements::get_property(const char* prop_a, const char* prop_b, const mitk
 	if (b)
 		return b->GetValueAsString();
 
-	MITK_WARN << "Failed to read the DICOM tag " << prop_a << " (" << prop_b << ")";
+	if (show_warning)
+		MITK_WARN << "Failed to read the DICOM tag " << prop_a << " (" << prop_b << ")";
 	return def_value;
 }
-string Elements::get_property(const char* prop_a, const char* prop_b, const mitk::DataNode* dataNode, const string& def_value)
+string Elements::get_property(const char* prop_a, const char* prop_b, const mitk::DataNode* dataNode, bool show_warning, const string& def_value)
 {
 	if (dataNode == nullptr)
 		return def_value;
 
 	const auto data = dataNode->GetData();
-	return get_property(prop_a, prop_b, data, def_value);
+	return get_property(prop_a, prop_b, data, show_warning, def_value);
 }
-string Elements::get_patientId(mitk::BaseData* baseData, const string& def_value)
+string Elements::get_patientId(mitk::BaseData* baseData, bool show_warning, const string& def_value)
 {
-	return get_property("dicom.patient.PatientID", "DICOM.0010.0020", baseData, def_value);
+	return get_property("dicom.patient.PatientID", "DICOM.0010.0020", baseData, show_warning, def_value);
 }
-string Elements::get_patientId(mitk::BaseData::Pointer baseData, const string& def_value)
+string Elements::get_patientId(mitk::BaseData::Pointer baseData, bool show_warning, const string& def_value)
 {
 	if (baseData == nullptr)
 		return def_value;
 
-	return get_patientId(baseData.GetPointer(), def_value);
+	return get_patientId(baseData.GetPointer(), show_warning, def_value);
 }
-string Elements::get_patientId(mitk::DataNode* dataNode, const string& def_value)
+string Elements::get_patientId(mitk::DataNode* dataNode, bool show_warning, const string& def_value)
 {
 	if (dataNode == nullptr)
 		return def_value;
 
 	const auto data = dataNode->GetData();
-	return get_patientId(data, def_value);
+	return get_patientId(data, show_warning, def_value);
 }
-string Elements::get_patientId_or_patientName(mitk::BaseData* baseData, const string& def_value)
+string Elements::get_patientId_or_patientName(mitk::BaseData* baseData, bool show_warning, const string& def_value)
 {
-	string id = get_patientId(baseData, "");
+	string id = get_patientId(baseData, show_warning, "");
 	if (!id.empty())
 		return id;
 
-	id = get_patientName(baseData, "");
+	id = get_patientName(baseData, show_warning, "");
 	if (!id.empty())
 		return id;
 
 	return def_value;
 }
-string Elements::get_patientId_or_patientName(mitk::BaseData::Pointer baseData, const string& def_value)
+string Elements::get_patientId_or_patientName(mitk::BaseData::Pointer baseData, bool show_warning, const string& def_value)
 {
 	if (baseData == nullptr)
 		return def_value;
 
-	return get_patientId_or_patientName(baseData.GetPointer(), def_value);
+	return get_patientId_or_patientName(baseData.GetPointer(), show_warning, def_value);
 }
-string Elements::get_patientId_or_patientName(mitk::DataNode* dataNode, const string& def_value)
+string Elements::get_patientId_or_patientName(mitk::DataNode* dataNode, bool show_warning, const string& def_value)
 {
 	if (dataNode == nullptr)
 		return def_value;
 
 	const auto data = dataNode->GetData();
-	return get_patientId_or_patientName(data, def_value);
+	return get_patientId_or_patientName(data, show_warning, def_value);
 }
-QString Elements::get_patientId_or_patientName(const string& filename, const QString& def_value)
+QString Elements::get_patientId_or_patientName(const string& filename, bool show_warning, const QString& def_value)
 {
 	itk::GDCMImageIO::Pointer reader = itk::GDCMImageIO::New();
 	if (!reader->CanReadFile(filename.c_str()))
@@ -132,13 +133,14 @@ QString Elements::get_patientId_or_patientName(const string& filename, const QSt
 	patientId = id;
 	if (!patientId.isEmpty())
 		return patientId;
-	MITK_WARN << "No patientID in " << filename;
+	if (show_warning)
+		MITK_WARN << "No patientID in " << filename;
 	return def_value;
 }
-QString Elements::get_patientId_or_patientName(const QString& filename, const QString& def_value)
+QString Elements::get_patientId_or_patientName(const QString& filename, bool show_warning, const QString& def_value)
 {
 	string name = filename.toStdString();
-	return get_patientId_or_patientName(name, def_value);
+	return get_patientId_or_patientName(name, show_warning, def_value);
 }
 QString Elements::get_seriesInstanceUID(const string& filename, const QString& def_value)
 {
@@ -157,103 +159,110 @@ QString Elements::get_seriesInstanceUID(const string& filename, const QString& d
 		return def_value;
 	}
 }
-string Elements::get_patientName(mitk::BaseData* baseData, const string& def_value)
+string Elements::get_patientName(mitk::BaseData* baseData, bool show_warning, const string& def_value)
 {
-	return get_property("dicom.patient.PatientsName", "DICOM.0010.0010", baseData, def_value);
+	string name = get_property("dicom.patient.PatientsName", "DICOM.0010.0010", baseData, show_warning, def_value);
+	if (name.empty())
+	{
+		name = get_property("dicom.patient_name", "DICOM.patient_name", baseData, show_warning, def_value);
+	}
+	return name;
 }
-string Elements::get_patientName(mitk::BaseData::Pointer baseData, const string& def_value)
+string Elements::get_patientName(mitk::BaseData::Pointer baseData, bool show_warning, const string& def_value)
 {
 	if (baseData == nullptr)
 		return def_value;
 
-	return get_patientName(baseData.GetPointer(), def_value);
+	return get_patientName(baseData.GetPointer(), show_warning, def_value);
 }
-string Elements::get_patientName(mitk::DataNode* dataNode, const string& def_value)
+string Elements::get_patientName(mitk::DataNode* dataNode, bool show_warning, const string& def_value)
 {
 	if (dataNode == nullptr)
 		return def_value;
 
 	const auto data = dataNode->GetData();
-	return get_patientName(data, def_value);
+	return get_patientName(data, show_warning, def_value);
 }
-string Elements::find_patientName(const list<mitk::BaseData::Pointer>& baseDataList, const string& def_value)
+string Elements::find_patientName(const list<mitk::BaseData::Pointer>& baseDataList, bool show_warning, const string& def_value)
 {
 	if (baseDataList.size() == 0)
 		return "";
 
-	const char* prop_a = "DICOM.0010.0010";
-	const char* prop_b = "dicom.patient.PatientsName";
+	vector<string> props = { "DICOM.0010.0010", "dicom.patient.PatientsName", "dicom.patient_name", "DICOM.patient_name" };
 
 	// Read all the data sets until the patient name is found
 	for (const auto baseData : baseDataList)
 	{
 		if (baseData == nullptr || baseData.IsNull())
 			continue;
-
-		auto a = baseData->GetProperty(prop_a);
-		if (a)
-			return a->GetValueAsString();
-
-		auto b = baseData->GetProperty(prop_b);
-		if (b)
-			return b->GetValueAsString();
+		
+		for (const auto& prop : props)
+		{
+			auto name = baseData->GetProperty(prop.c_str());
+			if (name)
+				return name->GetValueAsString();
+		}
 	}
 
-	MITK_WARN << "Failed to read the DICOM tag " << prop_a << " (" << prop_b << ")";
+	if (show_warning)
+		MITK_WARN << "Failed to read the DICOM tag " << props[0] << " (" << props[1] << ")";
 	return def_value;
 }
-string Elements::get_patientBirthdate(mitk::BaseData* baseData, const string& def_value)
+string Elements::get_patientBirthdate(mitk::BaseData* baseData, bool show_warning, const string& def_value)
 {
-	return get_property("dicom.patient.PatientsBirthDate", "DICOM.0010.0030", baseData, def_value);
+	return get_property("dicom.patient.PatientsBirthDate", "DICOM.0010.0030", baseData, show_warning, def_value);
 }
-string Elements::get_patientBirthdate(mitk::BaseData::Pointer baseData, const string& def_value)
+string Elements::get_patientBirthdate(mitk::BaseData::Pointer baseData, bool show_warning, const string& def_value)
 {
 	if (baseData == nullptr)
 		return def_value;
 
-	return get_patientBirthdate(baseData.GetPointer(), def_value);
+	return get_patientBirthdate(baseData.GetPointer(), show_warning, def_value);
 }
-string Elements::get_patientBirthdate(mitk::DataNode* dataNode, const string& def_value)
+string Elements::get_patientBirthdate(mitk::DataNode* dataNode, bool show_warning, const string& def_value)
 {
 	if (dataNode == nullptr)
 		return def_value;
 
 	const auto data = dataNode->GetData();
-	return get_patientBirthdate(data, def_value);
+	return get_patientBirthdate(data, show_warning, def_value);
 }
-string Elements::get_patientGender(mitk::BaseData* baseData, const string& def_value)
+string Elements::get_patientGender(mitk::BaseData* baseData, bool show_warning, const string& def_value)
 {
-	return get_property("dicom.patient.PatientsSex", "DICOM.0010.0040", baseData, def_value);
+	return get_property("dicom.patient.PatientsSex", "DICOM.0010.0040", baseData, show_warning, def_value);
 }
-string Elements::get_patientGender(mitk::BaseData::Pointer baseData, const string& def_value)
+string Elements::get_patientGender(mitk::BaseData::Pointer baseData, bool show_warning, const string& def_value)
 {
 	if (baseData == nullptr)
 		return def_value;
 
-	return get_patientGender(baseData.GetPointer(), def_value);
+	return get_patientGender(baseData.GetPointer(), show_warning, def_value);
 }
-string Elements::get_patientGender(mitk::DataNode* dataNode, const string& def_value)
+string Elements::get_patientGender(mitk::DataNode* dataNode, bool show_warning, const string& def_value)
 {
 	if (dataNode == nullptr)
 		return def_value;
 
 	const auto data = dataNode->GetData();
-	return get_patientGender(data, def_value);
+	return get_patientGender(data, show_warning, def_value);
 }
-string Elements::get_imageName(mitk::BaseData* baseData, const string& def_value)
+string Elements::get_imageName(mitk::BaseData* baseData, bool show_warning, const string& def_value)
 {
 	if (baseData == nullptr)
 		return def_value;
 
 	stringstream imageName;
 	//auto prop_SeriesInstanceUID = baseData->GetProperty("dicom.series.SeriesInstanceUID");
-	string seriesInstanceUID = get_property("DICOM.0008.0018", "dicom.series.SeriesInstanceUID", baseData);
+	string seriesInstanceUID = get_property("DICOM.0008.0018", "dicom.series.SeriesInstanceUID", baseData, show_warning);
 	if (!seriesInstanceUID.empty())
 		imageName << seriesInstanceUID; // prop_SeriesInstanceUID->GetValueAsString();
 	else
-		imageName << "image";
+	{
+		seriesInstanceUID = get_property("DICOM.series_instance_uid", "dicom.series_instance_uid", baseData, show_warning);
+		imageName << (seriesInstanceUID.empty() ? "image" : seriesInstanceUID);
+	}
 	//auto prop_Modality = baseData->GetProperty("dicom.series.Modality");
-	string modality = get_property("DICOM.0008.0060", "dicom.series.Modality", baseData);
+	string modality = get_property("DICOM.0008.0060", "dicom.series.Modality", baseData, show_warning);
 	if (!modality.empty())
 	{
 		imageName << "_";
@@ -261,28 +270,28 @@ string Elements::get_imageName(mitk::BaseData* baseData, const string& def_value
 	}
 	return imageName.str();
 }
-string Elements::get_imageName(mitk::BaseData::Pointer baseData, const string& def_value)
+string Elements::get_imageName(mitk::BaseData::Pointer baseData, bool show_warning, const string& def_value)
 {
 	if (baseData == nullptr)
 		return def_value;
 
-	return get_imageName(baseData.GetPointer(), def_value);
+	return get_imageName(baseData.GetPointer(), show_warning, def_value);
 }
-string Elements::get_imageName(mitk::DataNode* dataNode, const string& def_value)
+string Elements::get_imageName(mitk::DataNode* dataNode, bool show_warning, const string& def_value)
 {
 	if (dataNode == nullptr)
 		return def_value;
 
 	const auto data = dataNode->GetData();
-	return get_imageName(data, def_value);
+	return get_imageName(data, show_warning, def_value);
 }
-vector<QString> Elements::get_imageNames(const list<mitk::BaseData::Pointer>& baseDataList, const string& def_value)
+vector<QString> Elements::get_imageNames(const list<mitk::BaseData::Pointer>& baseDataList, bool show_warning, const string& def_value)
 {
 	// Use std::set to allow only unique image names
 	set<QString> imageSet;
 	for (const auto baseData : baseDataList)
 	{
-		string name = get_imageName(baseData, def_value);
+		string name = get_imageName(baseData, show_warning, def_value);
 		imageSet.emplace(QString::fromStdString(name));
 	}
 	vector<QString> images;
@@ -443,4 +452,43 @@ bool Elements::split_properties(const string& str_prop, QStringList* properties,
 	assert(props.size() >= 1);
 	assert(nums == nullptr || (props.size() == (int)nums->size()));
 	return isOK;
+}
+
+size_t Elements::get_hash(mitk::BaseData* baseData)
+{
+	size_t retval = 0;
+	if (baseData == nullptr)
+		return retval;
+	list<string> keys;
+	string id = get_patientId(baseData, false);
+	if (!id.empty()) keys.push_back(id);
+	string name = get_patientName(baseData, false);
+	if (!name.empty()) keys.push_back(name);
+	string birthdate = get_patientBirthdate(baseData, false);
+	if (!birthdate.empty()) keys.push_back(birthdate);
+	string gender = get_patientGender(baseData, false);
+	if (!gender.empty()) keys.push_back(gender);
+	string imageName = get_imageName(baseData, false);
+	if (!imageName.empty()) keys.push_back(imageName);
+	vector<string> v_props = baseData->GetPropertyContextNames();
+	list<string> props { make_move_iterator(v_props.begin()), make_move_iterator(v_props.end()) };
+	keys.splice(keys.end(), props);
+	string uid = baseData->GetUID();
+	if (!uid.empty()) keys.push_back(uid);
+	for (const auto& key : keys)
+	{
+		// retval = h1 ^ (h2 << 1)
+		retval ^= hash<string>{}(key) + 0x9e3779b9 + (retval << 6) + (retval >> 2);
+	}
+	auto geo = baseData->GetGeometry();
+	if (geo != nullptr)
+	{
+		auto center = geo->GetCenter();
+		for (auto it = center.Begin(); it != center.End(); ++it)
+		{
+			auto& val = *it;
+			retval ^= hash<double>{}(val)+0x9e3779b9 + (retval << 6) + (retval >> 2);
+		}
+	}
+	return retval;
 }

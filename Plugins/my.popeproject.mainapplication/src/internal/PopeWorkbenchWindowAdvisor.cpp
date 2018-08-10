@@ -50,7 +50,7 @@ shared_ptr<vector<QAction*>> PopeWorkbenchWindowAdvisor::createDataActions()
 {
 	auto dataActions = make_shared<vector<QAction*>>();
 
-	/// Create "Open DICOM dataset" and "Open folder" actions.
+	/// Create "Open DICOM dataset" action.
 	QAction* openFolderAction = new QAction();
 	auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/places/");
 	openFolderAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "folder.svg"));
@@ -58,6 +58,7 @@ shared_ptr<vector<QAction*>> PopeWorkbenchWindowAdvisor::createDataActions()
 	openFolderAction->setToolTip("Load all data from a folder");
 	QObject::connect(openFolderAction, SIGNAL(triggered(bool)), this, SLOT(on_action_OpenFolder_triggered()));
 
+	/// Create "Open folder" action.
 	QAction* openDICOMDatasetAction = new QAction();
 	//basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
 	basePath = QStringLiteral(":/images/");
@@ -66,8 +67,18 @@ shared_ptr<vector<QAction*>> PopeWorkbenchWindowAdvisor::createDataActions()
 	openDICOMDatasetAction->setToolTip("Open DICOM data set");
 	QObject::connect(openDICOMDatasetAction, SIGNAL(triggered(bool)), this, SLOT(on_action_OpenDICOM_triggered()));
 
+	/// Create "Open folder" action.
+	QAction* openPACSAction = new QAction();
+	basePath = QStringLiteral(":/PACS/"); //?? does not work
+	openPACSAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "CreateSurface.png"));
+	openPACSAction->setText("&PACS...");
+	openPACSAction->setToolTip("Picture archiving and communication system (PACS)");
+	QObject::connect(openPACSAction, SIGNAL(triggered(bool)), this, SLOT(on_action_PACS_triggered()));
+
+	/// Add the actions to the list.
 	dataActions->push_back(openFolderAction);
 	dataActions->push_back(openDICOMDatasetAction);
+	dataActions->push_back(openPACSAction);
 	return dataActions;
 }
 QToolBar* PopeWorkbenchWindowAdvisor::createToolbar_AndAddDataActions(QMainWindow* mainWindow, shared_ptr<vector<QAction*>> dataActions)
@@ -161,7 +172,7 @@ void PopeWorkbenchWindowAdvisor::addSettingsToToolbar(QMainWindow* mainWindow, Q
 	QIcon icon(":/images/preferences-system.png");
 	settingsAction->setIcon(icon); // berry::QtStyleManager::ThemeIcon(basePath + "preferences-system.png"));
 	settingsAction->setText("&Settings...");
-	settingsAction->setToolTip("Open preferences");
+	settingsAction->setToolTip("Open Preferences");
 	QObject::connect(settingsAction, SIGNAL(triggered(bool)), this, SLOT(on_action_Settings_triggered()));
 
 	/// Add the action to the main toolbar.
@@ -225,19 +236,14 @@ void PopeWorkbenchWindowAdvisor::on_action_OpenFolder_triggered()
 	properties["imagePath"] = imagePath;
 	emit OpenDataFolder(properties);
 }
-void PopeWorkbenchWindowAdvisor::on_action_Settings_triggered()
+void PopeWorkbenchWindowAdvisor::on_action_PACS_triggered()
 {
-	QmitkPreferencesDialog preferencesDialog(QApplication::activeWindow());
-	preferencesDialog.exec();
-}
-void PopeWorkbenchWindowAdvisor::on_MainWindow_ShowPACS_triggered(const ctkEvent& event)
-{
+	DicomViewDialog dialog(nullptr);
+	dialog.exec();
+	return;
+
 	if (viewToolbar == nullptr)
 		return;
-
-	DicomViewDialog * dialog = new DicomViewDialog(nullptr);
-	dialog->exec();
-	return;
 
 	// !Test code
 
@@ -269,11 +275,20 @@ void PopeWorkbenchWindowAdvisor::on_MainWindow_ShowPACS_triggered(const ctkEvent
 	if (dicomviewAction != nullptr)
 		dicomviewAction->ShowView(); // give it focus
 
-	// If there are no actions, show preferences
+									 // If there are no actions, show preferences
 	if (dicomviewAction == nullptr && xnatAction == nullptr)
 	{
 		QmitkPreferencesDialog preferencesDialog(QApplication::activeWindow());
 		preferencesDialog.SetSelectedPage("org.mitk.gui.qt.application.DicomViewPreferencePage");
 		preferencesDialog.exec();
 	}
+}
+void PopeWorkbenchWindowAdvisor::on_action_Settings_triggered()
+{
+	QmitkPreferencesDialog preferencesDialog(QApplication::activeWindow());
+	preferencesDialog.exec();
+}
+void PopeWorkbenchWindowAdvisor::on_MainWindow_ShowPACS_triggered(const ctkEvent& event)
+{
+	on_action_PACS_triggered();
 }

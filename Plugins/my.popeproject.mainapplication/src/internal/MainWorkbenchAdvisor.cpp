@@ -18,24 +18,34 @@ const QString MainWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "my.popeproject.mai
 
 const initializer_list<PluginDescriptor> plugins =
 {
-//	[order]		[id]										[name]						[role]			[title] [position]		[open]
-	{ "02",		"org.mitk.views.datamanager",				"Data Manager",				"main",			"yes",	"left",			"yes" },
-	{ "01",		"my.popeproject.views.toolsplugin",			"POPE View",				"main",			"no",	"right",		"yes" },
-	{ "11",		"org.mitk.views.basicimageprocessing",		"Image Processing",			"secondary", 	"no",	"right",		"no"  },
-	{ "13",		"my.popeproject.views.segmentation",		"Segmentation Tools",		"secondary",	"no",	"right",		"no"  },
-	{ "14",		"org.mitk.views.segmentation",				"Segmentation",				"secondary",	"no",	"right",		"no"  },
-	{ "15",		"org.mitk.views.segmentationutilities",		"Segmentation Utilities",	"secondary",	"no",	"right",		"no"  },
-	{ "16",		"org.mitk.views.deformableclippingplane",	"Clipping Plane",			"secondary",	"no",	"right",		"no"  },
-	{ "17",		"org.blueberry.views.logview",				"Log",						"secondary",	"no",	"right",		"no"  },
-	{ "07",		"org.mitk.views.imagestatistics",			"Statistics",				"secondary",	"no",	"right",		"no"  },
-	{ "03",		"org.mitk.views.imagenavigator",			"Image Navigator",			"secondary",	"no",	"bottom_right",	"yes" },
-	{ "06",		"org.mitk.views.measurement",				"Measurement",				"secondary",	"no",	"bottom_right",	"no"  },
-	{ "08",		"org.mitk.views.imagecropper",				"Image Cropper",			"secondary",	"no",	"bottom_right",	"no"  },
-	{ "04",		"org.mitk.views.properties",				"Properties",				"secondary",	"no",	"bottom_left",	"no"  },
-	{ "05",		"org.mitk.views.volumevisualization",		"Volume Visualization",		"secondary",	"no",	"bottom_left",	"no"  },
-	{ "12",		"org.mitk.gui.qt.dicominspector",			"DICOM Inspector",			"secondary",	"no",	"bottom_left",	"no"  },
-	//{ "09",		"my.pacs.views.dicomview",					"PACS Browser",				"pacs",			"yes",	"bottom", 		"no"  },
-	{ "10",		"org.mitk.views.xnat.treebrowser",			"XNAT Browser",				"pacs",			"yes",	"bottom", 		"no"  },
+//	[order]		[id]											[name]									[role]			[title] [position]		[open]
+	{ "02",		"org.mitk.views.datamanager",					"Data Manager",							"main",			"yes",	"left",			"yes" },
+	{ "00",		"my.popeproject.views.toolsplugin",				"POPE View",							"main",			"no",	"right",		"yes" },
+	{ "01",		"my.popeproject.views.registrationplugin",		"Registration",							"main",			"no",	"right",		"yes" },
+	{ "11",		"org.mitk.views.basicimageprocessing",			"Image Processing",						"secondary", 	"no",	"right",		"no"  },
+	{ "13",		"my.popeproject.views.segmentation",			"Segmentation Tools",					"secondary",	"no",	"right",		"no"  },
+	{ "14",		"org.mitk.views.segmentation",					"Segmentation",							"secondary",	"no",	"right",		"no"  },
+	{ "15",		"org.mitk.views.segmentationutilities",			"Segmentation Utilities",				"secondary",	"no",	"right",		"no"  },
+	{ "16",		"org.mitk.views.deformableclippingplane",		"Clipping Plane",						"secondary",	"no",	"right",		"no"  },
+	{ "09",		"org.blueberry.views.logview",					"Log",									"secondary",	"no",	"right",		"no"  },
+	{ "07",		"org.mitk.views.imagestatistics",				"Statistics",							"secondary",	"no",	"right",		"no"  },
+	{ "03",		"org.mitk.views.imagenavigator",				"Image Navigator",						"secondary",	"no",	"bottom_right",	"yes" },
+	{ "06",		"org.mitk.views.measurement",					"Measurement",							"secondary",	"no",	"bottom_right",	"no"  },
+	{ "08",		"org.mitk.views.imagecropper",					"Image Cropper",						"secondary",	"no",	"right",		"no"  },
+	{ "04",		"org.mitk.views.properties",					"Properties",							"secondary",	"no",	"bottom_left",	"no"  },
+	{ "05",		"org.mitk.views.volumevisualization",			"Volume Visualization",					"secondary",	"no",	"bottom_left",	"no"  },
+	{ "12",		"org.mitk.gui.qt.dicominspector",				"DICOM Inspector",						"secondary",	"no",	"bottom_left",	"no"  },
+	//{ "09",		"my.pacs.views.dicomview",					"PACS Browser",							"pacs",			"yes",	"bottom", 		"no"  },
+	{ "17",		"org.mitk.views.xnat.treebrowser",				"XNAT Browser",							"pacs",			"yes",	"bottom", 		"no"  },
+	{ "20",		"org.mitk.views.matchpoint.algorithm.browser",	"MatchPoint Algorithm Browser",			"secondary",	"no",	"right", 		"no"  },
+	{ "21",		"org.mitk.views.matchpoint.algorithm.control",	"MatchPoint Algorithm Control",			"secondary",	"no",	"right", 		"no"  },
+	{ "22",		"org.mitk.views.matchpoint.algorithm.framereg",	"MatchPoint Frame Correction",			"secondary",	"no",	"right", 		"no"  },
+	{ "23",		"org.mitk.views.matchpoint.mapper",				"MatchPoint Mapper",					"secondary",	"no",	"right", 		"no"  },
+	{ "24",		"org.mitk.views.matchpoint.algorithm.batch",	"MatchPoint Registration Batch Processing","secondary",	"no",	"right", 		"no"  },
+	{ "25",		"org.mitk.views.matchpoint.evaluation.editor",	"MatchPoint Registration Evaluator",	"secondary",	"no",	"right", 		"no"  },
+	{ "26",		"org.mitk.views.matchpoint.manipulator",		"MatchPoint Registration Manipulator",	"secondary",	"no",	"right", 		"no"  },
+	{ "27",		"org.mitk.views.matchpoint.visualizer",			"MatchPoint Registration Vizualizer",	"secondary",	"no",	"right", 		"no"  },
+	{ "28",		"org.mitk.views.aicpregistration",				"AICP-Registration",					"secondary",	"no",	"right", 		"no"  },
 };
 
 
@@ -92,6 +102,7 @@ berry::WorkbenchWindowAdvisor* MainWorkbenchAdvisor::CreateWorkbenchWindowAdviso
 	excludeViews.push_back("org.blueberry.views.helpindex");
 	excludeViews.push_back("org.blueberry.views.helpsearch");
 	excludeViews.push_back("org.mitk.views.aicpregistration");
+	excludeViews.push_back("my.pacs.views.dicomviewdialog");
 
 	advisor->SetViewExcludeList(excludeViews);
 

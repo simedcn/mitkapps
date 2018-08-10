@@ -41,6 +41,7 @@ namespace mitk
 
 struct TagTree;
 using TagNode = shared_ptr<TagTree>;
+using StatData = vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer>;
 
 // All views in MITK derive from QmitkAbstractView. You have to override
 // at least the two methods CreateQtPartControl() and SetFocus().
@@ -73,6 +74,7 @@ public:
 	void updateTagRepresentation();
 	void updateShowPatientData();
 	void updateShowStatistics();
+	void updateStatistics(const StatData& statistics, mitk::Image* image);
 	void updateEditableControls(bool update_tags = true);
 
 protected:
@@ -101,6 +103,7 @@ private:
 	using DataNodeList = list<mitk::DataNode::Pointer>;
 	mitk::DataNode* getFirstSelectedNode(shared_ptr<DataNodeList> dataNodes = nullptr);
 	void enable3DRepresentation(bool flag);
+	void updateCrosshair();
 
 private:
 	// Generated from the associated UI file, it encapsulates all the widgets of our view.
@@ -114,6 +117,7 @@ private:
 	long m_TimeObserverTag;
 	mitk::Image* m_StatisticsImage = nullptr;
 	bool m_StatisticsUpdatePending;
+	map<size_t, StatData> m_statistics;
 	bool m_DataNodeSelectionChanged;
 	//bool m_Visible;
 
@@ -127,9 +131,11 @@ private:
 
 signals:
 	void Representation3DHasToBeInitiated(const ctkDictionary&);
+	void UpdateCrosshair(const ctkDictionary&);
 	void NodeHasManyImages(const ctkDictionary&);
 	void SetLevelWindowRange(const ctkDictionary&);
 	void SelecedDataNodeChanged(const ctkDictionary&);
+	void AllNodesRemoved(const ctkDictionary&);
 
 	/// Method to set the data to the member and start the threaded statistics update
 	void StatisticsUpdate();
@@ -139,7 +145,7 @@ public slots:
 	void on_MainWindow_Representation3D_changed(const ctkEvent& event);
 
 protected slots:
-	void on_ThreadedStatisticsCalculation_ends();
+	void on_ThreadedStatisticsCalculation_finished();
 	/// Checks if update is possible and calls StatisticsUpdate() possible
 	void RequestStatisticsUpdate();
 

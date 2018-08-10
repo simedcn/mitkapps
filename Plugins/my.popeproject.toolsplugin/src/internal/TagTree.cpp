@@ -121,6 +121,8 @@ shared_ptr<Tag> ckeck_tree(TagNode tree, bool isRootNode)// = false)
 			if (it == groups.end())
 			{// if the first element was deleted
 				it = groups.begin();
+				if (it == groups.end())
+					break; // no more elements
 			}
 		}
 	}

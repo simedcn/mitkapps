@@ -66,6 +66,7 @@
 #include <algorithm>
 #include <iterator>
 
+
 using namespace std;
 
 // Don't forget to initialize the VIEW_ID.
@@ -88,6 +89,95 @@ void set_childTreeWidgetItems_editable(QTreeWidgetItem* item, bool isEditable, i
 	}
 	bool isExpanded = (level <= 3);
 	item->setExpanded(isExpanded);
+}
+void detect_beginning(vector<double> diff, const double& min_threshold, const double& max_threshold, int* i_beginning, int* i_end)
+{
+	// Start of start region
+	int i1_1 = 0;
+	for (int i = i1_1; i < diff.size(); i++)
+	{
+		i1_1 = i;
+		if (diff[i] > max_threshold)
+			break;
+	}
+	// End of start region
+	int i1_2 = i1_1 + 1;
+	for (int i = i1_2; i < diff.size(); i++)
+	{
+		i1_2 = i;
+		if (diff[i] <= min_threshold)
+			break;
+	}
+	*i_beginning = i1_1;
+	*i_end = i1_2;
+}
+void detect_end(vector<double> diff, const double& min_threshold, const double& max_threshold, int* i_beginning, int* i_end)
+{
+	// End of end region
+	int i2_2 = diff.size() - 1;
+	for (int i = i2_2; i > 0; i--)
+	{
+		i2_2 = i;
+		if (diff[i] > max_threshold)
+			break;
+	}
+	// End point
+	int i2_1 = i2_2 - 1;
+	for (int i = i2_1; i > 0; i--)
+	{
+		i2_1 = i;
+		if (diff[i] <= min_threshold)
+			break;
+	}
+	*i_beginning = i2_1;
+	*i_end = i2_2;
+}
+QString GetFormattedString(double value, unsigned int decimals)
+{
+	typedef mitk::ImageStatisticsCalculator::StatisticsContainer::RealType RealType;
+	RealType maxVal = std::numeric_limits<RealType>::max();
+
+	if (value == maxVal)
+	{
+		return QString("NA");
+	}
+	else
+	{
+		return QString("%1").arg(value, 0, 'f', decimals);
+	}
+}
+QString GetFormattedIndex(const vnl_vector<int>& vector)
+{
+	if (vector.empty())
+	{
+		return QString();
+	}
+	QString formattedIndex("(");
+	for (const auto& entry : vector)
+	{
+		formattedIndex += QString::number(entry);
+		formattedIndex += ",";
+	}
+	formattedIndex.chop(1);
+	formattedIndex += ")";
+	return formattedIndex;
+}
+shared_ptr<string> get_name_of_image(mitk::Image* image)
+{
+	shared_ptr<string> retval = nullptr;
+	if (image != nullptr)
+	{
+		auto baseData = dynamic_cast<mitk::BaseData*>(image);
+		if (baseData != nullptr)
+		{
+			auto property_name = baseData->GetProperty("name");
+			if (property_name)
+			{
+				retval = make_shared<string>(property_name->GetValueAsString());
+			}
+		}
+	}
+	return retval;
 }
 
 ToolsPlugin::ToolsPlugin()
@@ -160,7 +250,7 @@ void ToolsPlugin::CreateQtPartControl(QWidget* parent)
 	connect(this->ui.checkBox_GroupTags, SIGNAL(toggled(bool)), this, SLOT(on_checkBox_GroupTags_toggled(bool)));
 	connect(this->ui.checkBox_ShowStatistics, SIGNAL(toggled(bool)), this, SLOT(on_checkBox_ShowStatistics_toggled(bool)));
 
-	connect((QObject*) this->m_CalculationThread, SIGNAL(finished()), this, SLOT(on_ThreadedStatisticsCalculation_ends()), Qt::QueuedConnection);
+	connect((QObject*) this->m_CalculationThread, SIGNAL(finished()), this, SLOT(on_ThreadedStatisticsCalculation_finished()), Qt::QueuedConnection);
 	connect((QObject*) this, SIGNAL(StatisticsUpdate()), this, SLOT(RequestStatisticsUpdate()), Qt::QueuedConnection);
 
 	/// CTK signals.
@@ -186,9 +276,11 @@ void ToolsPlugin::CreateQtPartControl(QWidget* parent)
 
 		// Using Qt::DirectConnection is equivalent to ctkEventAdmin::sendEvent()
 		eventAdmin->publishSignal(this, SIGNAL(Representation3DHasToBeInitiated(const ctkDictionary&)), "pope/representation/START3D", Qt::DirectConnection);
+		eventAdmin->publishSignal(this, SIGNAL(UpdateCrosshair(const ctkDictionary&)), "pope/representation/CROSSHAIR", Qt::DirectConnection);
 		eventAdmin->publishSignal(this, SIGNAL(NodeHasManyImages(const ctkDictionary&)), "pope/representation/ENABLED3D", Qt::DirectConnection);
 		eventAdmin->publishSignal(this, SIGNAL(SetLevelWindowRange(const ctkDictionary&)), "pope/representation/SETRANGE", Qt::DirectConnection);
 		eventAdmin->publishSignal(this, SIGNAL(SelecedDataNodeChanged(const ctkDictionary&)), "data/SELECTEDNODE", Qt::DirectConnection);
+		eventAdmin->publishSignal(this, SIGNAL(AllNodesRemoved(const ctkDictionary&)), "data/ALLNODESREMOVED", Qt::DirectConnection);
 	}
 
 	/// Create the DisplayCoordinate Supplier and provide it with the function name it should call.
@@ -258,6 +350,8 @@ void ToolsPlugin::updateAfterSelectionChanged()
 	row_Patient_ID->setText(QString::fromStdString(patientID));
 
 	updateTags();
+
+	/// Update statistics table
 }
 void ToolsPlugin::updateTags()
 {
@@ -418,668 +512,8 @@ void ToolsPlugin::updateShowStatistics()
 	ui.checkBox_ShowStatistics->blockSignals(false);
 	ui.tableWidget_Statistics->setVisible(showStatistics);
 }
-void ToolsPlugin::updateEditableControls(bool update_tags)
+void ToolsPlugin::updateStatistics(const StatData& statistics, mitk::Image* image)
 {
-	bool editable_text = m_ToolsPluginPreferencesNode->GetBool("editable text", false);
-	QAbstractItemView::EditTriggers triggers = editable_text ? (QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed) : QAbstractItemView::NoEditTriggers;
-	ui.tableWidget_PatientData->setEditTriggers(triggers);
-	ui.tableWidget_Tags->setEditTriggers(triggers);
-	ui.treeWidget_Tags->setEditTriggers(triggers);
-
-	if (update_tags)
-		updateTags();
-}
-
-std::map<double, double> ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram)
-{
-	std::map<double, double> histogramMap;
-
-	auto endIt = histogram->End();
-	auto it = histogram->Begin();
-
-	// generating Lists of measurement and frequencies
-	for (; it != endIt; ++it)
-	{
-		double frequency = it.GetFrequency();
-		double measurement = it.GetMeasurementVector()[0];
-		histogramMap.emplace(measurement, frequency);
-	}
-
-	return histogramMap;
-}
-
-void ToolsPlugin::NodeAdded(const mitk::DataNode* node)
-{
-	//berry::IWorkbenchWindow::Pointer workbenchWindow = this->GetSite()->GetWorkbenchWindow();
-	//berry::ISelectionService* workbenchWindowSelectionService = workbenchWindow->GetSelectionService();
-	//berry::ISelection::ConstPointer selection = workbenchWindowSelectionService->GetSelection("org.mitk.views.datamanager");
-	//berry::IViewPart::Pointer dataManagerView = workbenchWindow->GetActivePage()->FindView("org.mitk.views.datamanager");
-	//QmitkDataNodeSelectionProvider::Pointer dataManagerSelectionProvider = dataManagerView->GetSite()->GetSelectionProvider().Cast<QmitkDataNodeSelectionProvider>();
-	//auto qs = dataManagerSelectionProvider->GetQItemSelection();
-	//QItemSelectionRange qisr;
-	//qs.push_back();
-	//dataManagerSelectionProvider->SetSelection(selection);
-	//dataManagerSelectionProvider->SetQItemSelection(qs);
-	//auto s = dataManagerSelectionProvider->GetQItemSelection();
-	//int is = s.size();
-
-
-	//mitk::DataNode::Pointer pt = mitk::DataNode::New();
-	//pt->SetData(node->GetData());
-	//pt->SetName(node->GetName());
-	//FireNodeSelected(pt);
-	//this->RequestRenderWindowUpdate();
-	//mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-
-	//berry::SmartPointer<berry::IEditorInput> nul;
-	//auto list_rve = this->GetSite()->GetPage()->FindEditors(nul, "my.popeproject.editors.renderwindow", berry::IWorkbenchPage::MATCH_ID);
-	//auto p_rve = list_rve.front().GetPointer();
-
-	//PopeRenderWindowEditor* rve = dynamic_cast<PopeRenderWindowEditor*>(p_rve);
-	//auto multiWidget = rve->GetStdMultiWidget();
-
-	//auto vv = this->GetSite()->GetPage()->GetViews();
-	//for (auto v : vv)
-	//{
-	//	MITK_INFO << v->GetPartName().toStdString();
-	//}
-
-	//berry::IWorkbenchWindow::Pointer window;
-	//window = this->GetSite()->GetWorkbenchWindow();
-	//MainWindow* mainWindow = static_cast<MainWindow*>(window->GetShell()->GetControl());
-
-	//// get access to StdMultiWidget by using RenderWindowPart
-	//auto part = GetRenderWindowPart();
-	//auto window = part->GetActiveQmitkRenderWindow();
-	//auto w = part->GetQmitkRenderWindow("my.popeproject.editors.renderwindow");
-	//auto manager = part->GetRenderingManager();
-	////auto multiWidget = qRWE->GetStdMultiWidget();
-
-	/*/// Chcek if it contains more than one-two images.
-	string tag = get_property("DICOM.0020.0013", "dicom.image.0020.0013", node);
-	bool has_many_images = tag.length() > 30;
-
-	/// If so, enable volume rendering if it was selected for first time.
-	if (has_many_images)
-	{
-		// Find the node to be selected
-		berry::IViewPart::Pointer datamanagerView = this->GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.datamanager");
-		//berry::ISelection::ConstPointer selection(this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-		//datamanagerView->GetSite()->GetSelectionProvider().Cast<berry::QtSelectionProvider>()->SetSelection(selection, QItemSelectionModel::Select);
-		//mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-		auto dView = dynamic_cast<QmitkDataManagerView*>(datamanagerView.GetPointer());
-		//QList<mitk::DataNode::Pointer> all_nodes = dView->GetNodeSet();
-		//mitk::DataNode::Pointer node_to_select = nullptr;
-		//for (auto n : all_nodes)
-		//{
-		//	if (n->GetName() == node->GetName())
-		//	{
-		//		node_to_select = n;
-		//		break;
-		//	}
-		//}
-		//if (node_to_select != nullptr)
-		//{
-		// Select datanode
-		//dView->SelectNode(node_to_select);
-		dView->SelectNode(node);
-	}*/
-
-}
-void ToolsPlugin::NodeRemoved(const mitk::DataNode* node)
-{
-	/// Stop the statistics calculation.
-	while (this->m_CalculationThread->isRunning())
-	{ // wait until thread has finished
-		itksys::SystemTools::Delay(30);
-	}
-
-	/// If \c node is the selected node, update the selected node.
-	if (node == m_SelectedNode)
-	{
-		SelectionChanged(nullptr);
-	}
-}
-
-void ToolsPlugin::Activated()
-{}
-void ToolsPlugin::Deactivated()
-{}
-void ToolsPlugin::Visible()
-{
-	//m_Visible = true;
-	/// Initialize the timeChanged event of imageNavigator.
-	mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
-	if (!renderWindow)
-		return;
-	auto cmdTimeEvent =	itk::ReceptorMemberCommand<ToolsPlugin>::New();
-	cmdTimeEvent->SetCallbackFunction(this, &ToolsPlugin::on_imageNavigator_timeChanged);
-	// It is sufficient to add the observer to the axial render window since the GeometryTimeEvent is always triggered by all views.
-	auto event = mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0);
-	m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->AddObserver(event, cmdTimeEvent);
-}
-void ToolsPlugin::Hidden()
-{
-	//m_Visible = false;
-	// The slice navigation controller observer is removed here instead of in the destructor.
-	// If it was called in the destructor, the application would freeze because the view's destructor gets called after the render windows have been destructed.
-	if (m_TimeObserverTag == 0)
-		return;
-
-	mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
-	if (renderWindow)
-	{
-		renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->RemoveObserver(m_TimeObserverTag);
-	}
-	m_TimeObserverTag = 0;
-}
-void ToolsPlugin::SetFocus()
-{
-	// default focus --> one line to set focus for the default widget
-}
-
-void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
-{
-	if (m_StatisticsUpdatePending)
-	{
-		m_DataNodeSelectionChanged = true;
-		return; // not ready for new data now!
-	}
-
-	// Get the first selected node
-	auto nodes = shared_ptr<DataNodeList>(new DataNodeList);
-	*nodes = selectedDataNodes.toStdList();
-	auto firstSelectedNode = getFirstSelectedNode(nodes);
-
-	// Make invisible all the nodes but the first selected node
-	auto pluginContext = my_popeproject_toolsplugin_PluginActivator::GetPluginContext();
-	ctkServiceReference serviceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
-	mitk::IDataStorageService* storageService = pluginContext->getService<mitk::IDataStorageService>(serviceReference);
-	mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
-	auto all_nodes = dataStorage->GetAll();
-	for (auto datanode : *all_nodes)
-	{
-		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
-		if (!image)
-			continue;
-
-		//bool is_visible = false;
-		//bool is_property_found = datanode->GetBoolProperty("visible", is_visible);
-		//bool is_selected_node = (datanode.GetPointer() == firstSelectedNode);
-		//if (is_property_found && is_visible)
-		//	datanode->SetBoolProperty("visible", is_selected_node);
-		bool is_selected_node = false;
-		for (auto selected_node : selectedDataNodes)
-		{
-			if (datanode.GetPointer() == selected_node.GetPointer())
-			{
-				is_selected_node = true;
-				break;
-			}
-		}
-		datanode->SetBoolProperty("visible", is_selected_node);
-	}
-	this->RequestRenderWindowUpdate();
-
-	// Process the event in SelectionChanged()
-	SelectionChanged(firstSelectedNode);
-}
-void ToolsPlugin::SelectionChanged(mitk::DataNode* dataNode)
-{
-	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-
-	if ((m_SelectedNode != dataNode) && m_SelectedNode != nullptr)
-	{// Disable autorotation for the current node
-		bool property_autorotation = false; // default value - is used when the property doesn't exist
-											//m_SelectedNode->GetBoolProperty("autorotation", property_autorotation);
-		QString node_name = QString::fromStdString("/datanode.settings." + m_SelectedNode->GetName());
-		auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
-		property_autorotation = settingsNode->GetBool("autorotation", property_autorotation);
-
-		if (property_autorotation)
-		{
-			// Disable 3D representation
-			enable3DRepresentation(false);
-		}
-	}
-
-	// Update current selected node
-	/// Remeber datanode selected in DataStorage.
-	m_SelectedNode = dataNode;
-
-	ctkDictionary properties_selectedDataNodeName;
-	QString selectedDataNodeName = (dataNode == nullptr) ? "" : QString::fromStdString(dataNode->GetName());
-	properties_selectedDataNodeName["selectedDataNodeName"] = selectedDataNodeName;
-	emit SelecedDataNodeChanged(properties_selectedDataNodeName);
-
-	bool has_many_images = false;
-
-	berry::IPreferences::Pointer settingsNode;
-	if (dataNode != nullptr)
-	{// dataNode == nullptr when nothing is selected or the selection doesn't contain an image.
-	 //setLabelWidget();
-	 /// Get the settings node.
-		QString node_name = QString::fromStdString("/datanode.settings." + dataNode->GetName());
-		settingsNode = prefService->GetSystemPreferences()->Node(node_name);
-
-		/// Chcek if it contains more than one-two images.
-		string tag = Elements::get_property("dicom.image.0020.0013", "DICOM.0020.0013", dataNode);
-		if (tag.length() == 0)
-			tag = Elements::get_property("DICOM.0020.0013", "dicom.image.0020.0013", dataNode);
-		has_many_images = (tag.find("2 -> ") != string::npos) || (tag.length() > 30);
-
-		/// If so, enable volume rendering if it was selected for first time.
-		if (has_many_images)
-		{
-			// Check if it is selected for first time
-			bool def_val = m_ToolsPluginPreferencesNode->GetBool("3D autorotation", true);
-			bool property_autorotation = settingsNode->GetBool("autorotation", def_val);
-			//bool is_autorotation_found = dataNode->GetBoolProperty("autorotation", property_autorotation);
-			if (property_autorotation)
-				enable3DRepresentation(true);
-		}
-	}
-	/// Update Volume Rendering.
-	ui.checkbox_EnableVolumeRendering->setEnabled(has_many_images);
-	bool def_val = m_ToolsPluginPreferencesNode->GetBool("volume rendering", true);
-	bool is_volume_rendering_enabled = (has_many_images && def_val); // default value if not specified
-	if (dataNode != nullptr)
-	{// otherwise settingsNode is not initialized
-	 //dataNode->GetBoolProperty("volumerendering", is_volume_rendering_enabled);
-		is_volume_rendering_enabled = settingsNode->GetBool("volumerendering", is_volume_rendering_enabled);
-		if (!has_many_images && is_volume_rendering_enabled)
-		{
-			is_volume_rendering_enabled = false;
-			//const_cast<mitk::DataNode*>(dataNode)->SetBoolProperty("volumerendering", false); --> will be called
-		}
-	}
-	ui.checkbox_EnableVolumeRendering->setChecked(is_volume_rendering_enabled);
-
-	ctkDictionary properties_has_many_images;
-	properties_has_many_images["has_many_images"] = has_many_images;
-	emit NodeHasManyImages(properties_has_many_images);
-
-	/// Update views.
-	updateAfterSelectionChanged();
-
-	/// Update statistics if there are no data already saved.
-	if (dataNode != nullptr)
-	{
-		auto baseData = dataNode->GetData();
-		mitk::Image* image = dynamic_cast<mitk::Image*>(baseData);
-		if (image)
-		{
-			// Check if there are saved data
-			QString node_name = QString::fromStdString("/datanode.settings." + dataNode->GetName());
-			auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
-			double not_found = numeric_limits<double>::max();
-			double min = settingsNode->GetDouble("LevelWindow_min", not_found);
-			double max = settingsNode->GetDouble("LevelWindow_max", not_found);
-			if (min == not_found || max == not_found)
-			{
-				//auto statistics = img->GetStatistics();
-
-				// // reset data from last run
-				// ITKCommandType::Pointer changeListener = ITKCommandType::New();
-				// changeListener->SetCallbackFunction(this, &QmitkImageStatisticsView::SelectedDataModified);
-
-				// initialize thread and trigger it
-				m_CalculationThread->SetIgnoreZeroValueVoxel(false);
-				m_CalculationThread->Initialize(image, /*m_SelectedImageMask*/nullptr, /*m_SelectedPlanarFigure*/nullptr);
-				// m_CalculationThread->SetUseDefaultBinSize(m_Controls->m_UseDefaultBinSizeBox->isChecked());
-				//int timeStep = 0;
-				mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
-				unsigned int timeStep = 0;
-				if (renderPart != nullptr)
-				{
-					timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
-				}
-				// check time step validity
-				if (image->GetDimension() <= 3 && timeStep > image->GetDimension(3) - 1)
-				{
-					timeStep = image->GetDimension(3) - 1;
-				}
-				m_CalculationThread->SetTimeStep(timeStep);
-				try
-				{// Compute statistics
-					m_CalculationThread->start();
-					m_StatisticsImage = image;
-				}
-				catch (const mitk::Exception& e)
-				{
-					std::stringstream message;
-					message << "<font color='red'>" << e.GetDescription() << "</font>";
-					MITK_ERROR << message.str();
-					//this->m_StatisticsUpdatePending = false;
-					m_StatisticsImage = nullptr;
-				}
-				catch (const std::runtime_error &e)
-				{
-					std::stringstream message;
-					message << "<font color='red'>" << e.what() << "</font>";
-					MITK_ERROR << message.str();
-					//this->m_StatisticsUpdatePending = false;
-					m_StatisticsImage = nullptr;
-				}
-				catch (const std::exception &e)
-				{
-					MITK_ERROR << "Caught exception: " << e.what();
-					std::stringstream message;
-					message << "<font color='red'>Error! Unequal Dimensions of Image and Segmentation. No recompute possible </font>";
-					MITK_ERROR << message.str();
-					//this->m_StatisticsUpdatePending = false;
-					m_StatisticsImage = nullptr;
-				}
-				//// wait until thread has finished
-				//while (m_CalculationThread->isRunning())
-				//{
-				//	itksys::SystemTools::Delay(100);
-				//}
-			}
-		}
-	}
-
-	m_StatisticsUpdatePending = false;
-	m_DataNodeSelectionChanged = false;
-}
-void ToolsPlugin::SelectedDataModified()
-{
-	if (!m_StatisticsUpdatePending)
-	{
-		emit StatisticsUpdate();
-	}
-}
-void ToolsPlugin::OnPreferencesChanged(const berry::IBerryPreferences*)
-{
-	updateShowPatientData();
-	updateTagRepresentation();
-	updateShowStatistics();
-
-	updateEditableControls();
-}
-
-void ToolsPlugin::on_checkbox_EnableVolumeRendering_toggled(bool volRen)
-{
-	auto node = getFirstSelectedNode();
-	if (node == nullptr)
-		return;
-
-	QString node_name = QString::fromStdString("/datanode.settings." + node->GetName());
-	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-	auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
-
-	node->SetBoolProperty("volumerendering", volRen);
-	settingsNode->PutBool("volumerendering", volRen);
-	if (!volRen)
-	{
-		bool property_autorotation = false; // default value
-		property_autorotation = settingsNode->GetBool("autorotation", property_autorotation);
-		//bool is_autorotation_found = node->GetBoolProperty("autorotation", property_autorotation);
-		if (property_autorotation)
-		{
-			enable3DRepresentation(false);
-		}
-	}
-}
-void ToolsPlugin::on_checkBox_ShowPatientData_toggled(bool)
-{
-	m_ToolsPluginPreferencesNode->PutBool("show patient data", ui.checkBox_ShowPatientData->isChecked());
-	//updateShowPatientData(); -> will be called by OnPreferencesChanged()
-}
-void ToolsPlugin::on_checkBox_GroupTags_toggled(bool isGrouped)
-{
-	m_ToolsPluginPreferencesNode->PutBool("group tags", ui.checkBox_GroupTags->isChecked());
-	//updateTagRepresentation(); -> will be called by OnPreferencesChanged()
-}
-void ToolsPlugin::on_checkBox_ShowStatistics_toggled(bool)
-{
-	m_ToolsPluginPreferencesNode->PutBool("show statistics", ui.checkBox_ShowStatistics->isChecked());
-	//updateShowStatistics(); -> will be called by OnPreferencesChanged()
-}
-void ToolsPlugin::on_imageNavigator_timeChanged(const itk::EventObject& e)
-{
-	if (m_SelectedNode == nullptr)
-		return;
-
-	auto timeEvent = dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent*>(&e);
-	assert(timeEvent != nullptr);
-	if (timeEvent == nullptr)
-		return;
-	int timestep = timeEvent->GetPos();
-
-	mitk::Image* image = nullptr;
-	try
-	{
-		auto baseData = m_SelectedNode->GetData();
-		image = dynamic_cast<mitk::Image*>(baseData);
-	}
-	catch (...)
-	{
-		MITK_WARN << "No image to update ImageNavigator";
-		return;
-	}
-
-	if (!image)
-		return;
-
-	auto num_timeSteps = image->GetTimeSteps();
-	if (num_timeSteps > 1)
-	{
-		for (int x = 0; x < ui.tableWidget_Statistics->columnCount(); x++)
-		{
-			for (int y = 0; y < ui.tableWidget_Statistics->rowCount(); y++)
-			{
-				QTableWidgetItem* item = ui.tableWidget_Statistics->item(y, x);
-				if (item == nullptr)
-					break;
-
-				if (x == timestep)
-				{
-					item->setBackgroundColor(Qt::yellow);
-				}
-				else
-				{
-					if (y % 2 == 0)
-						item->setBackground(ui.tableWidget_Statistics->palette().base());
-					else
-						item->setBackground(ui.tableWidget_Statistics->palette().alternateBase());
-				}
-			}
-		}
-
-		ui.tableWidget_Statistics->viewport()->update();
-	}
-}
-
-void ToolsPlugin::on_pixel_selected(QVector<double> point)
-{
-	using namespace mitk;
-	// TODO: exlude binary images !!!!!
-	// !!!!!!!!
-	TNodePredicateDataType<Image>::Pointer isImage = TNodePredicateDataType<Image>::New();
-	auto nodePredicateProperty = NodePredicateProperty::New("visible", BoolProperty::New(false));
-	NodePredicateNot::Pointer isNotVisible = NodePredicateNot::New(nodePredicateProperty);
-	NodePredicateAnd::Pointer validVisibleImage = NodePredicateAnd::New(isImage, isNotVisible);
-
-	/// Parse all visible images and list the values of the clicked position
-	DataStorage::SetOfObjects::ConstPointer patientImages = this->GetDataStorage()->GetSubset(validVisibleImage);
-	vector<DataStorage::SetOfObjects::Element> images;
-
-	Point3D p3d;
-	p3d[0] = point[0];
-	p3d[1] = point[1];
-	p3d[2] = point[2];
-
-	for (auto image : *patientImages)
-	{
-		if (image.IsNull())
-			continue;
-		Image* img = dynamic_cast<Image*>(image->GetData());
-		if (img == nullptr)
-			continue;
-
-		images.push_back(image);
-	}
-
-	int images_size = images.size();
-	stringstream text;
-	text << "<html><head/><body>PixelValue(s) <span style=\"vertical-align:sub;\">Shift+Left_Click</span>: ";
-	if (images_size > 1)
-	{
-		text << "<br>";
-	}
-	for (int i = 0; i < images_size; i++)
-	{
-		if (images_size > 1)
-		{
-			text << Elements::get_short_name(images[i]->GetName()) << ": ";
-		}
-		Image* img = dynamic_cast<Image*>(images[i]->GetData());
-		double value = img->GetPixelValueByWorldCoordinate(p3d);
-		text << "<b>" << to_string(int(round(value))) << "</b>";
-		if (i < images_size - 1)
-		{
-			text << "<br>";
-		}
-	}
-	text << "</body></html>";
-	ui.label_PixelValue->setText(QString::fromStdString(text.str()));
-}
-void ToolsPlugin::on_MainWindow_Representation3D_changed(const ctkEvent& event)
-{
-	bool enable3D = event.getProperty("enable3D").toBool();
-	if (m_SelectedNode)
-	{
-		QString node_name = QString::fromStdString("/datanode.settings." + m_SelectedNode->GetName());
-		berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-		auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
-
-		if (enable3D)
-		{
-			// Chcek if it contains more than one-two images.
-			string tag = Elements::get_property("DICOM.0020.0013", "dicom.image.0020.0013", m_SelectedNode);
-			bool has_many_images = tag.length() > 30;
-			if (has_many_images)
-			{
-				// Enable volume rendering
-				//bool property_volumerendering;
-				//bool is_volume_rendering_property_found = m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
-				//if (!is_volume_rendering_property_found || !property_volumerendering)
-				bool property_volumerendering = settingsNode->GetBool("volumerendering", false);
-				if (!property_volumerendering)
-				{
-					//m_SelectedNode->SetBoolProperty("volumerendering", true); --> will be called
-					ui.checkbox_EnableVolumeRendering->setChecked(true);
-				}
-				//property_volumerendering = false;
-				//m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
-				//assert(property_volumerendering);
-			}
-		}
-		// Enable/disable autorotation
-		settingsNode->PutBool("autorotation", enable3D);
-		//m_SelectedNode->SetBoolProperty("autorotation", enable3D);
-	}
-}
-
-QString GetFormattedString(double value, unsigned int decimals)
-{
-	typedef mitk::ImageStatisticsCalculator::StatisticsContainer::RealType RealType;
-	RealType maxVal = std::numeric_limits<RealType>::max();
-
-	if (value == maxVal)
-	{
-		return QString("NA");
-	}
-	else
-	{
-		return QString("%1").arg(value, 0, 'f', decimals);
-	}
-}
-QString GetFormattedIndex(const vnl_vector<int>& vector)
-{
-	if (vector.empty())
-	{
-		return QString();
-	}
-	QString formattedIndex("(");
-	for (const auto& entry : vector)
-	{
-		formattedIndex += QString::number(entry);
-		formattedIndex += ",";
-	}
-	formattedIndex.chop(1);
-	formattedIndex += ")";
-	return formattedIndex;
-}
-
-void detect_beginning(vector<double> diff, const double& min_threshold, const double& max_threshold, int* i_beginning, int* i_end)
-{
-	// Start of start region
-	int i1_1 = 0;
-	for (int i = i1_1; i < diff.size(); i++)
-	{
-		i1_1 = i;
-		if (diff[i] > max_threshold)
-			break;
-	}
-	// End of start region
-	int i1_2 = i1_1 + 1;
-	for (int i = i1_2; i < diff.size(); i++)
-	{
-		i1_2 = i;
-		if (diff[i] <= min_threshold)
-			break;
-	}
-	*i_beginning = i1_1;
-	*i_end = i1_2;
-}
-void detect_end(vector<double> diff, const double& min_threshold, const double& max_threshold, int* i_beginning, int* i_end)
-{
-	// End of end region
-	int i2_2 = diff.size() - 1;
-	for (int i = i2_2; i > 0; i--)
-	{
-		i2_2 = i;
-		if (diff[i] > max_threshold)
-			break;
-	}
-	// End point
-	int i2_1 = i2_2 - 1;
-	for (int i = i2_1; i > 0; i--)
-	{
-		i2_1 = i;
-		if (diff[i] <= min_threshold)
-			break;
-	}
-	*i_beginning = i2_1;
-	*i_end = i2_2;
-}
-void ToolsPlugin::on_ThreadedStatisticsCalculation_ends()
-{
-	if (m_DataNodeSelectionChanged)
-	{
-		m_StatisticsUpdatePending = false;
-		RequestStatisticsUpdate();
-		return;    // stop visualization of results and calculate statistics of new selection
-	}
-
-	bool is_ok = m_CalculationThread->GetStatisticsUpdateSuccessFlag();
-	if (!is_ok)
-		return;
-
-	auto baseData = m_SelectedNode->GetData();
-	mitk::Image* image = dynamic_cast<mitk::Image*>(baseData);
-	if (!image)
-		return;
-
-	if (image != m_StatisticsImage)
-		return;
-
-	/// Update statistics
-	auto statistics = m_CalculationThread->GetStatisticsData();
-
 	unsigned int num_timeSteps = image->GetTimeSteps();
 	ui.tableWidget_Statistics->setColumnCount(num_timeSteps);
 	ui.tableWidget_Statistics->horizontalHeader()->setVisible(num_timeSteps > 1);
@@ -1093,17 +527,17 @@ void ToolsPlugin::on_ThreadedStatisticsCalculation_ends()
 
 		/*if (statistics.at(t)->GetMaxIndex().size() == 3)
 		{
-			mitk::Point3D index, max, min;
-			index[0] = statistics.at(t)->GetMaxIndex()[0];
-			index[1] = statistics.at(t)->GetMaxIndex()[1];
-			index[2] = statistics.at(t)->GetMaxIndex()[2];
-			image->GetGeometry()->IndexToWorld(index, max);
-			this->m_WorldMaxList.push_back(max);
-			index[0] = statistics.at(t)->GetMinIndex()[0];
-			index[1] = statistics.at(t)->GetMinIndex()[1];
-			index[2] = statistics.at(t)->GetMinIndex()[2];
-			m_SelectedImage->GetGeometry()->IndexToWorld(index, min);
-			this->m_WorldMinList.push_back(min);
+		mitk::Point3D index, max, min;
+		index[0] = statistics.at(t)->GetMaxIndex()[0];
+		index[1] = statistics.at(t)->GetMaxIndex()[1];
+		index[2] = statistics.at(t)->GetMaxIndex()[2];
+		image->GetGeometry()->IndexToWorld(index, max);
+		this->m_WorldMaxList.push_back(max);
+		index[0] = statistics.at(t)->GetMinIndex()[0];
+		index[1] = statistics.at(t)->GetMinIndex()[1];
+		index[2] = statistics.at(t)->GetMinIndex()[2];
+		m_SelectedImage->GetGeometry()->IndexToWorld(index, min);
+		this->m_WorldMinList.push_back(min);
 		}*/
 
 		auto stat_t = statistics.at(t).GetPointer();
@@ -1272,7 +706,6 @@ void ToolsPlugin::on_ThreadedStatisticsCalculation_ends()
 			ui.tableWidget_Statistics->setItem(count, t, item);
 			count++;
 		}
-
 	}
 
 	ui.tableWidget_Statistics->resizeColumnsToContents();
@@ -1290,7 +723,659 @@ void ToolsPlugin::on_ThreadedStatisticsCalculation_ends()
 	unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 	mitk::SliceNavigationController::GeometryTimeEvent timeEvent(image->GetTimeGeometry(), t);
 	this->on_imageNavigator_timeChanged(timeEvent);
-	
+}
+void ToolsPlugin::updateEditableControls(bool update_tags)
+{
+	bool editable_text = m_ToolsPluginPreferencesNode->GetBool("editable text", false);
+	QAbstractItemView::EditTriggers triggers = editable_text ? (QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed) : QAbstractItemView::NoEditTriggers;
+	ui.tableWidget_PatientData->setEditTriggers(triggers);
+	ui.tableWidget_Tags->setEditTriggers(triggers);
+	ui.treeWidget_Tags->setEditTriggers(triggers);
+
+	if (update_tags)
+		updateTags();
+}
+
+std::map<double, double> ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram)
+{
+	std::map<double, double> histogramMap;
+
+	auto endIt = histogram->End();
+	auto it = histogram->Begin();
+
+	// generating Lists of measurement and frequencies
+	for (; it != endIt; ++it)
+	{
+		double frequency = it.GetFrequency();
+		double measurement = it.GetMeasurementVector()[0];
+		histogramMap.emplace(measurement, frequency);
+	}
+
+	return histogramMap;
+}
+
+void ToolsPlugin::NodeAdded(const mitk::DataNode* node)
+{
+	//berry::IWorkbenchWindow::Pointer workbenchWindow = this->GetSite()->GetWorkbenchWindow();
+	//berry::ISelectionService* workbenchWindowSelectionService = workbenchWindow->GetSelectionService();
+	//berry::ISelection::ConstPointer selection = workbenchWindowSelectionService->GetSelection("org.mitk.views.datamanager");
+	//berry::IViewPart::Pointer dataManagerView = workbenchWindow->GetActivePage()->FindView("org.mitk.views.datamanager");
+	//QmitkDataNodeSelectionProvider::Pointer dataManagerSelectionProvider = dataManagerView->GetSite()->GetSelectionProvider().Cast<QmitkDataNodeSelectionProvider>();
+	//auto qs = dataManagerSelectionProvider->GetQItemSelection();
+	//QItemSelectionRange qisr;
+	//qs.push_back();
+	//dataManagerSelectionProvider->SetSelection(selection);
+	//dataManagerSelectionProvider->SetQItemSelection(qs);
+	//auto s = dataManagerSelectionProvider->GetQItemSelection();
+	//int is = s.size();
+
+
+	//mitk::DataNode::Pointer pt = mitk::DataNode::New();
+	//pt->SetData(node->GetData());
+	//pt->SetName(node->GetName());
+	//FireNodeSelected(pt);
+	//this->RequestRenderWindowUpdate();
+	//mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+
+	//berry::SmartPointer<berry::IEditorInput> nul;
+	//auto list_rve = this->GetSite()->GetPage()->FindEditors(nul, "my.popeproject.editors.renderwindow", berry::IWorkbenchPage::MATCH_ID);
+	//auto p_rve = list_rve.front().GetPointer();
+
+	//PopeRenderWindowEditor* rve = dynamic_cast<PopeRenderWindowEditor*>(p_rve);
+	//auto multiWidget = rve->GetStdMultiWidget();
+
+	//auto vv = this->GetSite()->GetPage()->GetViews();
+	//for (auto v : vv)
+	//{
+	//	MITK_INFO << v->GetPartName().toStdString();
+	//}
+
+	//berry::IWorkbenchWindow::Pointer window;
+	//window = this->GetSite()->GetWorkbenchWindow();
+	//MainWindow* mainWindow = static_cast<MainWindow*>(window->GetShell()->GetControl());
+
+	//// get access to StdMultiWidget by using RenderWindowPart
+	//auto part = GetRenderWindowPart();
+	//auto window = part->GetActiveQmitkRenderWindow();
+	//auto w = part->GetQmitkRenderWindow("my.popeproject.editors.renderwindow");
+	//auto manager = part->GetRenderingManager();
+	////auto multiWidget = qRWE->GetStdMultiWidget();
+
+	/*/// Chcek if it contains more than one-two images.
+	string tag = get_property("DICOM.0020.0013", "dicom.image.0020.0013", node);
+	bool has_many_images = tag.length() > 30;
+
+	/// If so, enable volume rendering if it was selected for first time.
+	if (has_many_images)
+	{
+		// Find the node to be selected
+		berry::IViewPart::Pointer datamanagerView = this->GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.datamanager");
+		//berry::ISelection::ConstPointer selection(this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+		//datamanagerView->GetSite()->GetSelectionProvider().Cast<berry::QtSelectionProvider>()->SetSelection(selection, QItemSelectionModel::Select);
+		//mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
+		auto dView = dynamic_cast<QmitkDataManagerView*>(datamanagerView.GetPointer());
+		//QList<mitk::DataNode::Pointer> all_nodes = dView->GetNodeSet();
+		//mitk::DataNode::Pointer node_to_select = nullptr;
+		//for (auto n : all_nodes)
+		//{
+		//	if (n->GetName() == node->GetName())
+		//	{
+		//		node_to_select = n;
+		//		break;
+		//	}
+		//}
+		//if (node_to_select != nullptr)
+		//{
+		// Select datanode
+		//dView->SelectNode(node_to_select);
+		dView->SelectNode(node);
+	}*/
+
+}
+void ToolsPlugin::NodeRemoved(const mitk::DataNode* node)
+{
+	string node_name = node->GetName();
+
+	/// Stop the statistics calculation if needed.
+	if (this->m_CalculationThread->isRunning())
+	{
+		auto stat_image = this->m_CalculationThread->GetStatisticsImage().GetPointer();
+		string stat_name = this->m_CalculationThread->GetStatisticsDataNodeName();
+		if (stat_name == node_name)
+		{
+			while (this->m_CalculationThread->isRunning())
+			{ // wait until thread has finished
+				itksys::SystemTools::Delay(30);
+			}
+		}
+	}
+
+	/// If \c node is the selected node, update the selected node.
+	if (node == m_SelectedNode)
+	{
+		SelectionChanged(nullptr);
+	}
+
+	/// If it was the last node, send notification to DataManager.
+	auto pluginContext = my_popeproject_toolsplugin_PluginActivator::GetPluginContext();
+	ctkServiceReference serviceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
+	mitk::IDataStorageService* storageService = pluginContext->getService<mitk::IDataStorageService>(serviceReference);
+	mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+	auto all_nodes = dataStorage->GetAll();
+	bool is_found = false;
+	for (auto datanode : *all_nodes)
+	{
+		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+		if (!image)
+		{
+			//auto geo = image->GetGeometry();
+			//geo->
+			continue;
+		}
+		string name = datanode->GetName();
+		if (name == node_name)
+			continue;
+		is_found = true;
+		break;
+	}
+	if (!is_found)
+	{
+		ctkDictionary properties;
+		emit AllNodesRemoved(properties);
+	}
+}
+
+void ToolsPlugin::Activated()
+{}
+void ToolsPlugin::Deactivated()
+{}
+void ToolsPlugin::Visible()
+{
+	//m_Visible = true;
+	/// Initialize the timeChanged event of imageNavigator.
+	mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+	if (!renderWindow)
+		return;
+	auto cmdTimeEvent =	itk::ReceptorMemberCommand<ToolsPlugin>::New();
+	cmdTimeEvent->SetCallbackFunction(this, &ToolsPlugin::on_imageNavigator_timeChanged);
+	// It is sufficient to add the observer to the axial render window since the GeometryTimeEvent is always triggered by all views.
+	auto event = mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0);
+	m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->AddObserver(event, cmdTimeEvent);
+}
+void ToolsPlugin::Hidden()
+{
+	//m_Visible = false;
+	// The slice navigation controller observer is removed here instead of in the destructor.
+	// If it was called in the destructor, the application would freeze because the view's destructor gets called after the render windows have been destructed.
+	if (m_TimeObserverTag == 0)
+		return;
+
+	mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+	if (renderWindow)
+	{
+		renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->RemoveObserver(m_TimeObserverTag);
+	}
+	m_TimeObserverTag = 0;
+}
+void ToolsPlugin::SetFocus()
+{
+	// default focus --> one line to set focus for the default widget
+}
+
+void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
+{
+	if (m_StatisticsUpdatePending)
+	{
+		m_DataNodeSelectionChanged = true;
+		return; // not ready for new data now!
+	}
+
+	// Get the first selected node
+	auto nodes = shared_ptr<DataNodeList>(new DataNodeList);
+	*nodes = selectedDataNodes.toStdList();
+	auto firstSelectedNode = getFirstSelectedNode(nodes);
+
+	// Make invisible all the nodes but the first selected node
+	auto pluginContext = my_popeproject_toolsplugin_PluginActivator::GetPluginContext();
+	ctkServiceReference serviceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
+	mitk::IDataStorageService* storageService = pluginContext->getService<mitk::IDataStorageService>(serviceReference);
+	mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+	auto all_nodes = dataStorage->GetAll();
+	for (auto datanode : *all_nodes)
+	{
+		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+		if (!image)
+			continue;
+
+		//bool is_visible = false;
+		//bool is_property_found = datanode->GetBoolProperty("visible", is_visible);
+		//bool is_selected_node = (datanode.GetPointer() == firstSelectedNode);
+		//if (is_property_found && is_visible)
+		//	datanode->SetBoolProperty("visible", is_selected_node);
+		bool is_selected_node = false;
+		for (auto selected_node : selectedDataNodes)
+		{
+			if (datanode.GetPointer() == selected_node.GetPointer())
+			{
+				is_selected_node = true;
+				break;
+			}
+		}
+		datanode->SetBoolProperty("visible", is_selected_node);
+	}
+
+	// Process the event in SelectionChanged()
+	SelectionChanged(firstSelectedNode);
+}
+void ToolsPlugin::SelectionChanged(mitk::DataNode* dataNode)
+{
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+
+	if ((m_SelectedNode != dataNode) && m_SelectedNode != nullptr)
+	{// Disable autorotation for the current node
+		bool property_autorotation = false; // default value - is used when the property doesn't exist
+											//m_SelectedNode->GetBoolProperty("autorotation", property_autorotation);
+		QString node_name = QString::fromStdString("/datanode.settings." + m_SelectedNode->GetName());
+		auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+		property_autorotation = settingsNode->GetBool("autorotation", property_autorotation);
+
+		if (property_autorotation)
+		{
+			// Disable 3D representation
+			enable3DRepresentation(false);
+		}
+	}
+
+	// Update current selected node
+	/// Remeber datanode selected in DataStorage.
+	m_SelectedNode = dataNode;
+
+	ctkDictionary properties_selectedDataNodeName;
+	QString selectedDataNodeName = (dataNode == nullptr) ? "" : QString::fromStdString(dataNode->GetName());
+	properties_selectedDataNodeName["selectedDataNodeName"] = selectedDataNodeName;
+	emit SelecedDataNodeChanged(properties_selectedDataNodeName);
+
+	bool has_many_images = false;
+
+	berry::IPreferences::Pointer settingsNode;
+	if (dataNode != nullptr)
+	{// dataNode == nullptr when nothing is selected or the selection doesn't contain an image.
+	 //setLabelWidget();
+	 /// Get the settings node.
+		QString node_name = QString::fromStdString("/datanode.settings." + dataNode->GetName());
+		settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+
+		/// Chcek if it contains more than one-two images.
+		string tag = Elements::get_property("dicom.image.0020.0013", "DICOM.0020.0013", dataNode);
+		if (tag.length() == 0)
+			tag = Elements::get_property("DICOM.0020.0013", "dicom.image.0020.0013", dataNode);
+		has_many_images = (tag.find("2 -> ") != string::npos) || (tag.length() > 30);
+
+		/// If so, enable volume rendering if it was selected for first time.
+		if (has_many_images)
+		{
+			// Check if it is selected for first time
+			bool def_val = m_ToolsPluginPreferencesNode->GetBool("3D autorotation", true);
+			bool property_autorotation = settingsNode->GetBool("autorotation", def_val);
+			//bool is_autorotation_found = dataNode->GetBoolProperty("autorotation", property_autorotation);
+			/// Show/hide crosshair
+			if (property_autorotation)
+				enable3DRepresentation(true); // <-- crosshair visibility will be set
+			else
+				updateCrosshair();
+		}
+	}
+	/// Update Volume Rendering.
+	ui.checkbox_EnableVolumeRendering->setEnabled(has_many_images);
+	bool def_val = m_ToolsPluginPreferencesNode->GetBool("volume rendering", true);
+	bool is_volume_rendering_enabled = (has_many_images && def_val); // default value if not specified
+	if (dataNode != nullptr)
+	{// otherwise settingsNode is not initialized
+	 //dataNode->GetBoolProperty("volumerendering", is_volume_rendering_enabled);
+		is_volume_rendering_enabled = settingsNode->GetBool("volumerendering", is_volume_rendering_enabled);
+		if (!has_many_images && is_volume_rendering_enabled)
+		{
+			is_volume_rendering_enabled = false;
+			//const_cast<mitk::DataNode*>(dataNode)->SetBoolProperty("volumerendering", false); --> will be called
+		}
+	}
+	ui.checkbox_EnableVolumeRendering->setChecked(is_volume_rendering_enabled);
+
+	ctkDictionary properties_has_many_images;
+	properties_has_many_images["has_many_images"] = has_many_images;
+	emit NodeHasManyImages(properties_has_many_images);
+
+	/// Update views.
+	updateAfterSelectionChanged();
+
+	/// Update statistics if there are no data already saved.
+	if (dataNode != nullptr)
+	{
+		auto baseData = dataNode->GetData();
+		string dataNodeName = dataNode->GetName();
+		mitk::Image* image = dynamic_cast<mitk::Image*>(baseData);
+		if (image)
+		{
+			// Check if there are saved data
+			//QString node_name = QString::fromStdString("/datanode.settings." + dataNode->GetName());
+			//auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+			//double not_found = numeric_limits<double>::max();
+			//double min = settingsNode->GetDouble("LevelWindow_min", not_found);
+			//double max = settingsNode->GetDouble("LevelWindow_max", not_found);
+			//if (min == not_found || max == not_found)
+			auto hash = Elements::get_hash(baseData);
+			auto statistics = m_statistics.find(hash);
+			bool is_calculated = (statistics != m_statistics.end());
+			if (is_calculated)
+			{
+				updateStatistics(statistics->second, image);
+			}
+			else
+			{
+				ui.tableWidget_Statistics->clearContents();
+				ui.tableWidget_Statistics->setColumnCount(1);
+				ui.tableWidget_Statistics->horizontalHeader()->setVisible(false);
+
+				// // reset data from last run
+				// ITKCommandType::Pointer changeListener = ITKCommandType::New();
+				// changeListener->SetCallbackFunction(this, &QmitkImageStatisticsView::SelectedDataModified);
+
+				// initialize thread and trigger it
+				m_CalculationThread->SetIgnoreZeroValueVoxel(false);
+				m_CalculationThread->Initialize(image, /*m_SelectedImageMask*/nullptr, /*m_SelectedPlanarFigure*/nullptr, dataNodeName);
+				// m_CalculationThread->SetUseDefaultBinSize(m_Controls->m_UseDefaultBinSizeBox->isChecked());
+				//int timeStep = 0;
+				mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
+				unsigned int timeStep = 0;
+				if (renderPart != nullptr)
+				{
+					timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
+				}
+				// check time step validity
+				if (image->GetDimension() <= 3 && timeStep > image->GetDimension(3) - 1)
+				{
+					timeStep = image->GetDimension(3) - 1;
+				}
+				m_CalculationThread->SetTimeStep(timeStep);
+				try
+				{// Compute statistics
+					m_CalculationThread->start();
+					m_StatisticsImage = image;
+				}
+				catch (const mitk::Exception& e)
+				{
+					std::stringstream message;
+					message << "<font color='red'>" << e.GetDescription() << "</font>";
+					MITK_ERROR << message.str();
+					//this->m_StatisticsUpdatePending = false;
+					m_StatisticsImage = nullptr;
+				}
+				catch (const std::runtime_error &e)
+				{
+					std::stringstream message;
+					message << "<font color='red'>" << e.what() << "</font>";
+					MITK_ERROR << message.str();
+					//this->m_StatisticsUpdatePending = false;
+					m_StatisticsImage = nullptr;
+				}
+				catch (const std::exception &e)
+				{
+					MITK_ERROR << "Caught exception: " << e.what();
+					std::stringstream message;
+					message << "<font color='red'>Error! Unequal Dimensions of Image and Segmentation. No recompute possible </font>";
+					MITK_ERROR << message.str();
+					//this->m_StatisticsUpdatePending = false;
+					m_StatisticsImage = nullptr;
+				}
+				//// wait until thread has finished
+				//while (m_CalculationThread->isRunning())
+				//{
+				//	itksys::SystemTools::Delay(100);
+				//}
+			}
+		}
+	}
+
+	m_StatisticsUpdatePending = false;
+	m_DataNodeSelectionChanged = false;
+
+	this->RequestRenderWindowUpdate();
+}
+void ToolsPlugin::SelectedDataModified()
+{
+	if (!m_StatisticsUpdatePending)
+	{
+		emit StatisticsUpdate();
+	}
+}
+void ToolsPlugin::OnPreferencesChanged(const berry::IBerryPreferences*)
+{
+	updateShowPatientData();
+	updateTagRepresentation();
+	updateShowStatistics();
+
+	updateEditableControls();
+}
+
+void ToolsPlugin::on_checkbox_EnableVolumeRendering_toggled(bool volRen)
+{
+	auto node = getFirstSelectedNode();
+	if (node == nullptr)
+		return;
+
+	QString node_name = QString::fromStdString("/datanode.settings." + node->GetName());
+	berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+	auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+
+	node->SetBoolProperty("volumerendering", volRen);
+	settingsNode->PutBool("volumerendering", volRen);
+	if (!volRen)
+	{
+		bool property_autorotation = false; // default value
+		property_autorotation = settingsNode->GetBool("autorotation", property_autorotation);
+		//bool is_autorotation_found = node->GetBoolProperty("autorotation", property_autorotation);
+		if (property_autorotation)
+		{
+			enable3DRepresentation(false);
+		}
+	}
+}
+void ToolsPlugin::on_checkBox_ShowPatientData_toggled(bool)
+{
+	m_ToolsPluginPreferencesNode->PutBool("show patient data", ui.checkBox_ShowPatientData->isChecked());
+	//updateShowPatientData(); -> will be called by OnPreferencesChanged()
+}
+void ToolsPlugin::on_checkBox_GroupTags_toggled(bool isGrouped)
+{
+	m_ToolsPluginPreferencesNode->PutBool("group tags", ui.checkBox_GroupTags->isChecked());
+	//updateTagRepresentation(); -> will be called by OnPreferencesChanged()
+}
+void ToolsPlugin::on_checkBox_ShowStatistics_toggled(bool)
+{
+	m_ToolsPluginPreferencesNode->PutBool("show statistics", ui.checkBox_ShowStatistics->isChecked());
+	//updateShowStatistics(); -> will be called by OnPreferencesChanged()
+}
+
+void ToolsPlugin::on_imageNavigator_timeChanged(const itk::EventObject& e)
+{
+	if (m_SelectedNode == nullptr)
+		return;
+
+	auto timeEvent = dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent*>(&e);
+	assert(timeEvent != nullptr);
+	if (timeEvent == nullptr)
+		return;
+	int timestep = timeEvent->GetPos();
+
+	mitk::Image* image = nullptr;
+	try
+	{
+		auto baseData = m_SelectedNode->GetData();
+		image = dynamic_cast<mitk::Image*>(baseData);
+	}
+	catch (...)
+	{
+		MITK_WARN << "No image to update ImageNavigator";
+		return;
+	}
+
+	if (!image)
+		return;
+
+	auto num_timeSteps = image->GetTimeSteps();
+	if (num_timeSteps > 1)
+	{
+		for (int x = 0; x < ui.tableWidget_Statistics->columnCount(); x++)
+		{
+			//auto header = ui.tableWidget_Statistics->horizontalHeader();
+			//if (header->isVisible() && x == timestep)
+			//	header->children...->setBackgroundColor(Qt::yellow);
+			for (int y = 0; y < ui.tableWidget_Statistics->rowCount(); y++)
+			{
+				QTableWidgetItem* item = ui.tableWidget_Statistics->item(y, x);
+				if (item == nullptr)
+					break;
+
+				//if (x == timestep)
+				//	item->setBackgroundColor(Qt::yellow);
+				else
+				{
+					if (y % 2 == 0)
+						item->setBackground(ui.tableWidget_Statistics->palette().base());
+					else
+						item->setBackground(ui.tableWidget_Statistics->palette().alternateBase());
+				}
+			}
+		}
+
+		ui.tableWidget_Statistics->viewport()->update();
+	}
+}
+
+void ToolsPlugin::on_pixel_selected(QVector<double> point)
+{
+	using namespace mitk;
+	// TODO: exlude binary images !!!!!
+	// !!!!!!!!
+	TNodePredicateDataType<Image>::Pointer isImage = TNodePredicateDataType<Image>::New();
+	auto nodePredicateProperty = NodePredicateProperty::New("visible", BoolProperty::New(false));
+	NodePredicateNot::Pointer isNotVisible = NodePredicateNot::New(nodePredicateProperty);
+	NodePredicateAnd::Pointer validVisibleImage = NodePredicateAnd::New(isImage, isNotVisible);
+
+	/// Parse all visible images and list the values of the clicked position
+	DataStorage::SetOfObjects::ConstPointer patientImages = this->GetDataStorage()->GetSubset(validVisibleImage);
+	vector<DataStorage::SetOfObjects::Element> images;
+
+	Point3D p3d;
+	p3d[0] = point[0];
+	p3d[1] = point[1];
+	p3d[2] = point[2];
+
+	for (auto image : *patientImages)
+	{
+		if (image.IsNull())
+			continue;
+		Image* img = dynamic_cast<Image*>(image->GetData());
+		if (img == nullptr)
+			continue;
+
+		images.push_back(image);
+	}
+
+	int images_size = images.size();
+	stringstream text;
+	text << "<html><head/><body>PixelValue(s) <span style=\"vertical-align:sub;\">Shift+Left_Click</span>: ";
+	if (images_size > 1)
+	{
+		text << "<br>";
+	}
+	for (int i = 0; i < images_size; i++)
+	{
+		if (images_size > 1)
+		{
+			text << Elements::get_short_name(images[i]->GetName()) << ": ";
+		}
+		Image* img = dynamic_cast<Image*>(images[i]->GetData());
+		double value = img->GetPixelValueByWorldCoordinate(p3d);
+		text << "<b>" << to_string(int(round(value))) << "</b>";
+		if (i < images_size - 1)
+		{
+			text << "<br>";
+		}
+	}
+	text << "</body></html>";
+	ui.label_PixelValue->setText(QString::fromStdString(text.str()));
+}
+void ToolsPlugin::on_MainWindow_Representation3D_changed(const ctkEvent& event)
+{
+	bool enable3D = event.getProperty("enable3D").toBool();
+	if (m_SelectedNode)
+	{
+		QString node_name = QString::fromStdString("/datanode.settings." + m_SelectedNode->GetName());
+		berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+		auto settingsNode = prefService->GetSystemPreferences()->Node(node_name);
+
+		if (enable3D)
+		{
+			// Chcek if it contains more than one-two images.
+			string tag = Elements::get_property("DICOM.0020.0013", "dicom.image.0020.0013", m_SelectedNode);
+			bool has_many_images = tag.length() > 30;
+			if (has_many_images)
+			{
+				// Enable volume rendering
+				//bool property_volumerendering;
+				//bool is_volume_rendering_property_found = m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
+				//if (!is_volume_rendering_property_found || !property_volumerendering)
+				bool property_volumerendering = settingsNode->GetBool("volumerendering", false);
+				if (!property_volumerendering)
+				{
+					//m_SelectedNode->SetBoolProperty("volumerendering", true); --> will be called
+					ui.checkbox_EnableVolumeRendering->setChecked(true);
+				}
+				//property_volumerendering = false;
+				//m_SelectedNode->GetBoolProperty("volumerendering", property_volumerendering);
+				//assert(property_volumerendering);
+			}
+		}
+		// Enable/disable autorotation
+		settingsNode->PutBool("autorotation", enable3D);
+		//m_SelectedNode->SetBoolProperty("autorotation", enable3D);
+	}
+}
+
+void ToolsPlugin::on_ThreadedStatisticsCalculation_finished()
+{
+	if (m_DataNodeSelectionChanged)
+	{
+		m_StatisticsUpdatePending = false;
+		RequestStatisticsUpdate();
+		return;    // stop visualization of results and calculate statistics of new selection
+	}
+
+	bool is_ok = m_CalculationThread->GetStatisticsUpdateSuccessFlag();
+	if (!is_ok)
+		return;
+
+	if (m_SelectedNode == nullptr)
+		return;
+
+	auto baseData = m_SelectedNode->GetData();
+	mitk::Image* image = dynamic_cast<mitk::Image*>(baseData);
+	if (!image)
+		return;
+
+	if (image != m_StatisticsImage)
+		return;
+
+	auto statistics = m_CalculationThread->GetStatisticsData();
+	auto hash = Elements::get_hash(baseData);
+	if (hash != 0)
+		m_statistics[hash] = statistics;
+	updateStatistics(statistics, image);
+
+	return;
+
 	//!! Temp code
 	int num_t = statistics.size();
 	vector<long> n(num_t);
@@ -1394,4 +1479,11 @@ void ToolsPlugin::enable3DRepresentation(bool flag)
 	ctkDictionary properties;
 	properties["enable3D"] = flag;
 	emit Representation3DHasToBeInitiated(properties);
+}
+void ToolsPlugin::updateCrosshair()
+{
+	ctkDictionary properties;
+	//bool is_crosshair_visible = m_ToolsPluginPreferencesNode->GetBool("show crosshair", false);
+	//properties["showCrosshair"] = is_crosshair_visible;
+	emit UpdateCrosshair(properties);
 }
