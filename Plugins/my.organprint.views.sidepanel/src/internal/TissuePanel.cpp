@@ -1,4 +1,4 @@
-#include "TissuPanel.h"
+#include "TissuePanel.h"
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -16,16 +16,16 @@
 
 using namespace std;
 
-const std::string orgpnt::TissuPanel::VIEW_ID = "my.organprint.views.tissupanel";
+const std::string orgpnt::TissuePanel::VIEW_ID = "my.organprint.views.tissuepanel";
 
 
-orgpnt::TissuPanel::TissuPanel()
-    : listener(StorageListener(this, &TissuPanel::OnNodeChanged))
+orgpnt::TissuePanel::TissuePanel()
+    : listener(StorageListener(this, &TissuePanel::OnNodeChanged))
 {
 
 }
 
-orgpnt::TissuPanel::~TissuPanel() {
+orgpnt::TissuePanel::~TissuePanel() {
     cout << "Destroying tissu panel" << endl;
 
     mitk::DataStorage * storage = GetDataStorage();
@@ -33,7 +33,7 @@ orgpnt::TissuPanel::~TissuPanel() {
     storage->ChangedNodeEvent.RemoveListener(listener);
 }
 
-void orgpnt::TissuPanel::CreateQtPartControl(QWidget *parent) {
+void orgpnt::TissuePanel::CreateQtPartControl(QWidget *parent) {
 
 
     m_Controls.setupUi(parent);
@@ -52,7 +52,7 @@ void orgpnt::TissuPanel::CreateQtPartControl(QWidget *parent) {
 
 }
 
-void orgpnt::TissuPanel::onCurrentTissuTypeChanged(int newType) {
+void orgpnt::TissuePanel::onCurrentTissuTypeChanged(int newType) {
 
     mitk::DataNode * selected = GetSelectedNode();
 
@@ -69,11 +69,11 @@ void orgpnt::TissuPanel::onCurrentTissuTypeChanged(int newType) {
 
 }
 
-void orgpnt::TissuPanel::SetFocus() {
+void orgpnt::TissuePanel::SetFocus() {
 
 }
 
-void orgpnt::TissuPanel::OnNodeChanged(const mitk::DataNode *node) {
+void orgpnt::TissuePanel::OnNodeChanged(const mitk::DataNode *node) {
 
     const QString NO_SELECTION("Select a segmentation node");
 
@@ -96,7 +96,7 @@ void orgpnt::TissuPanel::OnNodeChanged(const mitk::DataNode *node) {
 
 }
 
-void orgpnt::TissuPanel::UpdateSelectionLabel(const mitk::DataNode * node) {
+void orgpnt::TissuePanel::UpdateSelectionLabel(const mitk::DataNode * node) {
 
     m_Controls.tissuNameLabel->setText(QString::fromStdString(node->GetName()));
 
@@ -104,7 +104,7 @@ void orgpnt::TissuPanel::UpdateSelectionLabel(const mitk::DataNode * node) {
 
 }
 
-void orgpnt::TissuPanel::UpdateComboBox() {
+void orgpnt::TissuePanel::UpdateComboBox() {
 
     QComboBox * cb = m_Controls.tissuTypeComboBox;
 
@@ -125,7 +125,7 @@ void orgpnt::TissuPanel::UpdateComboBox() {
     }
 }
 
-void orgpnt::TissuPanel::UpdateTissuSelection() {
+void orgpnt::TissuePanel::UpdateTissuSelection() {
 
     mitk::DataNode * selectedNode = this->GetSelectedNode();
     QComboBox * cb = m_Controls.tissuTypeComboBox;
@@ -147,7 +147,7 @@ void orgpnt::TissuPanel::UpdateTissuSelection() {
     }
 }
 
-mitk::DataNode * orgpnt::TissuPanel::GetSelectedNode() {
+mitk::DataNode * orgpnt::TissuePanel::GetSelectedNode() {
 
 
     mitk::DataStorage * storage = GetDataStorage();

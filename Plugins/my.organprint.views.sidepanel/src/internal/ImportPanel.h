@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
+#include <QString>
 
 // There's an item "AwesomeViewControls.ui" in the UI_FILES list in
 // files.cmake. The Qt UI Compiler will parse this file and generate a
@@ -61,11 +62,15 @@ private:
     void SetFocus() override;
 
 
+
+
     void next(int step);
 
     // Generated from the associated UI file, it encapsulates all the widgets
     // of our view.
     Ui::OrganPrintImportPanelControls m_Controls;
+
+    QString m_PatientId;
 
     QWidget * parent;
 };

@@ -30,6 +30,8 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     QString editorArea = layout->GetEditorArea();
     QString stepSelectorId = "my.organprint.views.stepselector";
     layout->SetEditorAreaVisible(true);
+    layout->SetFixed(true);
+    layout->GetViewLayout(editorArea)->SetCloseable(false);
     layout->AddStandaloneView(stepSelectorId, false, berry::IPageLayout::LEFT, selectorSize, editorArea);
     //layout->AddStandaloneViewPlaceholder(stepSelectorId,berry::IPageLayout::LEFT, selectorSize, editorArea,false);
     layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::RIGHT, 0.6f, editorArea);
@@ -38,7 +40,8 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
     layout->AddStandaloneView("org.mitk.views.statusbar",false,berry::IPageLayout::BOTTOM,0.1f,editorArea);
     //layout->AddStandaloneView("my.pacs.views.dicomview",false,berry::IPageLayout::BOTTOM,0.1,editorArea);
 
-
+    layout->SetEditorAreaVisible(false);
+    //layout->AddStandaloneView("org.mitk.editors.stdmultiwidget",false,berry::IPageLayout::RIGHT,0.5f,editorArea);
 
     QString prev_id = stepSelectorId;
     for (auto& viewId : MinimalApplication::VIEW_IDS)

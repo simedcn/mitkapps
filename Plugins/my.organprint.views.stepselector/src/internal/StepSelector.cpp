@@ -75,7 +75,7 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     {
         { "my.organprint.views.importpanel",		ui.pushButton_1 },
         { "org.mitk.views.segmentation",			ui.pushButton_2,true},
-        { "my.organprint.views.tissupanel",          ui.pushButton_3,true},
+        { "my.organprint.views.tissuepanel",          ui.pushButton_3,true},
         { "my.organprint.views.exportpanel",        ui.pushButton_4,true }
     };
 

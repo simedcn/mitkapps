@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <service/event/ctkEventConstants.h>
 #include <service/event/ctkEventAdmin.h>
 #include <DicomViewDialog.h>
+#include <PopeElements.h>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -66,6 +67,11 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
 
     cout << "Thank you for clicking" << endl;
 
+
+
+
+
+
     // Ask the user for a list of files to open
     QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Open",
                             nullptr,
@@ -80,6 +86,17 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
 
 
     berry::IWorkbenchWindow::Pointer window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+
+
+    QString patientId = Elements::get_patientId_or_patientName(fileNames.at(0));
+
+    bool erasePrevious = patientId != m_PatientId;
+
+    m_PatientId = patientId;
+
+    if(erasePrevious) {
+        GetDataStorage()->Remove(GetDataStorage()->GetAll());
+    }
 
     mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(window),
                                    true);
