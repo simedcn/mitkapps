@@ -18,5 +18,10 @@
         name="Export Panel"
         class="orgpnt::ExportPanel"
         icon="resources/AwesomeIcon.png" />
+
+<view id="my.organprint.views.tissupanel"
+      name="TissuPanel Panel"
+      class="orgpnt::TissuPanel"
+      icon="resources/AwesomeIcon.png" />
     </extension>
 </plugin>

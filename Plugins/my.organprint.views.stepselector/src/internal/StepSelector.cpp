@@ -39,6 +39,8 @@
 #include <mitkImage.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
+#include <QPixmap>
+#include <QMessageDialogWithToggle.h>
 
 // Don't forget to initialize the VIEW_ID.
 const string StepSelector::VIEW_ID = "my.organprint.views.stepselector";
@@ -62,7 +64,7 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     QString styleSheet = QLatin1String(file.readAll());
     parent->setStyleSheet(styleSheet);
 
-    ui.pushButton_3->hide();
+    // ui.pushButton_3->hide();
 
     // Wire up the UI widgets with our functionality.
     m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -73,7 +75,8 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     {
         { "my.organprint.views.importpanel",		ui.pushButton_1 },
         { "org.mitk.views.segmentation",			ui.pushButton_2,true},
-        { "my.organprint.views.exportpanel", 				ui.pushButton_4,true }
+        { "my.organprint.views.tissupanel",          ui.pushButton_3,true},
+        { "my.organprint.views.exportpanel",        ui.pushButton_4,true }
     };
 
     group = new QButtonGroup();
@@ -112,6 +115,12 @@ void StepSelector::CreateQtPartControl(QWidget* parent)
     onNodeListChanged(nullptr);
     initListeners();
     on_pushButton_clicked(0);
+
+
+    QPixmap logo(":/images/logo-color.png");
+
+    ui.logoLabel->setPixmap(logo.scaled(130,130,Qt::KeepAspectRatio));
+
 
 }
 
@@ -153,50 +162,13 @@ void StepSelector::selectView(int n)
         }
     }
 
+    if(n == 1) {
+        displayHelp("my.organpring.views.stepselector","skipHelpStep2",":/my.organprint.views.stepselector/step2.html");
+    }
 
     page->ShowView(m_steps[n].pluginId);
     m_currentStep = n;
-    /*
-    for (int i = 0; i < (int) m_steps.size(); i++)
-    {
 
-        cout << "requested step = " << n << " | i = " << i << endl;
-        const auto& step = m_steps[i];
-        berry::IViewPart::Pointer view = page->FindView(step.pluginId);
-
-
-
-        try
-        {
-
-            cout << "requested step = " << n << " | i = " << i << endl;
-            //cout << "view :" << view << endl;
-            if (i == n)
-            {   // Open
-                //step.button->checked(true);
-
-                page->ShowView(step.pluginId);
-
-
-                //step.button->setStyleSheet("background-color: #3399cc");
-
-                // step.button->SetDisabled(false);
-            }
-            else if (i != n && view != nullptr)
-            {   // Close
-                page->HideView(view);
-                // step.button->setStyleSheet("");
-            }
-
-
-
-        }
-        catch (const berry::PartInitException& e)
-        {
-            BERRY_ERROR << "Error: " << e.what();
-        }
-    }
-    */
 
 }
 
@@ -268,9 +240,18 @@ void StepSelector::onNodeListChanged(const mitk::DataNode*) {
 
         node = it->Value();
 
+        if(!node) continue;
+
+
         mitk::Image * image = dynamic_cast<mitk::Image*>(node->GetData());
 
+        std::string path = "";
+        bool exists = node->GetStringProperty("path",path);
         if(image!=nullptr) {
+            count++;
+        }
+
+        else if(exists) {
             count++;
         }
 
@@ -286,6 +267,8 @@ void StepSelector::onNodeListChanged(const mitk::DataNode*) {
         step.button->setEnabled(!step.requireData || count > 0);
 
     }
+
+    cout << "Step selector over" << endl;
 }
 
 void StepSelector::initListeners() {
@@ -297,5 +280,26 @@ void StepSelector::initListeners() {
 
     storage->RemoveNodeEvent.AddListener(
         mitk::MessageDelegate1<StepSelector, const mitk::DataNode *>(this, &StepSelector::onNodeListChanged));
+
+}
+
+void StepSelector::displayHelp(const char *group, const char * settingKey, const char *helpPath) {
+
+    bool skip = QMessageDialogWithToggle::getSettingValue(group,settingKey);
+
+    if(!skip) {
+
+        QMessageDialogWithToggle dialog(nullptr);
+        dialog.setMessageFromResource(helpPath);
+        dialog.setImage(":/images/logo-color.png");
+        dialog.setCheckBoxText("Don't remind me next time.");
+        dialog.setToggled(false);
+        bool skip = dialog.exec();
+
+        if(skip) {
+            QMessageDialogWithToggle::setSettingValue(group,settingKey,true);
+        }
+
+    }
 
 }

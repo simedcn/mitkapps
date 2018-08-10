@@ -37,6 +37,7 @@ const std::vector<QString> MinimalApplication::VIEW_IDS =
     "my.organprint.views.importpanel",
     "my.organprint.views.exportpanel",
     "org.mitk.views.segmentation",
+    "my.organprint.views.tissupanel",
     "my.pacs.views.dicomview"
 };
 
@@ -119,8 +120,10 @@ public:
         configurer->SetShowMenuBar(true);
         //return new berry::WorkbenchWindowAdvisor(configurer);
         ctkPluginContext* context = my_organprint_minimalapplication_Activator::GetContext();
-        //mitk::WorkbenchUtil::SetDepartmentLogoPreference(":/images/logo.png", context);
-        mitk::WorkbenchUtil::SetDepartmentLogoPreference(":/images/organ-print_fullHD.png",context);
+        mitk::WorkbenchUtil::SetDepartmentLogoPreference("", context);
+        mitk::WorkbenchUtil::SetDepartmentLogoPreference("", context);
+        //mitk::WorkbenchUtil::SetDepartmentLogoPreference(":/images/organ-print_fullHD.png",context);
+        //mitk::WorkbenchUtil::SetDepartmentLogoPreference(":/hello.png",context);
         return new OrganPrintWorkbenchWindowAdvisor(configurer);
     }
 

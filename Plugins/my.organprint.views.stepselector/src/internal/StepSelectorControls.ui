@@ -74,7 +74,7 @@ Configure</string>
    <item>
     <widget class="QPushButton" name="pushButton_4">
      <property name="text">
-      <string>3
+      <string>4
 Export</string>
      </property>
      <property name="checkable">
@@ -97,6 +97,19 @@ Export</string>
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="logoLabel">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>150</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
