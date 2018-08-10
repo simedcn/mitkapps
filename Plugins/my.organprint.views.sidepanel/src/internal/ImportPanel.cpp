@@ -87,17 +87,18 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
 
     berry::IWorkbenchWindow::Pointer window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
 
+    /*
+        QString patientId = Elements::get_patientId_or_patientName(fileNames.at(0));
 
-    QString patientId = Elements::get_patientId_or_patientName(fileNames.at(0));
+          bool erasePrevious = patientId != m_PatientId;
 
-    bool erasePrevious = patientId != m_PatientId;
+          m_PatientId = patientId;
 
-    m_PatientId = patientId;
-
-    if(erasePrevious) {
-        GetDataStorage()->Remove(GetDataStorage()->GetAll());
-    }
-
+          if(erasePrevious) {
+              mitk::DataStorage * storage =
+              GetDataStorage()->Remove(GetDataStorage()->GetAll());
+          }
+          */
     mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(window),
                                    true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
