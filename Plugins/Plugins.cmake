@@ -15,6 +15,6 @@ elseif("${ProjectToGenerate}" STREQUAL "POPE")
 	    Plugins/my.popeproject.segmentation:ON
 	    Plugins/my.popeproject.mainapplication:ON
 	    Plugins/my.pacs.views.dicomview:ON
-	    Plugins/my.popeproject.registration:ON
+	    Plugins/my.popeproject.registrationplugin:ON
 	  )
 endif()

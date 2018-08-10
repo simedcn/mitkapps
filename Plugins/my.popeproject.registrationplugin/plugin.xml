@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="my.popeproject.views.registrationplugin"
+          name="Registration"
+          class="RegistrationPlugin"
+          icon="resources/RegistrationIcon.xpm"
+    />
+          <!--closeable="false"
+          moveable="false"
+          showTitle="false"
+          standalone="true"-->
+  </extension>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.RegistrationPluginPreferencePage" name="Registration" class="RegistrationPluginPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.RegistrationPluginPreferencePageKeywords">
+      </keywordreference>
+    </page>
+  </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.RegistrationPluginPreferencePageKeywords" label="POPE" />
+    <keyword id="org.mitk.gui.qt.application.RegistrationPluginPreferencePageKeywords" label="Registration" />
+  </extension>
+</plugin>

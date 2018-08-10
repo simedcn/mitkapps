@@ -920,7 +920,7 @@ void ToolsPlugin::Hidden()
 }
 void ToolsPlugin::SetFocus()
 {
-	// default focus --> one line to set focus for the default widget
+	ui.tableWidget_PatientData->setFocus();
 }
 
 void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)

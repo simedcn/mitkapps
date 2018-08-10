@@ -1,5 +1,8 @@
 #ifndef RETRIEVEPROTOCOL_H
 #define RETRIEVEPROTOCOL_H
+
+#include <QString>
+
 enum RetrieveProtocol
 {
     PROTOCOL_CGET = 0,

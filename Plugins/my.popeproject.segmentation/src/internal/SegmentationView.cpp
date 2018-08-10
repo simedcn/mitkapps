@@ -258,7 +258,7 @@ void SegmentationView::NodeRemoved(const mitk::DataNode* node)
 
 void SegmentationView::SetFocus()
 {
-	// default focus --> one line to set focus for the default widget
+	ui.table_LabelSet->setFocus();
 }
 
 void SegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& dataNodes)

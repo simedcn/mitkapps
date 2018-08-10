@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RegistrationPluginControls</class>
+ <widget class="QWidget" name="RegistrationPluginControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>421</width>
+    <height>307</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Pope View</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QPushButton {
+    font: Roboto;
+    font: bold;
+    font-size: 14px;
+ /*   color: #FFF;*/
+    background-color: transparent;
+    border: 0px;
+    padding: 6px;
+}
+QPushButton:disabled {
+   color: #595B5C;
+}
+
+QPushButton:hover
+{
+    background-color:rgba(0,0,0,20%);
+}
+QLabel
+{
+    font: Roboto;
+/*    font: bold;*/
+    font-size: 10pt;
+/*    color: #FFF; */
+}
+
+
+QSpinBox, QSpinBox::before
+{
+    background-color: transparent;
+    font: Roboto;
+    font: normal;
+    font-size: 10pt;
+    color: #FFF; 
+    border:0px;
+}
+
+QLabel#PatientName_label, QLabel#PatientGender_label, QLabel#PatientDOB_label, QLabel#PatientID_label
+{
+    font: normal;
+}
+
+QPushButton#Print_pushbutton 
+{
+    background-color: #db4067;
+    border-width: 0px;
+    border-top-left-radius:9px;
+    border-top-right-radius:9px;
+    border-bottom-left-radius:9px;
+    border-bottom-right-radius:9px;
+    padding: 12px;
+    font: Roboto;
+    font-size: 18px;
+}
+
+QPushButton#pushButtonRegionGrowing
+{
+    font-size:14px;
+    padding: 12px;
+}
+
+
+QLabel#segmentation_title_label, QLabel#Profil_title_label
+{
+    font: Roboto;
+    font-size: 16pt;
+    color: #FFF; 
+}
+
+
+/****************************************************************
+ *																*
+ *	QWidgets menus												*
+ *																*
+ ***************************************************************/
+
+QWidget#ProfileWidget
+{
+    background-color: #623288;
+}
+
+QLabel#logo_label
+{
+    background-color: #6f6f6f;
+}
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_SelectedMovingImage">
+       <property name="text">
+        <string>Moving image:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_MovingImageNotSelected">
+       <property name="styleSheet">
+        <string notr="true">color: #E02000;
+background-color: rgb(255, 255, 159);
+background-color: #efef95;</string>
+       </property>
+       <property name="text">
+        <string>Please load and select a dataset in Data Manager.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_SelectedTargetImage">
+       <property name="text">
+        <string>Target image:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_TargetImageNotSelected">
+       <property name="styleSheet">
+        <string notr="true">color: #E02000;
+background-color: rgb(255, 255, 159);
+background-color: #efef95;</string>
+       </property>
+       <property name="text">
+        <string>Please load and select a dataset in Data Manager.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="pushButton_Registration">
+       <property name="text">
+        <string>Start Registration</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

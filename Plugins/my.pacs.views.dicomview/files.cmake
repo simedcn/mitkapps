@@ -1,6 +1,5 @@
 set(SRC_CPP_FILES
     DicomViewDialog.cpp
-    DicomViewConstants.h
 )
 
 set(INTERNAL_CPP_FILES
@@ -9,6 +8,7 @@ set(INTERNAL_CPP_FILES
   DicomViewPreferencePage.cpp
   UploadToPACSAction.cpp
   DicomView.cpp
+  DicomViewConstants.h
 )
 
 set(MOC_H_FILES

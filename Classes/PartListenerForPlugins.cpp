@@ -9,6 +9,7 @@
 #include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
 #include <berryIBerryPreferences.h>
+#include <berryFileEditorInput.h>
 
 using namespace std;
 
@@ -34,6 +35,23 @@ void PartListenerForPlugins::PartOpened(const berry::IWorkbenchPartReference::Po
 void PartListenerForPlugins::PartClosed(const berry::IWorkbenchPartReference::Pointer& ref)
 {
 	auto view_id = ref->GetId();
+
+	/*const QString editor_id = "my.popeproject.editors.renderwindow";
+	if (view_id == editor_id)
+	{
+		berry::IWorkbench* currentWorkbench = berry::PlatformUI::GetWorkbench();
+		if (currentWorkbench)
+		{
+			berry::IWorkbenchWindow::Pointer currentWorkbenchWindow = currentWorkbench->GetActiveWorkbenchWindow();
+			if (currentWorkbenchWindow)
+			{
+				berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(QString()));
+				currentWorkbenchWindow->GetActivePage()->OpenEditor(editorInput2, editor_id);
+			}
+		}
+		return;
+	}*/
+
 	auto plugin = PluginDescriptors::find_plugin(view_id);
 	if (plugin == nullptr)
 		return;

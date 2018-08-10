@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/Pope" >
+    <file>PopeIcon.png</file>
+    <file>RegistrationIcon.xpm</file>
+  </qresource>
+</RCC>
