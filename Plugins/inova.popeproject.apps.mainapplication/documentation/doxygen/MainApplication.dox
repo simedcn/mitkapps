@@ -1,0 +1,17 @@
+/**
+
+\page BlueBerryExampleMainApplication A main BlueBerry application
+
+  \image html MainApplication.png
+
+  The first example creates a main application with an empty perspective.
+
+  View complete source files:
+  \li \github{Examples/Plugins/inova.popeproject.apps.mainapplication/src/internal/MainApplication.cpp,MainApplication.cpp}
+  \li \github{Examples/Plugins/inova.popeproject.apps.mainapplication/src/internal/MainApplication.h,MainApplication.h}
+  \li \github{Examples/Plugins/inova.popeproject.apps.mainapplication/src/internal/MainPerspective.cpp,MainPerspective.cpp}
+  \li \github{Examples/Plugins/inova.popeproject.apps.mainapplication/src/internal/MainPerspective.h,MainPerspective.h}
+
+[\ref BlueBerryIntro] [Next: \ref BlueBerryExampleMultiplePerspectives]
+
+*/

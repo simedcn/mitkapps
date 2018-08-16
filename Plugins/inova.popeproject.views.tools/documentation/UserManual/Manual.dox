@@ -1,0 +1,19 @@
+/**
+\page inova_popeproject_views_tools The Pope Example Plugin
+
+\imageMacro{icon.xpm,"Icon of Pope Tools Plugin",2.00}
+
+\tableofcontents
+
+\section inova_popeproject_views_toolsOverview Overview
+
+Describe the features of your pope plugin here
+
+<ul>
+  <li>Increases productivity</li>
+  <li>Creates beautiful images</li>
+  <li>Brings world peace</li>
+</ul>
+
+*/
+

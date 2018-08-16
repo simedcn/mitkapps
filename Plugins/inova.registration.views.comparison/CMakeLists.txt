@@ -1,0 +1,7 @@
+project(inova_registration_views_comparison)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE inova_registration_views_comparison_EXPORT
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDS MitkQtWidgetsExt MitkMatchPointRegistration MitkMatchPointRegistrationUI
+)

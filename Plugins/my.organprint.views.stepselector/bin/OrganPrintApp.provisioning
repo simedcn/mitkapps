@@ -34,4 +34,4 @@ START file:///@EXECUTABLE_DIR/plugins/libmy_organprint_views_sidepanel.dll
 START file:///@EXECUTABLE_DIR/plugins/libmy_organprint_renderwindoweditor.dll
 START file:///@EXECUTABLE_DIR/plugins/libmy_organprint_minimalapplication.dll
 START file:///@EXECUTABLE_DIR/plugins/libmy_organprint_views_stepselector.dll
-START file:///@EXECUTABLE_DIR/plugins/libmy_pacs_views_dicomview.dll
+START file:///@EXECUTABLE_DIR/plugins/libinova_pacs_views_dicomview.dll

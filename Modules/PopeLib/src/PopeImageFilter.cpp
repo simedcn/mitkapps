@@ -109,7 +109,7 @@ static void AddOffset(const itk::Image<TPixel, VImageDimension>* inputImage, int
 PopeImageFilter::PopeImageFilter()
 	: m_Offset(0)
 {
-	this->SetNumberOfRequiredInputs(2);
+	this->SetNumberOfRequiredInputs(1); // 2
 	this->SetNumberOfRequiredOutputs(1);
 }
 

@@ -1,0 +1,5 @@
+set(Plugin-Name "Manual Registration")
+set(Plugin-Version "0.1")
+set(Plugin-Vendor "Inova DE GmbH")
+set(Plugin-ContactAddress "https://inova-de.eu")
+set(Require-Plugin org.mitk.gui.qt.common org.mitk.gui.qt.datamanager)

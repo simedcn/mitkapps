@@ -1,0 +1,16 @@
+/**
+  \defgroup inova_registration_views_rigidregistration inova.registration.views.rigidregistration Plugin
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup inova_registration_views_rigidregistration_internal Internal
+  \ingroup inova_registration_views_rigidregistration
+
+  \brief This subcategory includes the internal classes of the inova_registration_views_rigidregistration plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

@@ -15,7 +15,7 @@ set(_exclude_plugins
 
 # set(SOURCE_FILES
 #   POPEApp.cpp
-#   ../../Plugins/my.popeproject.mainapplication/resources/app.rc 
+#   ../../Plugins/inova.popeproject.apps.mainapplication/resources/app.rc 
 # )
 
 mitkFunctionCreateBlueBerryApplication(

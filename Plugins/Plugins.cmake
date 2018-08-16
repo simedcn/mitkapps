@@ -5,16 +5,22 @@ if("${ProjectToGenerate}" STREQUAL "OrganPrint")
 	  Plugins/my.organprint.renderwindoweditor:ON
 	  Plugins/my.organprint.minimalapplication:ON
 	  Plugins/my.organprint.views.stepselector:ON
-          Plugins/my.pacs.views.dicomview:ON
+          Plugins/inova.pacs.views.dicomview:ON
           Plugins/my.organprint.views.sidepanel:ON
 	)
 elseif("${ProjectToGenerate}" STREQUAL "POPE")
 	  set(PROJECT_PLUGINS
-	    Plugins/my.popeproject.renderwindoweditor:ON
-	    Plugins/my.popeproject.toolsplugin:ON
-	    Plugins/my.popeproject.segmentation:ON
-	    Plugins/my.popeproject.mainapplication:ON
-	    Plugins/my.pacs.views.dicomview:ON
-	    Plugins/my.popeproject.registrationplugin:ON
+		Plugins/inova.popeproject.editors.renderwindow:ON
+		Plugins/inova.popeproject.views.tools:ON
+		Plugins/inova.popeproject.views.segmentation:ON
+		Plugins/inova.popeproject.apps.mainapplication:ON
+		Plugins/inova.pacs.views.dicomview:ON
+		Plugins/inova.registration.views.rigidregistration:ON
+		Plugins/inova.registration.views.manualregistration:ON
+		Plugins/inova.registration.views.registrationalgorithms:ON
+		Plugins/inova.registration.views.frameregistration:ON
+		Plugins/inova.registration.views.mapper:ON
+		Plugins/inova.registration.views.comparison:ON
+		Plugins/inova.registration.views.visualizer:ON
 	  )
 endif()

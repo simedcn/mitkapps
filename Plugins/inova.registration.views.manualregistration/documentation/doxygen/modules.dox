@@ -1,0 +1,16 @@
+/**
+  \defgroup inova_registration_views_manualregistration inova.registration.views.manualregistration
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup inova_registration_views_manualregistration_internal Internal
+  \ingroup inova_registration_views_manualregistration
+
+  \brief This subcategory includes the internal classes of the inova.registration.views.manualregistration plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

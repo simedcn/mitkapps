@@ -1,0 +1,16 @@
+/**
+  \defgroup inova_registration_views_frameregistration inova.registration.views.frameregistration
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup inova_registration_views_frameregistration_internal Internal
+  \ingroup inova_registration_views_frameregistration
+
+  \brief This subcategory includes the internal classes of the inova.registration.views.frameregistration plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

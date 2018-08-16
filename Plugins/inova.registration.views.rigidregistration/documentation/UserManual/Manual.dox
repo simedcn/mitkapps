@@ -1,0 +1,20 @@
+/**
+\page inova_registration_views_rigidregistration The Pope Example Plugin
+
+\imageMacro{icon.xpm,"Icon of Pope Example Plugin",2.00}
+
+\tableofcontents
+
+\section inova_registration_views_rigidregistrationOverview Overview
+
+Describe the features of your pope plugin here
+
+<ul>
+  <li>Increases productivity</li>
+  <li>Creates beautiful images</li>
+  <li>Generates PhD thesis</li>
+  <li>Brings world peace</li>
+</ul>
+
+*/
+

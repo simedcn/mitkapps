@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension id="inova.popeproject.apps.mainapplication" point="org.blueberry.osgi.applications">
+    <application>
+      <run class="MainApplication"/>
+    </application>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="inova.popeproject.perspectives.mainperspective"
+      name="POPE"
+      icon="resources/POPE_icon.ico" 
+      class="MainPerspective">
+    </perspective>
+    <perspective
+      id="inova.popeproject.perspectives.dicomperspective"
+      name="DICOM"
+      icon="resources/logo48.png"
+      class="DicomPerspective">
+    </perspective>
+  </extension>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.MainApplicationPreferencePage" name="Tabs" class="MainApplicationPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords">
+      </keywordreference>
+    </page>
+  </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords" label="POPE" />
+    <keyword id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords" label="View" />
+    <keyword id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords" label="Tabs" />
+    <keyword id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords" label="Plugins" />
+    <keyword id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords" label="Plug-ins" />
+    <keyword id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords" label="Preferences" />
+    <keyword id="org.mitk.gui.qt.application.MainApplicationPreferencePageKeywords" label="Settings" />
+  </extension>
+</plugin>

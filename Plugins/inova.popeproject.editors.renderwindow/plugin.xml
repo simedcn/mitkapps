@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.editors">
+    <editor
+      id="inova.popeproject.editors.renderwindow"
+      name="Render Window"
+      default="true"
+      extensions="mitk"
+      icon="resources/PopeIcon.png"
+      class="PopeRenderWindowEditor">
+    </editor>
+  </extension>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.POPEPreferencePage" name="POPE" class="PopePreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.POPEPreferencePageKeywords">
+      </keywordreference>
+    </page>
+  </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.POPEPreferencePageKeywords" label="POPE" />
+    <keyword id="org.mitk.gui.qt.application.POPEPreferencePageKeywords" label="Preferences" />
+    <keyword id="org.mitk.gui.qt.application.POPEPreferencePageKeywords" label="Settings" />
+  </extension>
+</plugin>

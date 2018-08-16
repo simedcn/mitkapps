@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="inova.registration.views.comparison"
+          name="Registration Comparison"
+          class="RegistrationComparison"
+          category="Registration"
+          icon="resources/evaluator.png" />
+  </extension>
+
+</plugin>

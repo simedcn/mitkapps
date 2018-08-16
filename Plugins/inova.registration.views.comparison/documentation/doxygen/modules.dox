@@ -1,0 +1,16 @@
+/**
+  \defgroup inova_registration_views_comparison inova.registration.views.comparison
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup inova_registration_views_comparison_internal Internal
+  \ingroup inova_registration_views_comparison
+
+  \brief This subcategory includes the internal classes of the inova.registration.views.comparison. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

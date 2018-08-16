@@ -1,0 +1,16 @@
+/**
+  \defgroup inova_registration_views_mapper inova.registration.views.mapper
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup inova_registration_views_mapper_internal Internal
+  \ingroup inova_registration_views_mapper
+
+  \brief This subcategory includes the internal classes of the inova.registration.views.mapper plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

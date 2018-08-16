@@ -1,5 +1,0 @@
-set(Plugin-Name "Pope Registration Plugin")
-set(Plugin-Version "0.1")
-set(Plugin-Vendor "Pope Company")
-set(Plugin-ContactAddress "http://www.popeproject.my")
-set(Require-Plugin org.mitk.gui.qt.common org.mitk.gui.qt.datamanager)

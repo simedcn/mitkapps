@@ -1,0 +1,8 @@
+project(inova_registration_views_frameregistration)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE inova_registration_views_frameregistration_EXPORT
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDS MitkQtWidgetsExt MitkMatchPointRegistration MitkMatchPointRegistrationUI
+  PACKAGE_DEPENDS CTK|CTKCore
+)

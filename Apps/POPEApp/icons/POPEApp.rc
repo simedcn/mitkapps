@@ -1,2 +1,2 @@
-IDI_ICON1               ICON    DISCARDABLE     "../../../Plugins/my.popeproject.mainapplication/resources/POPE_icon.ico"
-GLFW_ICON               ICON                    "../../../Plugins/my.popeproject.mainapplication/resources/POPE_icon.ico"
+IDI_ICON1               ICON    DISCARDABLE     "../../../Plugins/inova.popeproject.apps.mainapplication/resources/POPE_icon.ico"
+GLFW_ICON               ICON                    "../../../Plugins/inova.popeproject.apps.mainapplication/resources/POPE_icon.ico"

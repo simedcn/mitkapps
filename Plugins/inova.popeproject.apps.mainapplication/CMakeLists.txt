@@ -1,0 +1,8 @@
+project(inova_popeproject_apps_mainapplication)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE inova_popeproject_apps_mainapplication_EXPORT
+  EXPORTED_INCLUDE_SUFFIXES src
+  DEPENDS inova_pacs_views_dicomview
+  MODULE_DEPENDS PRIVATE MitkQtWidgetsExt MitkSceneSerialization MitkAppUtil PopeLib
+)

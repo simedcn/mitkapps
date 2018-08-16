@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk org.mitk
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup inova_registration_views_registrationalgorithms_internal Internal
+  \ingroup inova_registration_views_registrationalgorithms
+
+  \brief This subcategory includes the internal classes of the inova.registration.views.registrationalgorithms plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

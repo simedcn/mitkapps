@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 	// -------------------------------------------------------------------
 	// Here you can switch to your customizable application:
 	// -------------------------------------------------------------------
-	myApp.setProperty(mitk::BaseApplication::PROP_APPLICATION, "my.popeproject.mainapplication");
+	myApp.setProperty(mitk::BaseApplication::PROP_APPLICATION, "inova.popeproject.apps.mainapplication");
 
 	return myApp.run();
 }

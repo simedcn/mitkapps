@@ -4,7 +4,7 @@
 
 set(target_libraries
   # Enable plug-ins from this project
-  my_popeproject_mainapplication
+  inova_popeproject_apps_mainapplication
 
   # Require external plug-ins
   org_mitk_gui_qt_datamanager

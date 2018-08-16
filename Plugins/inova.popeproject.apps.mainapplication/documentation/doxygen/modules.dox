@@ -1,0 +1,15 @@
+/**
+  \defgroup inova_popeproject_apps_mainapplication inova.popeproject.apps.mainapplication
+  \ingroup MITKExamplePlugins
+
+  \brief A main applictaion plug-in.
+*/
+
+/**
+  \defgroup inova_popeproject_apps_mainapplication_internal Internal
+  \ingroup inova_popeproject_apps_mainapplication
+
+  \brief This subcategory includes the internal classes of the inova_popeproject_apps_mainapplication plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/
