@@ -9,6 +9,8 @@
 #include <itkEuler3DTransform.h>
 #include "ui_ManualRegistration.h"
 
+#include <service/event/ctkEventAdmin.h>
+
 
 class QmitkMappingJob;
 
@@ -25,8 +27,8 @@ class ManualRegistration : public QmitkAbstractView, public mitk::IRenderWindowP
 	Q_OBJECT
 
 public:
-
 	static const std::string VIEW_ID;
+	static const QString PLUGIN_ID;
 
 	/**
 	* Creates smartpointer typedefs
@@ -38,42 +40,9 @@ public:
 
 	virtual void CreateQtPartControl(QWidget *parent);
 
-	protected slots:
-
-		/// \brief Called when the user clicks the GUI button
-
-	void OnStartBtnPushed();
-	void OnCancelBtnPushed();
-	void OnStoreBtnPushed();
-	void OnSettingsChanged(mitk::DataNode*);
-
-	void OnRotXChanged(double);
-	void OnRotYChanged(double);
-	void OnRotZChanged(double);
-
-	void OnTransXChanged(double);
-	void OnTransYChanged(double);
-	void OnTransZChanged(double);
-
-	void OnRotXSlideChanged(int);
-	void OnRotYSlideChanged(int);
-	void OnRotZSlideChanged(int);
-
-	void OnTransXSlideChanged(int);
-	void OnTransYSlideChanged(int);
-	void OnTransZSlideChanged(int);
-
-	void OnCenterTypeChanged(int);
-
-	void OnSliceChanged();
-
-	void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
-
-
 protected:
 	/// \brief called by QmitkFunctionality when DataManager's selection has changed
-	virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-	const QList<mitk::DataNode::Pointer>& nodes) override;
+	virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 	virtual void NodeRemoved(const mitk::DataNode* node) override;
 
@@ -82,15 +51,8 @@ protected:
 	virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
 	virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
 
-	Ui::ManualRegistrationControls m_Controls;
-
 private:
-	QWidget *m_Parent;
-
 	void Error(QString msg);
-
-	/** Methods returns a list of all eval nodes in the data manager.*/
-	QList<mitk::DataNode::Pointer> GetEvalNodes();
 
 	/**
 	* Checks if appropriated nodes are selected in the data manager. If nodes are selected,
@@ -118,6 +80,41 @@ private:
 
 	void ConfigureTransformCenter(int centerType);
 
+protected slots:
+	/// \brief Called when the user clicks the GUI button
+	void OnStartBtnPushed();
+	void OnCancelBtnPushed();
+	void OnStoreBtnPushed();
+	void OnSettingsChanged(mitk::DataNode*);
+
+	void OnRotXChanged(double);
+	void OnRotYChanged(double);
+	void OnRotZChanged(double);
+
+	void OnTransXChanged(double);
+	void OnTransYChanged(double);
+	void OnTransZChanged(double);
+
+	void OnRotXSlideChanged(int);
+	void OnRotYSlideChanged(int);
+	void OnRotZSlideChanged(int);
+
+	void OnTransXSlideChanged(int);
+	void OnTransYSlideChanged(int);
+	void OnTransZSlideChanged(int);
+
+	void OnCenterTypeChanged(int);
+
+	void OnSliceChanged();
+
+	void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
+
+	//void on_Plugin_hidden(ctkEvent event);
+
+protected:
+	QWidget *m_Parent;
+	Ui::ManualRegistrationControls ui;
+
 	mitk::DataNode::Pointer m_EvalNode;
 
 	QmitkSliceNavigationListener m_SliceChangeListener;
@@ -126,8 +123,14 @@ private:
 	itk::TimeStamp m_currentPositionTime;
 
 	bool m_activeManipulation;
-	bool m_autoMoving;
-	bool m_autoTarget;
+
+	using MAPRegistrationType = ::map::core::Registration<3, 3>;
+
+	MAPRegistrationType::ConstPointer m_SelectedPreReg;
+
+	mitk::DataNode::Pointer m_SelectedPreRegNode;
+	mitk::DataNode::Pointer m_SelectedMovingNode;
+	mitk::DataNode::Pointer m_SelectedTargetNode;
 
 	/** @brief currently valid selected position in the inspector*/
 	mitk::Point3D m_currentSelectedPosition;
@@ -135,19 +138,12 @@ private:
 	* This it is within the input image */
 	unsigned int m_currentSelectedTimeStep;
 
-	mitk::DataNode::Pointer m_SelectedPreRegNode;
-
-	mitk::DataNode::Pointer m_SelectedMovingNode;
-	mitk::DataNode::Pointer m_SelectedTargetNode;
-
 
 	mitk::MAPRegistrationWrapper::Pointer m_CurrentRegistrationWrapper;
-	typedef itk::Euler3DTransform<::map::core::continuous::ScalarType> TransformType;
+	using TransformType = itk::Euler3DTransform<::map::core::continuous::ScalarType>;
 	TransformType::Pointer m_InverseCurrentTransform;
 	TransformType::Pointer m_DirectCurrentTransform;
-	typedef map::core::Registration<3, 3> MAPRegistrationType;
 	MAPRegistrationType::Pointer m_CurrentRegistration;
-	MAPRegistrationType::ConstPointer m_SelectedPreReg;
 
 	bool m_internalUpdate;
 	static const std::string HelperNodeName;

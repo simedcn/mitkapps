@@ -2,7 +2,7 @@
 <plugin>
   <extension point="org.blueberry.ui.views">
     <view id="inova.registration.views.rigidregistration"
-          name="Digid Registration"
+          name="Rigid Registration"
           class="RegistrationPlugin"
           icon="resources/RegistrationIcon.xpm"
     />

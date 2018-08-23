@@ -44,7 +44,7 @@ using StatData = vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Po
 
 // All views in MITK derive from QmitkAbstractView. You have to override
 // at least the two methods CreateQtPartControl() and SetFocus().
-class ToolsPlugin : public QmitkAbstractView, public mitk::ILifecycleAwarePart//, public berry::IPartListener
+class ToolsPlugin : public QmitkAbstractView//, public mitk::ILifecycleAwarePart//, public berry::IPartListener
 {
 	// As QmitkAbstractView derives from QObject and we want to use the Qt
 	// signal and slot mechanism, we must not forget the Q_OBJECT macro.
@@ -58,6 +58,7 @@ public:
 	// your debug sessions if it has been forgotten. Also, don't forget
 	// to initialize it in the implementation file.
 	static const std::string VIEW_ID;
+	static const QString PLUGIN_ID;
 	static const int STAT_TABLE_BASE_HEIGHT;
 
 	ToolsPlugin();
@@ -80,11 +81,11 @@ protected:
 	void NodeAdded(const mitk::DataNode* node) override;
 	void NodeRemoved(const mitk::DataNode* node) override;
 
-protected:
-	void Activated() override;
-	void Deactivated() override;
-	void Visible() override;
-	void Hidden() override;
+//protected:
+//	void Activated() override;
+//	void Deactivated() override;
+//	void Visible() override;
+//	void Hidden() override;
 
 	// Typically a one-liner. Set the focus to the default widget.
 	void SetFocus() override;
@@ -145,7 +146,7 @@ public slots:
 
 protected slots:
 	void on_ThreadedStatisticsCalculation_finished();
-	/// Checks if update is possible and calls StatisticsUpdate() possible
+	/// Checks if the update is possible and calls StatisticsUpdate() possible
 	void RequestStatisticsUpdate();
 
 private slots:
@@ -155,6 +156,10 @@ private slots:
 	void on_checkBox_ShowStatistics_toggled(bool);
 	/// Is called from the image navigator once the time step has changed
 	void on_imageNavigator_timeChanged(const itk::EventObject&);
+
+protected slots:
+	void on_Plugin_visible(ctkEvent event);
+	void on_Plugin_hidden(ctkEvent event);
 };
 
 #endif

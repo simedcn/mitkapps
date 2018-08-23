@@ -1,4 +1,5 @@
 #include "PopeWorkbenchWindowAdvisor.h"
+#include "PluginListener.h"
 #include "inova_popeproject_apps_mainapplication_Activator.h"
 #include <DicomViewDialog.h>
 
@@ -27,7 +28,7 @@ PopeWorkbenchWindowAdvisor::~PopeWorkbenchWindowAdvisor()
 
 void PopeWorkbenchWindowAdvisor::setCTKSignals()
 {
-	/// CTK signals.
+	/// CTK slots.
 	auto pluginContext = inova_popeproject_apps_mainapplication_Activator::GetContext();
 	ctkDictionary propsForSlot;
 	ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();
@@ -37,7 +38,7 @@ void PopeWorkbenchWindowAdvisor::setCTKSignals()
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/show/PACS";
 		eventAdmin->subscribeSlot(this, SLOT(on_MainWindow_ShowPACS_triggered(ctkEvent)), propsForSlot);
 	}
-	/// Creating an Event Publisher.
+	/// CTK signals.
 	if (ref)
 	{
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
@@ -177,6 +178,41 @@ void PopeWorkbenchWindowAdvisor::addSettingsToToolbar(QMainWindow* mainWindow, Q
 	/// Add the action to the main toolbar.
 	toolBar->addAction(settingsAction);
 }
+void PopeWorkbenchWindowAdvisor::manageRegistrationPlugins(berry::IWorkbenchWindow::Pointer workbenchWindow)
+{
+	if (workbenchWindow == nullptr)
+		return;
+	auto page = workbenchWindow->GetActivePage();
+	if (page == nullptr)
+		return;
+
+	/// Close all registration subplugin, keeping only the stepselector plugin.
+	const QString registration_plugins = "inova.registration.views.";
+	const QString registration_stepselector = "inova.registration.views.stepselector";
+	auto views = page->GetViewReferences();
+	berry::IViewPart::Pointer stepselector;
+	bool is_subplugin = false;
+	for (auto view : views)
+	{
+		if (view == nullptr)
+			continue;
+		QString view_id = view->GetId();
+		if (view_id == registration_stepselector)
+			continue;
+
+		if (view_id.left(registration_plugins.length()) == registration_plugins)
+		{
+			try
+			{
+				page->HideView(view);
+			}
+			catch (const berry::PartInitException& e)
+			{
+				BERRY_ERROR << "Error: " << e.what();
+			}
+		}
+	}
+}
 
 void PopeWorkbenchWindowAdvisor::PostWindowCreate()
 {
@@ -198,6 +234,13 @@ void PopeWorkbenchWindowAdvisor::PostWindowCreate()
 	//	return;
 	if (mainWindow == nullptr)
 		return;
+
+	/// Manage registration subplugins.
+	manageRegistrationPlugins(window);
+
+	/// Register Plugin Visibility Listener.
+	pluginListener.reset(new PluginListener());
+	window->GetPartService()->AddPartListener(pluginListener.data());
 
 	/// Add Data actions to menu.
 	addDataActionsToMenu(mainWindow, dataActions);

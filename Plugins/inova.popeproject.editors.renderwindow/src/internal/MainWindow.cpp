@@ -62,7 +62,7 @@ MainWindow::MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent) :
 	//multiWidget->setStyleSheet("background-color:black; color: #FFF; border:0px");
 	// Tell the multiWidget which DataStorage to render
 
-	/// CTK signals.
+	/// CTK slots.
 	auto pluginContext = inova_popeproject_editors_renderwindow_Activator::GetPluginContext();
 	ctkDictionary propsForSlot;
 	ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();
@@ -84,7 +84,7 @@ MainWindow::MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent) :
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "data/NEWDATANODEADDED";
 		eventAdmin->subscribeSlot(this, SLOT(On_RegistrationPlugin_NewDataNodeAdded(ctkEvent)), propsForSlot);
 	}
-	/// Creating an Event Publisher.
+	/// CTK signals.
 	if (ref)
 	{
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);

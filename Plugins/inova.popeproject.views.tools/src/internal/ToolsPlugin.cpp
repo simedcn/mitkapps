@@ -71,6 +71,7 @@ using namespace std;
 
 // Don't forget to initialize the VIEW_ID.
 const string ToolsPlugin::VIEW_ID = "inova.popeproject.views.tools";
+const QString ToolsPlugin::PLUGIN_ID = QString::fromStdString(VIEW_ID);
 const int ToolsPlugin::STAT_TABLE_BASE_HEIGHT = 180;
 
 
@@ -253,7 +254,7 @@ void ToolsPlugin::CreateQtPartControl(QWidget* parent)
 	connect((QObject*) this->m_CalculationThread, SIGNAL(finished()), this, SLOT(on_ThreadedStatisticsCalculation_finished()), Qt::QueuedConnection);
 	connect((QObject*) this, SIGNAL(StatisticsUpdate()), this, SLOT(RequestStatisticsUpdate()), Qt::QueuedConnection);
 
-	/// CTK signals.
+	/// CTK slots.
 	auto pluginContext = inova_popeproject_views_tools_PluginActivator::GetPluginContext();
 	ctkDictionary propsForSlot;
 	ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();
@@ -262,8 +263,12 @@ void ToolsPlugin::CreateQtPartControl(QWidget* parent)
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "pope/representation/VIEWCHANGED";
 		eventAdmin->subscribeSlot(this, SLOT(on_MainWindow_Representation3D_changed(ctkEvent)), propsForSlot);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "plugin/VISIBLE";
+		eventAdmin->subscribeSlot(this, SLOT(on_Plugin_visible(ctkEvent)), propsForSlot);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "plugin/HIDDEN";
+		eventAdmin->subscribeSlot(this, SLOT(on_Plugin_hidden(ctkEvent)), propsForSlot);
 	}
-	/// Creating an Event Publisher.
+	/// CTK signals.
 	if (ref)
 	{
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
@@ -327,6 +332,7 @@ void ToolsPlugin::updateAfterSelectionChanged()
 	else
 	{
 		ui.label_ImageNotSelected->setText("Please load and select a dataset in Data Manager.");
+		ui.label_ImageNotSelected->setToolTip("");
 		ui.label_ImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
 		ui.label_ImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}
@@ -886,7 +892,7 @@ void ToolsPlugin::NodeRemoved(const mitk::DataNode* node)
 	}
 }
 
-void ToolsPlugin::Activated()
+/*void ToolsPlugin::Activated()
 {}
 void ToolsPlugin::Deactivated()
 {}
@@ -905,6 +911,42 @@ void ToolsPlugin::Visible()
 }
 void ToolsPlugin::Hidden()
 {
+	//m_Visible = false;
+	// The slice navigation controller observer is removed here instead of in the destructor.
+	// If it was called in the destructor, the application would freeze because the view's destructor gets called after the render windows have been destructed.
+	if (m_TimeObserverTag == 0)
+		return;
+
+	mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+	if (renderWindow)
+	{
+		renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->RemoveObserver(m_TimeObserverTag);
+	}
+	m_TimeObserverTag = 0;
+}*/
+void ToolsPlugin::on_Plugin_visible(ctkEvent event)
+{
+	QString plugin_id = event.getProperty("id").toString();
+	if (plugin_id != PLUGIN_ID)
+		return;
+
+	//m_Visible = true;
+	/// Initialize the timeChanged event of imageNavigator.
+	mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+	if (!renderWindow)
+		return;
+	auto cmdTimeEvent = itk::ReceptorMemberCommand<ToolsPlugin>::New();
+	cmdTimeEvent->SetCallbackFunction(this, &ToolsPlugin::on_imageNavigator_timeChanged);
+	// It is sufficient to add the observer to the axial render window since the GeometryTimeEvent is always triggered by all views.
+	auto geometryTimeEvent = mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0);
+	m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->AddObserver(geometryTimeEvent, cmdTimeEvent);
+}
+void ToolsPlugin::on_Plugin_hidden(ctkEvent event)
+{
+	QString plugin_id = event.getProperty("id").toString();
+	if (plugin_id != PLUGIN_ID)
+		return;
+
 	//m_Visible = false;
 	// The slice navigation controller observer is removed here instead of in the destructor.
 	// If it was called in the destructor, the application would freeze because the view's destructor gets called after the render windows have been destructed.

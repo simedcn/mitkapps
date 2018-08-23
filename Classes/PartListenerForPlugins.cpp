@@ -19,7 +19,7 @@ PartListenerForPlugins::PartListenerForPlugins(berry::IPreferences::Pointer pref
 {}
 berry::IPartListener::Events::Types PartListenerForPlugins::GetPartEventTypes() const
 {
-	return Events::OPENED | Events::CLOSED;// | Events::HIDDEN | Events::VISIBLE;
+	return Events::OPENED | Events::CLOSED; //| Events::HIDDEN | Events::VISIBLE;
 }
 void PartListenerForPlugins::PartOpened(const berry::IWorkbenchPartReference::Pointer& ref)
 {
@@ -61,6 +61,10 @@ void PartListenerForPlugins::PartClosed(const berry::IWorkbenchPartReference::Po
 	preferences->BlockSignals(false);
 }
 void PartListenerForPlugins::PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
-{}
+{
+	auto view_id = ref->GetId();
+}
 void PartListenerForPlugins::PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
-{}
+{
+	auto view_id = ref->GetId();
+}

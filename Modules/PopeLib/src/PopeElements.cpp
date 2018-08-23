@@ -7,6 +7,8 @@
 #include <iterator>
 #include <assert.h>
 
+using namespace std;
+
 
 Elements::Elements()
 {}
@@ -357,6 +359,22 @@ string Elements::get_short_name(string name)
 	short_name << name.substr(0, first_part) << "..." << name.substr(len - second_part - 1, second_part);
 	return short_name.str();
 }
+QString Elements::get_short_name_for_image(const string& name)
+{
+	QString str_name = QString::fromStdString(name);
+	QString short_name = str_name;
+	const string str_center_replacement = "...";
+	const int max_length = 28 + str_center_replacement.length();
+	if (name.length() > max_length)
+	{
+		stringstream ss;
+		const int half = (max_length - str_center_replacement.length()) / 2;
+		ss << name.substr(0, half) << str_center_replacement << name.substr(name.length() - half, half);
+		short_name = QString::fromStdString(ss.str());
+	}
+	return short_name;
+}
+
 
 bool Elements::recognize_property(QString* property, int* count)
 {

@@ -16,7 +16,6 @@
 #include <initializer_list>
 #include <memory>
 
-using namespace std;
 
 #define SHOW_WARNINGS false
 
@@ -26,45 +25,46 @@ private:
 	Elements();
 
 public:
-	static void delete_spaces(string& str);
-	static void to_upper(string& str);
-	static void to_lower(string& str);
-	static string trim_string(const string& str, const string& whitespace = " \t");
-	static wstring trim_string(const wstring& str, const wstring& whitespace = L" \t");
+	static void delete_spaces(std::string& str);
+	static void to_upper(std::string& str);
+	static void to_lower(std::string& str);
+	static std::string trim_string(const std::string& str, const std::string& whitespace = " \t");
+	static std::wstring trim_string(const std::wstring& str, const std::wstring& whitespace = L" \t");
 
-	static string get_property(const char* prop_a, const char* prop_b, const mitk::BaseData* data, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_property(const char* prop_a, const char* prop_b, const mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientId(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientId(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientId(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientId_or_patientName(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientId_or_patientName(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientId_or_patientName(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static QString get_patientId_or_patientName(const string& filename, bool show_warning = SHOW_WARNINGS, const QString& def_value = "");
+	static std::string get_property(const char* prop_a, const char* prop_b, const mitk::BaseData* data, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_property(const char* prop_a, const char* prop_b, const mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientId(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientId(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientId(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientId_or_patientName(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientId_or_patientName(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientId_or_patientName(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static QString get_patientId_or_patientName(const std::string& filename, bool show_warning = SHOW_WARNINGS, const QString& def_value = "");
 	static QString get_patientId_or_patientName(const QString& filename, bool show_warning = SHOW_WARNINGS, const QString& def_value = "");
-	static QString get_seriesInstanceUID(const string& filename, const QString& def_value = "");
-	static string get_patientName(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientName(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientName(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string find_patientName(const list<mitk::BaseData::Pointer>& baseDataList, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientBirthdate(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientBirthdate(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientBirthdate(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientGender(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientGender(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_patientGender(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_imageName(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_imageName(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static string get_imageName(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
-	static vector<QString> get_imageNames(const list<mitk::BaseData::Pointer>& baseDataList, bool show_warning = SHOW_WARNINGS, const string& def_value = "");
+	static QString get_seriesInstanceUID(const std::string& filename, const QString& def_value = "");
+	static std::string get_patientName(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientName(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientName(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string find_patientName(const std::list<mitk::BaseData::Pointer>& baseDataList, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientBirthdate(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientBirthdate(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientBirthdate(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientGender(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientGender(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_patientGender(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_imageName(mitk::BaseData* baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_imageName(mitk::BaseData::Pointer baseData, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::string get_imageName(mitk::DataNode* dataNode, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
+	static std::vector<QString> get_imageNames(const std::list<mitk::BaseData::Pointer>& baseDataList, bool show_warning = SHOW_WARNINGS, const std::string& def_value = "");
 
-	static string recognize_name(const string& name);
-	static string recognize_gender(const string& gender);
-	static string recognize_birthday(const string& birthday);
-	static string get_short_name(string name);
+	static std::string recognize_name(const std::string& name);
+	static std::string recognize_gender(const std::string& gender);
+	static std::string recognize_birthday(const std::string& birthday);
+	static std::string get_short_name(std::string name);
+	static QString get_short_name_for_image(const std::string& name);
 
 	static bool recognize_property(QString* property, int* count);
-	static bool split_properties(const string& str_prop, QStringList* properties, vector<int>* nums = nullptr);
+	static bool split_properties(const std::string& str_prop, QStringList* properties, std::vector<int>* nums = nullptr);
 
 	static size_t get_hash(mitk::BaseData* baseData);
 };

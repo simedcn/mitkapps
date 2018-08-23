@@ -33,31 +33,53 @@ void MainPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
 	QString editorArea = layout->GetEditorArea();
 	//layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.22f, editorArea);
-	auto left = layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.22f, editorArea);
-	auto right = layout->CreateFolder("right", berry::IPageLayout::RIGHT, 0.7f, editorArea);
+	auto top_left = layout->CreateFolder("top_left", berry::IPageLayout::LEFT, 0.24f, editorArea);
+	auto right = layout->CreateFolder("right", berry::IPageLayout::RIGHT, 0.67f, editorArea);
 	auto bottom = layout->CreateFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);
-	auto bottom_left = layout->CreateFolder("bottom_left", berry::IPageLayout::BOTTOM, 0.3f, "left");
-	auto bottom_right = layout->CreateFolder("bottom_right", berry::IPageLayout::BOTTOM, 0.78f, "right");
+	auto mid_left = layout->CreateFolder("mid_left", berry::IPageLayout::BOTTOM, 0.4f, "top_left");
+	auto bottom_left = layout->CreateFolder("bottom_left", berry::IPageLayout::BOTTOM, 0.5f, "mid_left");
+	//auto bottom_right = layout->CreateFolder("bottom_right", berry::IPageLayout::BOTTOM, 0.78f, "right");
+	QString current_selector_item;
 	for (const auto& plugin : PluginDescriptors::get())
 	{
-		switch (plugin.position)
+		if (plugin.role == PluginDescriptor::PluginRole_selector)
 		{
-		case PluginDescriptor::PluginPosistion::PluginPosistion_bottom_left:
-			bottom_left->AddView(plugin.id);
-			break;
-		case PluginDescriptor::PluginPosistion::PluginPosistion_bottom_right:
-			bottom_right->AddView(plugin.id);
-			break;
-		case PluginDescriptor::PluginPosistion::PluginPosistion_bottom:
-			bottom->AddView(plugin.id);
-			break;
-		case PluginDescriptor::PluginPosistion::PluginPosistion_left:
-			left->AddView(plugin.id);
-			break;
-		case PluginDescriptor::PluginPosistion::PluginPosistion_right:
-		default:
-			right->AddView(plugin.id);
-			break;
+			current_selector_item = plugin.id;
+		}
+		if (current_selector_item.isEmpty() || plugin.role != PluginDescriptor::PluginRole_selectorItem)
+		{
+			switch (plugin.position)
+			{
+			//case PluginDescriptor::PluginPosistion::PluginPosistion_bottom_right:
+			//	bottom_right->AddView(plugin.id);
+			//	break;
+			case PluginDescriptor::PluginPosistion::PluginPosistion_bottom:
+				bottom->AddView(plugin.id);
+				break;
+			case PluginDescriptor::PluginPosistion::PluginPosistion_top_left:
+				top_left->AddView(plugin.id);
+				break;
+			case PluginDescriptor::PluginPosistion::PluginPosistion_mid_left:
+				mid_left->AddView(plugin.id);
+				break;
+			case PluginDescriptor::PluginPosistion::PluginPosistion_bottom_left:
+				bottom_left->AddView(plugin.id);
+				break;
+			case PluginDescriptor::PluginPosistion::PluginPosistion_right:
+			default:
+				right->AddView(plugin.id);
+				break;
+			}
+		}
+		else
+		{
+			int pos =
+				plugin.position == PluginDescriptor::PluginPosistion_bottom ? berry::IPageLayout::BOTTOM :
+				plugin.position == PluginDescriptor::PluginPosistion_top_left ? berry::IPageLayout::LEFT :
+				plugin.position == PluginDescriptor::PluginPosistion_right ? berry::IPageLayout::RIGHT :
+				berry::IPageLayout::RIGHT;
+			layout->AddStandaloneView(plugin.id, false, pos, 0.20f, current_selector_item);
+			current_selector_item = plugin.id;
 		}
 	}
 	//right->AddView("org.mitk.views.imagestatistics"); --> crashing
@@ -84,8 +106,14 @@ void MainPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 			(plugin.role == PluginDescriptor::PluginRole_main) ? is_main_closeable :
 			(plugin.role == PluginDescriptor::PluginRole_secondary) ? is_closeable :
 			(plugin.role == PluginDescriptor::PluginRole_pacs) ? true :
+			(plugin.role == PluginDescriptor::PluginRole_selector) ? is_main_closeable :
+			(plugin.role == PluginDescriptor::PluginRole_selectorItem) ? false :
 			true;
-		bool moveable = (plugin.role == PluginDescriptor::PluginRole_main) ? is_main_moveable : is_moveable;
+		bool moveable = 
+			(plugin.role == PluginDescriptor::PluginRole_main) ? is_main_moveable : 
+			(plugin.role == PluginDescriptor::PluginRole_selector) ? false : 
+			(plugin.role == PluginDescriptor::PluginRole_selectorItem) ? false : 
+			is_moveable;
 		view->SetCloseable(closeable);
 		view->SetMoveable(moveable);
 	}

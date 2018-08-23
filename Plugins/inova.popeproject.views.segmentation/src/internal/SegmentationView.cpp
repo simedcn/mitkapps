@@ -129,6 +129,7 @@ void SegmentationView::updateAfterSelectionChanged()
 	else
 	{
 		ui.label_ImageNotSelected->setText("Please load and select a dataset in Data Manager.");
+		ui.label_ImageNotSelected->setToolTip("");
 		ui.label_ImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
 		ui.label_ImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}

@@ -64,6 +64,8 @@ PluginDescriptor::PluginDescriptor(initializer_list<QString> params)
 	this->role = 
 		(role.toLower() == "main") ? PluginRole_main :
 		(role.toLower() == "pacs") ? PluginRole_pacs :
+		(role.toLower() == "selector") ? PluginRole_selector :
+		(role.toLower() == "sel_item") ? PluginRole_selectorItem :
 		PluginRole_secondary;
 
 	const QString& title_visibility = *it++;
@@ -74,10 +76,14 @@ PluginDescriptor::PluginDescriptor(initializer_list<QString> params)
 		this->position = PluginPosistion_bottom;
 	else if (plugin_position == "bottom_left")
 		this->position = PluginPosistion_bottom_left;
-	else if (plugin_position == "bottom_right")
-		this->position = PluginPosistion_bottom_right;
-	else if (plugin_position == "left")
-		this->position = PluginPosistion_left;
+	//else if (plugin_position == "bottom_right")
+	//	this->position = PluginPosistion_bottom_right;
+	else if (plugin_position == "top_left")
+		this->position = PluginPosistion_top_left;
+	else if (plugin_position == "mid_left")
+		this->position = PluginPosistion_mid_left;
+	else if (plugin_position == "bottom_left")
+		this->position = PluginPosistion_bottom_left;
 	else //if (plugin_position == "right")
 		this->position = PluginPosistion_right;
 

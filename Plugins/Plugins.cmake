@@ -22,5 +22,6 @@ elseif("${ProjectToGenerate}" STREQUAL "POPE")
 		Plugins/inova.registration.views.mapper:ON
 		Plugins/inova.registration.views.comparison:ON
 		Plugins/inova.registration.views.visualizer:ON
+		Plugins/inova.registration.views.stepselector:ON
 	  )
 endif()

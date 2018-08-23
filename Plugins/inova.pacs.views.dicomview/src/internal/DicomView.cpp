@@ -543,10 +543,10 @@ void DicomView::addSeriesToDataManager(const QStringList& listOfFilesForSeries, 
 	}
 }
 
-void DicomView::OnPreferencesChanged(const berry::IBerryPreferences*)
+/*void DicomView::OnPreferencesChanged(const berry::IBerryPreferences*)
 {
 	updateSettings();
-}
+}*/
 
 /*
 static Uint8 findUncompressedPC(const OFString& sopClass, DcmSCU& scu)

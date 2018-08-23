@@ -76,22 +76,6 @@ const string RegistrationPlugin::VIEW_ID = "inova.registration.views.rigidregist
 
 int RegistrationPlugin::name_counter = 1;
 
-QString get_short_name_for_image(const string& name)
-{
-	QString str_name = QString::fromStdString(name);
-	QString short_name = str_name;
-	const string str_center_replacement = "...";
-	const int max_length = 28 + str_center_replacement.length();
-	if (name.length() > max_length)
-	{
-		stringstream ss;
-		const int half = (max_length - str_center_replacement.length()) / 2;
-		ss << name.substr(0, half) << str_center_replacement << name.substr(name.length() - half, half);
-		short_name = QString::fromStdString(ss.str());
-	}
-	return short_name;
-}
-
 RegistrationPlugin::RegistrationPlugin()
 {}
 RegistrationPlugin::~RegistrationPlugin()
@@ -117,7 +101,7 @@ void RegistrationPlugin::CreateQtPartControl(QWidget* parent)
 	connect(this->ui.pushButton_Registration, SIGNAL(clicked()), this, SLOT(on_pushButton_Registration_clicked()));
 	connect((QObject*)&this->m_CalculationThread, SIGNAL(finished()), this, SLOT(on_ThreadedRegistrationCalculation_finished()), Qt::QueuedConnection);
 
-	/// Creating an Event Publisher.
+	/// CTK signals.
 	auto pluginContext = inova_registration_views_rigidregistration_PluginActivator::GetPluginContext();
 	ctkDictionary propsForSlot;
 	ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();
@@ -173,13 +157,14 @@ void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, cons
 		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
 		if (!image)
 			continue;
-		if (moving_image == nullptr)
+		// Reverse direction
+		if (target_image == nullptr)
 		{
-			moving_image = datanode;
+			target_image = datanode;
 		}
 		else
 		{
-			target_image = datanode;
+			moving_image = datanode;
 			break;
 		}
 	}
@@ -194,7 +179,7 @@ void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, cons
 		}
 		else
 		{
-			QString short_name = get_short_name_for_image(name);
+			QString short_name = Elements::get_short_name_for_image(name);
 			ui.label_MovingImageNotSelected->setText(short_name);
 			ui.label_MovingImageNotSelected->setToolTip(QString::fromStdString(name));
 		}
@@ -204,6 +189,7 @@ void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, cons
 	else
 	{
 		ui.label_MovingImageNotSelected->setText("Please select a moving image in Data Manager.");
+		ui.label_MovingImageNotSelected->setToolTip("");
 		ui.label_MovingImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
 		ui.label_MovingImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}
@@ -219,7 +205,7 @@ void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, cons
 		}
 		else
 		{
-			QString short_name = get_short_name_for_image(name);
+			QString short_name = Elements::get_short_name_for_image(name);
 			ui.label_TargetImageNotSelected->setText(short_name);
 			ui.label_TargetImageNotSelected->setToolTip(QString::fromStdString(name));
 		}
@@ -228,7 +214,8 @@ void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, cons
 	}
 	else
 	{
-		ui.label_TargetImageNotSelected->setText("Please select a moving image in Data Manager.");
+		ui.label_TargetImageNotSelected->setText("Please select a target image in Data Manager.");
+		ui.label_TargetImageNotSelected->setToolTip("");
 		ui.label_TargetImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
 		ui.label_TargetImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}

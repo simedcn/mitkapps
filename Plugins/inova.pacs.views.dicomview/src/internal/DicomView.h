@@ -3,8 +3,8 @@
 
 #include "DicomViewConstants.h"
 
-#include <QmitkAbstractView.h>
-#include <berryQtViewPart.h>
+//#include <QmitkAbstractView.h>
+//#include <berryQtViewPart.h>
 #include <berryIPreferences.h>
 
 #include "dcmtk/dcmnet/scu.h"
@@ -68,7 +68,7 @@ protected:
 	void addSeriesToDataManager(const QStringList& listOfFilesForSeries, const shared_ptr<QString> modality);
 
 private:
-	virtual void OnPreferencesChanged(const berry::IBerryPreferences*) /*override*/;
+	//virtual void OnPreferencesChanged(const berry::IBerryPreferences*) /*override*/;
 
 signals:
 	void OpenDICOMSeries(const ctkDictionary&);

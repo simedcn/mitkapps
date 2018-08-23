@@ -61,7 +61,7 @@ DataManager::DataManager(mitk::DataStorage *datastorage, QObject *parent)
 	//bool load_nrrd = false;
 	//m_Settings.setValue("AppSettings/LoadRNND", load_nrrd); //??
 
-	/// CTK signals.
+	/// CTK slots.
 	auto pluginContext = inova_popeproject_editors_renderwindow_Activator::GetPluginContext();
 	ctkDictionary propsForSlot;
 	ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();

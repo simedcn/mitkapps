@@ -1,4 +1,3 @@
-
 #include "MainWorkbenchWindowAdvisor.h"
 #include "PartListenerForPlugins.h"
 

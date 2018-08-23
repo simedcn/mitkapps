@@ -114,7 +114,6 @@ QLabel#logo_label
       <widget class="QLabel" name="label_MovingImageNotSelected">
        <property name="styleSheet">
         <string notr="true">color: #E02000;
-background-color: rgb(255, 255, 159);
 background-color: #efef95;</string>
        </property>
        <property name="text">
@@ -150,7 +149,6 @@ background-color: #efef95;</string>
       <widget class="QLabel" name="label_TargetImageNotSelected">
        <property name="styleSheet">
         <string notr="true">color: #E02000;
-background-color: rgb(255, 255, 159);
 background-color: #efef95;</string>
        </property>
        <property name="text">

@@ -1,4 +1,3 @@
-
 set(CPP_FILES
   ../../Classes/MainWorkbenchWindowAdvisor.cpp
   ../../Classes/ShowViewAction.cpp
@@ -22,6 +21,7 @@ set(INTERNAL_CPP_FILES
   MainWorkbenchAdvisor.cpp
   MainApplicationPreferencePage.cpp
   PopeWorkbenchWindowAdvisor.cpp
+  PluginListener.cpp
 )
 
 set(MOC_H_FILES
@@ -32,6 +32,7 @@ set(MOC_H_FILES
   src/internal/MainWorkbenchAdvisor.h
   src/internal/MainApplicationPreferencePage.h
   src/internal/PopeWorkbenchWindowAdvisor.h
+  src/internal/PluginListener.h
   ../../Classes/MainWorkbenchWindowAdvisor.h
   ../../Classes/ShowViewAction.h
 )

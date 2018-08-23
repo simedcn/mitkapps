@@ -39,17 +39,20 @@ public:
 public:
 	enum PluginPosistion
 	{
-		PluginPosistion_left,
+		PluginPosistion_top_left,
+		PluginPosistion_mid_left,
+		PluginPosistion_bottom_left,
 		PluginPosistion_right,
-		PluginPosistion_bottom_right,
+		//PluginPosistion_bottom_right,
 		PluginPosistion_bottom,
-		PluginPosistion_bottom_left
 	};
 	enum PluginRole
 	{
 		PluginRole_main,
 		PluginRole_secondary,
 		PluginRole_pacs,
+		PluginRole_selector,
+		PluginRole_selectorItem
 	};
 };
 

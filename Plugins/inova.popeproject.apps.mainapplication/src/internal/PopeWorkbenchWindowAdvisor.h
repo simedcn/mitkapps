@@ -25,6 +25,7 @@ protected:
 	QToolBar* createToolbar_AndAddDataActions(QMainWindow* mainWindow, shared_ptr<vector<QAction*>> dataActions);
 	void addDataActionsToMenu(QMainWindow* mainWindow, shared_ptr<vector<QAction*>> dataActions);
 	void addSettingsToToolbar(QMainWindow* mainWindow, QToolBar* toolBar = nullptr);
+	void manageRegistrationPlugins(berry::IWorkbenchWindow::Pointer window);
 
 	QString GetWorkDirectory() const;
 
@@ -45,6 +46,7 @@ public slots:
 
 protected:
 	bool addToolbarLabels = false;
+	QScopedPointer<berry::IPartListener> pluginListener;
 };
 
 #endif /*POPEWORKBENCHWINDOWADVISOR_H_*/

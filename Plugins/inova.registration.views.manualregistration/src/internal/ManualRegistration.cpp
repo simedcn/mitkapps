@@ -1,4 +1,6 @@
 #include "ManualRegistration.h"
+#include "inova_registration_views_manualregistration_Activator.h"
+#include <PopeElements.h>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -17,6 +19,11 @@
 #include <mitkAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
+
+// CTK
+#include <ctkPluginActivator.h>
+#include <service/event/ctkEventAdmin.h>
+#include <service/event/ctkEventConstants.h>
 
 // Qmitk
 #include "QmitkRenderWindow.h"
@@ -39,15 +46,18 @@
 
 #include <boost/math/constants/constants.hpp>
 
-const std::string ManualRegistration::VIEW_ID = "inova.registration.views.manualregistration";
+using string = std::string;
 
-const std::string ManualRegistration::HelperNodeName = "RegistrationManipulationEvaluationHelper";
+
+const string ManualRegistration::VIEW_ID = "inova.registration.views.manualregistration";
+const QString ManualRegistration::PLUGIN_ID = QString::fromStdString(VIEW_ID);
+
+const string ManualRegistration::HelperNodeName = "RegistrationManipulationEvaluationHelper";
+
 
 ManualRegistration::ManualRegistration()
 	: m_Parent(nullptr)
 	, m_activeManipulation(false)
-	, m_autoMoving(false)
-	, m_autoTarget(false)
 	, m_currentSelectedTimeStep(0)
 	, m_internalUpdate(false)
 {
@@ -56,6 +66,8 @@ ManualRegistration::ManualRegistration()
 
 ManualRegistration::~ManualRegistration()
 {
+	if (m_activeManipulation)
+		StopSession();
 	if (this->m_EvalNode.IsNotNull() && this->GetDataStorage().IsNotNull())
 	{
 		this->GetDataStorage()->Remove(this->m_EvalNode);
@@ -76,39 +88,47 @@ void ManualRegistration::Error(QString msg)
 void ManualRegistration::CreateQtPartControl(QWidget* parent)
 {
 	// create GUI widgets from the Qt Designer's .ui file
-	m_Controls.setupUi(parent);
+	ui.setupUi(parent);
 
 	m_Parent = parent;
 
-	connect(m_Controls.pbStart, SIGNAL(clicked()), this, SLOT(OnStartBtnPushed()));
-	connect(m_Controls.pbCancel, SIGNAL(clicked()), this, SLOT(OnCancelBtnPushed()));
-	connect(m_Controls.pbStore, SIGNAL(clicked()), this, SLOT(OnStoreBtnPushed()));
-	connect(m_Controls.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
-	connect(m_Controls.radioSelectedReg, SIGNAL(toggled(bool)), m_Controls.lbRegistrationName, SLOT(setVisible(bool)));
+	connect(ui.pbStart, SIGNAL(clicked()), this, SLOT(OnStartBtnPushed()));
+	connect(ui.pbCancel, SIGNAL(clicked()), this, SLOT(OnCancelBtnPushed()));
+	connect(ui.pbStore, SIGNAL(clicked()), this, SLOT(OnStoreBtnPushed()));
+	connect(ui.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
 
-	connect(m_Controls.slideRotX, SIGNAL(valueChanged(int)), this, SLOT(OnRotXSlideChanged(int)));
-	connect(m_Controls.sbRotX, SIGNAL(valueChanged(double)), this, SLOT(OnRotXChanged(double)));
-	connect(m_Controls.slideRotY, SIGNAL(valueChanged(int)), this, SLOT(OnRotYSlideChanged(int)));
-	connect(m_Controls.sbRotY, SIGNAL(valueChanged(double)), this, SLOT(OnRotYChanged(double)));
-	connect(m_Controls.slideRotZ, SIGNAL(valueChanged(int)), this, SLOT(OnRotZSlideChanged(int)));
-	connect(m_Controls.sbRotZ, SIGNAL(valueChanged(double)), this, SLOT(OnRotZChanged(double)));
+	connect(ui.slideRotX, SIGNAL(valueChanged(int)), this, SLOT(OnRotXSlideChanged(int)));
+	connect(ui.sbRotX, SIGNAL(valueChanged(double)), this, SLOT(OnRotXChanged(double)));
+	connect(ui.slideRotY, SIGNAL(valueChanged(int)), this, SLOT(OnRotYSlideChanged(int)));
+	connect(ui.sbRotY, SIGNAL(valueChanged(double)), this, SLOT(OnRotYChanged(double)));
+	connect(ui.slideRotZ, SIGNAL(valueChanged(int)), this, SLOT(OnRotZSlideChanged(int)));
+	connect(ui.sbRotZ, SIGNAL(valueChanged(double)), this, SLOT(OnRotZChanged(double)));
 
-	connect(m_Controls.slideTransX, SIGNAL(valueChanged(int)), this, SLOT(OnTransXSlideChanged(int)));
-	connect(m_Controls.sbTransX, SIGNAL(valueChanged(double)), this, SLOT(OnTransXChanged(double)));
-	connect(m_Controls.slideTransY, SIGNAL(valueChanged(int)), this, SLOT(OnTransYSlideChanged(int)));
-	connect(m_Controls.sbTransY, SIGNAL(valueChanged(double)), this, SLOT(OnTransYChanged(double)));
-	connect(m_Controls.slideTransZ, SIGNAL(valueChanged(int)), this, SLOT(OnTransZSlideChanged(int)));
-	connect(m_Controls.sbTransZ, SIGNAL(valueChanged(double)), this, SLOT(OnTransZChanged(double)));
+	connect(ui.slideTransX, SIGNAL(valueChanged(int)), this, SLOT(OnTransXSlideChanged(int)));
+	connect(ui.sbTransX, SIGNAL(valueChanged(double)), this, SLOT(OnTransXChanged(double)));
+	connect(ui.slideTransY, SIGNAL(valueChanged(int)), this, SLOT(OnTransYSlideChanged(int)));
+	connect(ui.sbTransY, SIGNAL(valueChanged(double)), this, SLOT(OnTransYChanged(double)));
+	connect(ui.slideTransZ, SIGNAL(valueChanged(int)), this, SLOT(OnTransZSlideChanged(int)));
+	connect(ui.sbTransZ, SIGNAL(valueChanged(double)), this, SLOT(OnTransZChanged(double)));
 
-	connect(m_Controls.comboCenter, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCenterTypeChanged(int)));
+	connect(ui.comboCenter, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCenterTypeChanged(int)));
 
+	/// CTK slots.
+	//auto pluginContext = inova_registration_views_manualregistration_Activator::GetContext();
+	//ctkDictionary propsForSlot;
+	//ctkServiceReference ref = pluginContext->getServiceReference<ctkEventAdmin>();
+	//if (ref)
+	//{
+	//	ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
+	//	propsForSlot[ctkEventConstants::EVENT_TOPIC] = "plugin/HIDDEN";
+	//	eventAdmin->subscribeSlot(this, SLOT(on_Plugin_hidden(ctkEvent)), propsForSlot);
+	//}
 
 	this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
 	connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
 
-	m_Controls.radioNewReg->setChecked(true);
-	m_Controls.groupScale->setVisible(false);
-	m_Controls.lbRegistrationName->setVisible(false);
+	ui.groupScale->setVisible(false);
+	ui.label_PreRegistration->setVisible(false);
 
 	m_EvalNode = this->GetDataStorage()->GetNamedNode(HelperNodeName);
 
@@ -122,101 +142,91 @@ void ManualRegistration::RenderWindowPartActivated(mitk::IRenderWindowPart* rend
 	this->m_SliceChangeListener.RenderWindowPartActivated(renderWindowPart);
 }
 
-void ManualRegistration::RenderWindowPartDeactivated(
-	mitk::IRenderWindowPart* renderWindowPart)
+void ManualRegistration::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
 	this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
 void ManualRegistration::CheckInputs()
 {
-	if (!m_activeManipulation)
-	{
-	QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
-	this->m_autoMoving = false;
-	this->m_autoTarget = false;
+	if (m_activeManipulation)
+		return;
+
+	/// Reset the current selection.
+	this->m_SelectedPreReg = nullptr;
 	this->m_SelectedMovingNode = nullptr;
 	this->m_SelectedTargetNode = nullptr;
 	this->m_SelectedPreRegNode = nullptr;
-	this->m_SelectedPreReg = nullptr;
 
-	if (dataNodes.size() > 0)
+	QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
+	if (dataNodes.size() == 0)
+		return;
+
+	/// Check if a registration node is selected.
+	for (auto datanode : dataNodes)
 	{
-		//test if auto select works
-		if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]))
-		{
-			mitk::DataNode::Pointer regNode = dataNodes[0];
-			dataNodes.pop_front();
+		if (!mitk::MITKRegistrationHelper::IsRegNode(datanode))
+			continue;
 
-			mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<mitk::MAPRegistrationWrapper*>(regNode->GetData());
-			if (regWrapper)
-			{
-				this->m_SelectedPreReg = dynamic_cast<const MAPRegistrationType*>(regWrapper->GetRegistration());
-			}
+		mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<mitk::MAPRegistrationWrapper*>(datanode->GetData());
+		const MAPRegistrationType* selected_reg = nullptr;
+		if (regWrapper)
+			selected_reg = dynamic_cast<const MAPRegistrationType*>(regWrapper->GetRegistration());
+		else
+			continue;
 
-			if (this->m_SelectedPreReg.IsNotNull())
-			{
-				this->m_SelectedPreRegNode = regNode;
+		if (selected_reg == nullptr)
+			continue;
 
-				mitk::BaseProperty* uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
+		mitk::BaseProperty* uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
+		if (uidProp == nullptr)
+			continue;
+		// Prepare the moving node
+		mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
+		auto selectedMovingNode = this->GetDataStorage()->GetNode(predicate);
 
-				if (uidProp)
-				{
-					//search for the moving node
-					mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
-						uidProp);
-					this->m_SelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
-					this->m_autoMoving = this->m_SelectedMovingNode.IsNotNull();
-				}
+		uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
+		if (uidProp == nullptr)
+			continue;
 
-				uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
+		// Set the target node
+		predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
+		this->m_SelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
 
-				if (uidProp)
-				{
-					//search for the target node
-					mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
-						uidProp);
-					this->m_SelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
-					this->m_autoTarget = this->m_SelectedTargetNode.IsNotNull();
-				}
-			}
-		}
-
-		//if still nodes are selected -> ignore possible auto select
-		if (!dataNodes.empty())
-		{
-			mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
-
-			if (inputImage)
-			{
-				this->m_SelectedMovingNode = dataNodes[0];
-				this->m_autoMoving = false;
-				dataNodes.pop_front();
-			}
-		}
-
-		if (!dataNodes.empty())
-		{
-			mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
-
-			if (inputImage)
-			{
-				this->m_SelectedTargetNode = dataNodes[0];
-				this->m_autoTarget = false;
-				dataNodes.pop_front();
-			}
-		}
+		// Set the selected items if everithing has been found
+		this->m_SelectedMovingNode = selectedMovingNode;
+		this->m_SelectedPreReg = selected_reg;
+		this->m_SelectedPreRegNode = datanode;
+		break;
 	}
+
+	/// If not, set tagret and moving images.
+	if (this->m_SelectedPreRegNode == nullptr)
+	{
+		for (auto datanode : dataNodes)
+		{
+			mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+			if (!image)
+				continue;
+			// Reverse direction
+			if (m_SelectedTargetNode == nullptr)
+			{
+				m_SelectedTargetNode = datanode;
+			}
+			else
+			{
+				m_SelectedMovingNode = datanode;
+				break;
+			}
+		}
 	}
 }
-
 
 void ManualRegistration::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&)
 {
 	this->CheckInputs();
 	this->ConfigureControls();
 };
-
 
 void ManualRegistration::NodeRemoved(const mitk::DataNode* node)
 {
@@ -227,80 +237,85 @@ void ManualRegistration::NodeRemoved(const mitk::DataNode* node)
 		if (node == this->m_EvalNode)
 		{
 			this->m_EvalNode = nullptr;
+			StopSession();
 		}
-		this->OnCancelBtnPushed();
-		MITK_INFO << "Stopped current MatchPoint manual registration session, because at least one relevant node was removed from storage.";
+		else
+		{
+			this->OnCancelBtnPushed();
+		}
+		MITK_INFO << "Stopped current MatchPoint manual registration session because at least one relevant node was removed from storage.";
 	}
 }
 
 void ManualRegistration::ConfigureControls()
 {
 	//configure input data widgets
-	if (this->m_SelectedPreRegNode.IsNull())
+	bool is_prereg = (m_SelectedPreRegNode != nullptr);
+	ui.label_PreRegistration->setVisible(is_prereg);
+	if (is_prereg)
 	{
-		m_Controls.lbRegistrationName->setText(QString("<font color='red'>No registration selected!</font>"));
+		string name = m_SelectedPreRegNode->GetName();
+		QString short_name = Elements::get_short_name_for_image(name);
+		ui.label_PreRegistration->setText("Pre-Registration: " + short_name);
+		ui.label_PreRegistration->setToolTip(QString::fromStdString(name));
 	}
 	else
 	{
-		m_Controls.lbRegistrationName->setText(QString::fromStdString(this->m_SelectedPreRegNode->GetName()));
+		ui.label_PreRegistration->setText("");
+		ui.label_PreRegistration->setToolTip("");
 	}
 
-	if (this->m_SelectedMovingNode.IsNull())
+	bool is_moving_image = (m_SelectedMovingNode != nullptr);
+	if (is_moving_image)
 	{
-		m_Controls.lbMovingName->setText(QString("<font color='red'>no moving image selected!</font>"));
+		string name = m_SelectedMovingNode->GetName();
+		QString short_name = Elements::get_short_name_for_image(name);
+		ui.label_MovingImageNotSelected->setText("Moving image: " + short_name);
+		ui.label_MovingImageNotSelected->setToolTip(QString::fromStdString(name));
+		ui.label_MovingImageNotSelected->setStyleSheet("");
+		ui.label_MovingImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		if (this->m_autoMoving)
-		{
-			m_Controls.lbMovingName->setText(QString("<font color='gray'>") + QString::fromStdString(this->m_SelectedMovingNode->GetName()) + QString(" (auto selected)</font>"));
-		}
-		else
-		{
-			m_Controls.lbMovingName->setText(QString::fromStdString(this->m_SelectedMovingNode->GetName()));
-		}
+		ui.label_MovingImageNotSelected->setText("Please select a moving image in Data Manager.");
+		ui.label_MovingImageNotSelected->setToolTip("");
+		ui.label_MovingImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_MovingImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}
 
-	if (this->m_SelectedTargetNode.IsNull())
+	bool is_target_image = (m_SelectedTargetNode != nullptr);
+	if (is_target_image)
 	{
-		m_Controls.lbTargetName->setText(QString("<font color='red'>no target image selected!</font>"));
+		string name = m_SelectedTargetNode->GetName();
+		QString short_name = Elements::get_short_name_for_image(name);
+		ui.label_TargetImageNotSelected->setText("Target image: " + short_name);
+		ui.label_TargetImageNotSelected->setToolTip(QString::fromStdString(name));
+		ui.label_TargetImageNotSelected->setStyleSheet("");
+		ui.label_TargetImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		if (this->m_autoTarget)
-		{
-			m_Controls.lbTargetName->setText(QString("<font color='gray'>") + QString::fromStdString(this->m_SelectedTargetNode->GetName()) + QString(" (auto selected)</font>"));
-		}
-		else
-		{
-			m_Controls.lbTargetName->setText(QString::fromStdString(this->m_SelectedTargetNode->GetName()));
-		}
+		ui.label_TargetImageNotSelected->setText("Please select a target image in Data Manager.");
+		ui.label_TargetImageNotSelected->setToolTip("");
+		ui.label_TargetImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_TargetImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}
 
 	if (!m_activeManipulation)
 	{
-		QString name = "ManuelRegistration";
-
+		QString name = "ManualRegistration";
 		if (m_SelectedPreRegNode.IsNotNull())
-		{
-			name = QString::fromStdString(m_SelectedPreRegNode->GetName()) + " manual refined";
-		}
-		this->m_Controls.lbNewRegName->setText(name);
+			name = QString::fromStdString(m_SelectedPreRegNode->GetName()) + " Refined";
+		this->ui.lbNewRegName->setText(name);
 	}
 
 	//config settings widget
-	this->m_Controls.groupReg->setEnabled(!m_activeManipulation);
-
-	this->m_Controls.lbMovingName->setEnabled(!m_activeManipulation);
-	this->m_Controls.lbTargetName->setEnabled(!m_activeManipulation);
-
-	this->m_Controls.pbStart->setEnabled(this->m_SelectedMovingNode.IsNotNull() && this->m_SelectedTargetNode.IsNotNull() && !m_activeManipulation);
-
-	this->m_Controls.lbNewRegName->setEnabled(m_activeManipulation);
-	this->m_Controls.checkMapEntity->setEnabled(m_activeManipulation);
-	this->m_Controls.tabWidget->setEnabled(m_activeManipulation);
-	this->m_Controls.pbCancel->setEnabled(m_activeManipulation);
-	this->m_Controls.pbStore->setEnabled(m_activeManipulation);
+	this->ui.pbStart->setEnabled(m_SelectedMovingNode.IsNotNull() && m_SelectedTargetNode.IsNotNull() && !m_activeManipulation);
+	this->ui.lbNewRegName->setEnabled(m_activeManipulation);
+	this->ui.checkMapEntity->setEnabled(m_activeManipulation);
+	this->ui.tabWidget->setEnabled(m_activeManipulation);
+	this->ui.pbCancel->setEnabled(m_activeManipulation);
+	this->ui.pbStore->setEnabled(m_activeManipulation);
 
 	this->UpdateTransformWidgets();
 }
@@ -319,9 +334,9 @@ void ManualRegistration::InitSession()
 
 	::map::core::RegistrationManipulator<MAPRegistrationType> manipulator(m_CurrentRegistration);
 	::map::core::PreCachedRegistrationKernel<3, 3>::Pointer kernel = ::map::core::PreCachedRegistrationKernel<3, 3>::New();
-	manipulator.setDirectMapping(::map::core::NullRegistrationKernel < 3, 3 >::New());
+	manipulator.setDirectMapping(::map::core::NullRegistrationKernel<3, 3>::New());
 
-	if (this->m_Controls.radioNewReg->isChecked())
+	if (m_SelectedPreRegNode == nullptr)
 	{ //new registration
 		kernel->setTransformModel(m_InverseCurrentTransform);
 		manipulator.setInverseMapping(kernel);
@@ -336,8 +351,8 @@ void ManualRegistration::InitSession()
 	}
 	else
 	{ //use selected pre registration as baseline
-		itk::CompositeTransform < ::map::core::continuous::ScalarType, 3>::Pointer compTransform = itk::CompositeTransform < ::map::core::continuous::ScalarType, 3>::New();
-		const map::core::RegistrationKernel<3, 3>* preKernel = dynamic_cast<const map::core::RegistrationKernel<3, 3>*>(&this->m_SelectedPreReg->getInverseMapping());
+		itk::CompositeTransform <::map::core::continuous::ScalarType, 3>::Pointer compTransform = itk::CompositeTransform <::map::core::continuous::ScalarType, 3>::New();
+		const ::map::core::RegistrationKernel<3, 3>* preKernel = dynamic_cast<const ::map::core::RegistrationKernel<3, 3>*>(&this->m_SelectedPreReg->getInverseMapping());
 		compTransform->AddTransform(preKernel->getTransformModel()->Clone());
 		compTransform->AddTransform(this->m_InverseCurrentTransform);
 
@@ -345,17 +360,17 @@ void ManualRegistration::InitSession()
 		manipulator.setInverseMapping(kernel);
 	}
 
-	m_Controls.comboCenter->setCurrentIndex(0);
+	ui.comboCenter->setCurrentIndex(0);
 	this->ConfigureTransformCenter(0);
 
 	//set bounds of the translation slider widget to have sensible ranges
 	auto currenttrans = m_DirectCurrentTransform->GetTranslation();
-	this->m_Controls.slideTransX->setMinimum(currenttrans[0] - 250);
-	this->m_Controls.slideTransY->setMinimum(currenttrans[1] - 250);
-	this->m_Controls.slideTransZ->setMinimum(currenttrans[2] - 250);
-	this->m_Controls.slideTransX->setMaximum(currenttrans[0] + 250);
-	this->m_Controls.slideTransY->setMaximum(currenttrans[1] + 250);
-	this->m_Controls.slideTransZ->setMaximum(currenttrans[2] + 250);
+	this->ui.slideTransX->setMinimum(currenttrans[0] - 250);
+	this->ui.slideTransY->setMinimum(currenttrans[1] - 250);
+	this->ui.slideTransZ->setMinimum(currenttrans[2] - 250);
+	this->ui.slideTransX->setMaximum(currenttrans[0] + 250);
+	this->ui.slideTransY->setMaximum(currenttrans[1] + 250);
+	this->ui.slideTransZ->setMaximum(currenttrans[2] + 250);
 
 	//reinit view
 	mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -374,7 +389,7 @@ void ManualRegistration::InitSession()
 	this->m_EvalNode->SetBoolProperty("helper object", true);
 	this->GetDataStorage()->Add(this->m_EvalNode);
 
-	this->m_Controls.evalSettings->SetNode(this->m_EvalNode);
+	this->ui.evalSettings->SetNode(this->m_EvalNode);
 
 	this->m_activeManipulation = true;
 };
@@ -401,19 +416,19 @@ void ManualRegistration::StopSession()
 void ManualRegistration::UpdateTransformWidgets()
 {
 	this->m_internalUpdate = true;
-	this->m_Controls.sbTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
-	this->m_Controls.sbTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
-	this->m_Controls.sbTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
-	this->m_Controls.slideTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
-	this->m_Controls.slideTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
-	this->m_Controls.slideTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
+	this->ui.sbTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
+	this->ui.sbTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
+	this->ui.sbTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
+	this->ui.slideTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
+	this->ui.slideTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
+	this->ui.slideTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
 
-	this->m_Controls.sbRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
-	this->m_Controls.sbRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-	this->m_Controls.sbRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
-	this->m_Controls.slideRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
-	this->m_Controls.slideRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-	this->m_Controls.slideRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+	this->ui.sbRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
+	this->ui.sbRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+	this->ui.sbRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+	this->ui.slideRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
+	this->ui.slideRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+	this->ui.slideRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
 	this->m_internalUpdate = false;
 };
 
@@ -421,22 +436,22 @@ void ManualRegistration::UpdateTransform(bool updateRotation)
 {
 	if (updateRotation)
 	{
-		if (m_Controls.comboCenter->currentIndex() == 2)
+		if (ui.comboCenter->currentIndex() == 2)
 		{
 		 ConfigureTransformCenter(2);
 		}
 		this->m_DirectCurrentTransform->SetRotation(
-			this->m_Controls.sbRotX->value()*(boost::math::double_constants::pi / 180),
-			this->m_Controls.sbRotY->value()*(boost::math::double_constants::pi / 180),
-			this->m_Controls.sbRotZ->value()*(boost::math::double_constants::pi / 180)
+			this->ui.sbRotX->value()*(boost::math::double_constants::pi / 180),
+			this->ui.sbRotY->value()*(boost::math::double_constants::pi / 180),
+			this->ui.sbRotZ->value()*(boost::math::double_constants::pi / 180)
 		);
 	}
 	else
 	{
 		TransformType::OutputVectorType trans;
-		trans[0] = this->m_Controls.sbTransX->value();
-		trans[1] = this->m_Controls.sbTransY->value();
-		trans[2] = this->m_Controls.sbTransZ->value();
+		trans[0] = this->ui.sbTransX->value();
+		trans[1] = this->ui.sbTransY->value();
+		trans[2] = this->ui.sbTransZ->value();
 
 		this->m_DirectCurrentTransform->SetTranslation(trans);
 	}
@@ -467,9 +482,9 @@ void ManualRegistration::OnSliceChanged()
 			this->m_EvalNode->SetProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::GenericProperty<mitk::Point3D>::New(currentSelectedPosition));
 		}
 
-		if (m_activeManipulation && m_Controls.comboCenter->currentIndex() == 2)
+		if (m_activeManipulation && ui.comboCenter->currentIndex() == 2)
 		{ //update transform with the current position.
-			OnCenterTypeChanged(m_Controls.comboCenter->currentIndex());
+			OnCenterTypeChanged(ui.comboCenter->currentIndex());
 		}
 	}
 }
@@ -517,8 +532,8 @@ void ManualRegistration::OnStoreBtnPushed()
 	manipulator.setInverseMapping(kernel);
 	manipulator.setDirectMapping(kernel2);
 
-	if (this->m_Controls.radioSelectedReg->isChecked())
-	{ //compine registration with selected pre registration as baseline
+	if (m_SelectedPreRegNode != nullptr)
+	{// Combine registration with selected pre registration as baseline
 		typedef ::map::core::RegistrationCombinator<MAPRegistrationType, MAPRegistrationType> CombinatorType;
 		CombinatorType::Pointer combinator = CombinatorType::New();
 		newReg = combinator->process(*m_SelectedPreReg,*newReg);
@@ -526,12 +541,12 @@ void ManualRegistration::OnStoreBtnPushed()
 	}
 
 	mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(
-		this->m_Controls.lbNewRegName->text().toStdString(), newRegWrapper, "org.mitk::manual_registration",
+		this->ui.lbNewRegName->text().toStdString(), newRegWrapper, "org.mitk::manual_registration",
 		mitk::EnsureUID(m_SelectedMovingNode->GetData()), mitk::EnsureUID(m_SelectedTargetNode->GetData()));
 
 	this->GetDataStorage()->Add(spResultRegistrationNode);
 
-	if (m_Controls.checkMapEntity->checkState() == Qt::Checked)
+	if (ui.checkMapEntity->checkState() == Qt::Checked)
 	{
 		QmitkMappingJob* pMapJob = new QmitkMappingJob();
 		pMapJob->setAutoDelete(true);
@@ -542,7 +557,7 @@ void ManualRegistration::OnStoreBtnPushed()
 		pMapJob->m_doGeometryRefinement = false;
 		pMapJob->m_spRefGeometry = this->m_SelectedTargetNode->GetData()->GetGeometry()->Clone().GetPointer();
 
-		pMapJob->m_MappedName = this->m_Controls.lbNewRegName->text().toStdString() + std::string(" mapped moving data");
+		pMapJob->m_MappedName = this->ui.lbNewRegName->text().toStdString() + std::string(" mapped moving data");
 		pMapJob->m_allowUndefPixels = true;
 		pMapJob->m_paddingValue = 100;
 		pMapJob->m_allowUnregPixels = true;
@@ -582,7 +597,7 @@ void ManualRegistration::OnRotXChanged(double x)
 	if (!m_internalUpdate)
 	{
 		m_internalUpdate = true;
-		this->m_Controls.slideRotX->setValue(x);
+		this->ui.slideRotX->setValue(x);
 		m_internalUpdate = false;
 		this->UpdateTransform(true);
 	}
@@ -592,7 +607,7 @@ void ManualRegistration::OnRotXSlideChanged(int x)
 {
 	if (!m_internalUpdate)
 	{
-		this->m_Controls.sbRotX->setValue(x);
+		this->ui.sbRotX->setValue(x);
 	}
 };
 
@@ -601,7 +616,7 @@ void ManualRegistration::OnRotYChanged(double y)
 	if (!m_internalUpdate)
 	{
 		m_internalUpdate = true;
-		this->m_Controls.slideRotY->setValue(y);
+		this->ui.slideRotY->setValue(y);
 		m_internalUpdate = false;
 		this->UpdateTransform(true);
 	}
@@ -611,7 +626,7 @@ void ManualRegistration::OnRotYSlideChanged(int y)
 {
 	if (!m_internalUpdate)
 	{
-		this->m_Controls.sbRotY->setValue(y);
+		this->ui.sbRotY->setValue(y);
 	}
 };
 
@@ -620,7 +635,7 @@ void ManualRegistration::OnRotZChanged(double z)
 	if (!m_internalUpdate)
 	{
 		m_internalUpdate = true;
-		this->m_Controls.slideRotZ->setValue(z);
+		this->ui.slideRotZ->setValue(z);
 		m_internalUpdate = false;
 		this->UpdateTransform(true);
 	}
@@ -630,7 +645,7 @@ void ManualRegistration::OnRotZSlideChanged(int z)
 {
 	if (!m_internalUpdate)
 	{
-		this->m_Controls.sbRotZ->setValue(z);
+		this->ui.sbRotZ->setValue(z);
 	}
 };
 
@@ -639,7 +654,7 @@ void ManualRegistration::OnTransXChanged(double x)
 	if (!m_internalUpdate)
 	{
 		m_internalUpdate = true;
-		this->m_Controls.slideTransX->setValue(x);
+		this->ui.slideTransX->setValue(x);
 		m_internalUpdate = false;
 		this->UpdateTransform();
 	}
@@ -649,7 +664,7 @@ void ManualRegistration::OnTransXSlideChanged(int x)
 {
 	if (!m_internalUpdate)
 	{
-		this->m_Controls.sbTransX->setValue(x);
+		this->ui.sbTransX->setValue(x);
 	}
 };
 
@@ -658,7 +673,7 @@ void ManualRegistration::OnTransYChanged(double y)
 	if (!m_internalUpdate)
 	{
 		m_internalUpdate = true;
-		this->m_Controls.slideTransY->setValue(y);
+		this->ui.slideTransY->setValue(y);
 		m_internalUpdate = false;
 		this->UpdateTransform();
 	}
@@ -668,7 +683,7 @@ void ManualRegistration::OnTransYSlideChanged(int y)
 {
 	if (!m_internalUpdate)
 	{
-		this->m_Controls.sbTransY->setValue(y);
+		this->ui.sbTransY->setValue(y);
 	}
 };
 
@@ -677,7 +692,7 @@ void ManualRegistration::OnTransZChanged(double z)
 	if (!m_internalUpdate)
 	{
 		m_internalUpdate = true;
-		this->m_Controls.slideTransZ->setValue(z);
+		this->ui.slideTransZ->setValue(z);
 		m_internalUpdate = false;
 		this->UpdateTransform();
 	}
@@ -687,7 +702,7 @@ void ManualRegistration::OnTransZSlideChanged(int z)
 {
 	if (!m_internalUpdate)
 	{
-		this->m_Controls.sbTransZ->setValue(z);
+		this->ui.sbTransZ->setValue(z);
 	}
 };
 
@@ -729,3 +744,12 @@ void ManualRegistration::ConfigureTransformCenter(int centerType)
 	m_DirectCurrentTransform->SetOffset(offset);
 	m_DirectCurrentTransform->GetInverse(m_InverseCurrentTransform);
 };
+
+/*void ManualRegistration::on_Plugin_hidden(ctkEvent event)
+{
+	QString plugin_id = event.getProperty("id").toString();
+	if (plugin_id != PLUGIN_ID)
+		return;
+
+	StopSession();
+}*/
