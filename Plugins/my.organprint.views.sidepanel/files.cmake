@@ -5,6 +5,8 @@ set(CPP_FILES
   src/internal/ImportPanel.cpp
   src/internal/ExportPanel.cpp
   src/internal/TissuePanel.cpp
+  src/internal/ExternalShapeSmoother.cpp
+  src/ExternalProgramOpener.cpp
 )
 
 set(UI_FILES
@@ -20,6 +22,7 @@ set(MOC_H_FILES
   src/internal/ImportPanel.h
   src/internal/ExportPanel.h
   src/internal/TissuePanel.h
+  src/ExternalProgramOpener.h
 )
 
 # List of resource files that can be used by the plugin system without loading

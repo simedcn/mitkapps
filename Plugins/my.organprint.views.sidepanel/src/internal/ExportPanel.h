@@ -42,6 +42,12 @@ class ExportPanel : public QmitkAbstractView
     // class declaration.
     Q_OBJECT
 
+
+    typedef mitk::MessageDelegate1<orgpnt::ExportPanel, const mitk::DataNode *> StorageListener;
+    typedef mitk::DataNode DataNode;
+    typedef mitk::DataStorage DataStorage;
+    typedef mitk::DataStorage::SetOfObjects SetOfObjects;
+
 public:
     // This is a tricky one and will give you some headache later on in
     // your debug sessions if it has been forgotten. Also, don't forget
@@ -52,19 +58,30 @@ public:
     // associated signals and slots.
     void CreateQtPartControl(QWidget* parent) override;
 
+    ExportPanel();
+    ~ExportPanel();
 
-protected slots:
-    void ExportInSTL();
-    void SaveProject();
-private:
-    // Typically a one-liner. Set the focus to the default widget.
-    void SetFocus() override;
-
+    void OnNodeChanged(const mitk::DataNode * node);
+protected:
+    const StorageListener listener;
 
 
     // Generated from the associated UI file, it encapsulates all the widgets
     // of our view.
     Ui::OrganPrintExportPanelControls m_Controls;
+protected slots:
+    void ExportInSTL();
+    void SaveProject();
+    void OpenWith3DSlicer();
+
+
+
+    // Typically a one-liner. Set the focus to the default widget.
+    void SetFocus() override;
+
+
+
+
 };
 }
 

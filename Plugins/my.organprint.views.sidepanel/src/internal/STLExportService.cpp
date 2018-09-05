@@ -9,6 +9,8 @@
 #include <QFile>
 #include "itkImageRegionIterator.h"
 #include "mitkImageCast.h"
+#include "ExternalShapeSmoother.h"
+
 STLExportService::STLExportService()
 {
 
@@ -25,6 +27,12 @@ bool STLExportService::exportTo(QString & dir, const DataNode * dataNode) {
     itk::SmartPointer<mitk::ImageToSurfaceFilter> i2sf = mitk::ImageToSurfaceFilter::New();
     itk::SmartPointer<mitk::Surface> surface = mitk::Surface::New();
 
+    ExternalShapeSmoother smoother;
+
+
+
+    smoother.smooth(dataNode);
+    DataNode * smoothed = smoother.GetResult();
 
     const DataNode * node_selected = dataNode;
     std::string name = dataNode->GetName();
@@ -44,7 +52,11 @@ bool STLExportService::exportTo(QString & dir, const DataNode * dataNode) {
     QTextStream output(&data);
     output << dir << "/" << QString::fromStdString(name) << ".stl; #" << QString("%1%2%3").arg(int(rgb[0] * 255), 2, 16, QChar('0')).arg(int(rgb[1] * 255), 2, 16, QChar('0')).arg(int(rgb[2] * 255), 2, 16, QChar('0')).toUpper();
 
-    mitk::IOUtil::Save(surface, sstr.str());
+    //surface = (mitk::Surface*) smoothed->GetData();
+    if(smoother.Success())
+        mitk::IOUtil::Save(smoothed->GetData(), sstr.str());
+
+
 
     //writer->SetFileName(sstr.str().c_str());
     //writer->SetInputData(surface->GetVtkPolyData());
@@ -52,7 +64,9 @@ bool STLExportService::exportTo(QString & dir, const DataNode * dataNode) {
     return true;
 
 }
-
+void STLExportService::SetDataStorage(DataStorage *storage) {
+    m_DataStorage = storage;
+}
 int STLExportService::exportTo(QString & path, DataStorage * storage) {
 
     cout << "Exporting to " << path.toStdString() << endl;
@@ -83,6 +97,9 @@ int STLExportService::exportTo(QString & path, DataStorage * storage) {
     return (int) exportList->Size();
 
 }
+
+
+
 const mitk::DataNode * STLExportService::GetSelectedNode(DataStorage * storage) {
     //const IsSelectedPredicate * isSelected = new IsSelectedPredicate();
 
@@ -127,16 +144,16 @@ bool STLExportService::isParent(DataStorage * storage, const DataNode*node) {
 }
 
 void STLExportService::printName(const DataNode * node) {
-    cout << "Node [" << &node << "] " << node->GetName() << endl;
+    MITK_DEBUG << "Node [" << &node << "] " << node->GetName() << endl;
 }
 void STLExportService::Log(const char msg[]) {
-    cout << "[STLExportService] " << msg << endl;
+    MITK_DEBUG << "[STLExportService] " << msg << endl;
 }
 
 void STLExportService::exportToCsv(QString & imagePath, DataStorage * storage, const DataNode * node) {
     QFile data(imagePath);
 
-    cout << "Exportin in CSV " << imagePath.toStdString() << endl;
+    MITK_DEBUG << "Exportin in CSV " << imagePath.toStdString() << endl;
 
     if (!data.open(QFile::WriteOnly | QFile::Truncate))
         return;
@@ -145,7 +162,7 @@ void STLExportService::exportToCsv(QString & imagePath, DataStorage * storage, c
 
 
     QString segmentationName = QString::fromStdString(node->GetName());
-    cout << "segmentationName: " << segmentationName.toStdString();
+    MITK_DEBUG << "segmentationName: " << segmentationName.toStdString();
     //QModelIndex index = m_Controls.listWidget->currentIndex();
     //QString itemText = index.data(Qt::DisplayRole).toString();
     //MITK_INFO << itemText;
@@ -157,7 +174,7 @@ void STLExportService::exportToCsv(QString & imagePath, DataStorage * storage, c
     //     header = header + "," + item->text();
     // }
     output << header << "\n";
-    cout << header.toStdString() << endl;
+    MITK_DEBUG << header.toStdString() << endl;
     // Now iterate through image and write down all voxel positions and image values
     // Here we use ITK to do this
     typedef itk::Image<unsigned char, 3> TSegmentationImage;
@@ -181,7 +198,7 @@ void STLExportService::exportToCsv(QString & imagePath, DataStorage * storage, c
         parent = iterator->Value();
 
 
-        cout << "Parent: " << parent->GetName() << endl;
+        MITK_DEBUG << "Parent: " << parent->GetName() << endl;
         //for(int row = 0; row < m_Controls.listWidget->count(); row++)
         //{
 
@@ -231,13 +248,46 @@ void STLExportService::exportToCsv(QString & imagePath, DataStorage * storage, c
 
 }
 
+bool STLExportService::exportToSTL(QString & path, const DataNode *dataNode, bool smoothing = false) {
+
+    MITK_INFO << "Saving STL file from " << dataNode->GetName() << " at " << path.toStdString();
+
+    if(smoothing) {
+        MITK_INFO << "Smoothing" << endl;
+        ExternalShapeSmoother smoother;
+        smoother.smooth(dataNode);
+        DataNode * smoothed = smoother.GetResult();
+        if(smoother.Success()) {
+            mitk::IOUtil::Save(smoothed->GetData(), path.toStdString());
+        }
+    }
+    else {
+
+        itk::SmartPointer<mitk::ImageToSurfaceFilter> i2sf = mitk::ImageToSurfaceFilter::New();
+        itk::SmartPointer<mitk::Surface> surface = mitk::Surface::New();
+
+        i2sf->SetInput(dynamic_cast<mitk::Image*> (dataNode->GetData()));
+        i2sf->Update();
+        surface = i2sf->GetOutput();
+        mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+        newNode->SetData(surface);
+        MITK_INFO << "Number of Point " <<surface->GetVtkPolyData()->GetNumberOfPoints();
+        mitk::IOUtil::Save(surface, path.toStdString());
+    }
+
+    return true;
+}
+
+STLExportService::SetOfObjects::ConstPointer STLExportService::GetSelectedNodes(DataStorage *storage) {
+    return storage->GetSubset(mitk::NodePredicateProperty::New("selected",mitk::BoolProperty::New(true)));
+}
+
 IsSelectedPredicate::IsSelectedPredicate()  {
 
 }
 
 
 STLExportService::SetOfObjects::ConstPointer STLExportService::GetVisibleParentNodes(DataStorage * storage) {
-
 
     return storage->GetSubset(mitk::NodePredicateProperty::New("visible",mitk::BoolProperty::New(true)));
 
@@ -253,3 +303,5 @@ bool IsSelectedPredicate::CheckNode(const mitk::DataNode *node) const {
     }
     return result;
 }
+
+

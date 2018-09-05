@@ -42,6 +42,9 @@ QPushButton, #QmitkSegmentationControls QPushButton {
   color:white;
   background-color: transparent;
   border-radius:6px;
+  border-color: #AEAFB0;
+  border-width:1px;
+  border-style:solid;
 }
 
 QPushButton:pressed {
@@ -651,16 +654,22 @@ QSplitter {
     font-size:18px;
     color:white;
     font-weight:bold;
+    border-radius:0;
+    border-width:0;
+    border-color:transparent;
  
 }
 #StepSelectorControls QPushButton:checked {
     background-color:  #353535;
+    border:0;
 }
 #StepSelectorControls QPushButton:hover {
     background-color:  #353535;
+    border:0;
 }
 #StepSelectorControls QPushButton:disabled {
     color:  #353535;
+    border:0;
 }
 
 
@@ -699,3 +708,6 @@ QTreeView::branch:selected, QTreeView::item:selected {
     padding:10px;
 }
 
+#OrganPrintExportPanelControls QLabel {
+    font-size:15px;
+}

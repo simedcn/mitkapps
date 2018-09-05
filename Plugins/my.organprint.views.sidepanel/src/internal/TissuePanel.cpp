@@ -26,7 +26,7 @@ orgpnt::TissuePanel::TissuePanel()
 }
 
 orgpnt::TissuePanel::~TissuePanel() {
-    cout << "Destroying tissu panel" << endl;
+    MITK_DEBUG << "Destroying tissue panel" << endl;
 
     mitk::DataStorage * storage = GetDataStorage();
 
@@ -109,14 +109,14 @@ void orgpnt::TissuePanel::UpdateComboBox() {
     QComboBox * cb = m_Controls.tissuTypeComboBox;
 
     if(cb) {
-        cout << "Found Combobox" << endl;
+        MITK_DEBUG << "Found Combobox" << endl;
         TissuTypeService * tts = TissuTypeService::GetInstance();
 
         if(tts) {
-            cout << "Found Service" << endl;
+            MITK_DEBUG << "Found Service" << endl;
             for(TissuType * type : *(tts->GetTissuTypeList())) {
                 if(type) {
-                    cout << "Found tissu type" << endl;
+                    MITK_DEBUG << "Found tissue type" << endl;
                     cb->addItem(QString::fromStdString(*(type->GetName())));
                 }
             }

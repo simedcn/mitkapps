@@ -37,6 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <service/event/ctkEventAdmin.h>
 #include <DicomViewDialog.h>
 #include <PopeElements.h>
+#include "ExternalProgramOpener.h"
+
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -58,6 +60,9 @@ void orgpnt::ImportPanel::CreateQtPartControl(QWidget* parent)
 void orgpnt::ImportPanel::SetFocus()
 {
     m_Controls.openImageButton->setFocus();
+
+
+
 }
 
 
@@ -65,7 +70,7 @@ void orgpnt::ImportPanel::SetFocus()
 void orgpnt::ImportPanel::OpenImageFromDisk()
 {
 
-    cout << "Thank you for clicking" << endl;
+    MITK_DEBUG << "Thank you for clicking" << endl;
 
 
 
@@ -80,7 +85,7 @@ void orgpnt::ImportPanel::OpenImageFromDisk()
 
     if (fileNames.empty())
         return;
-    cout << "Loading the the files..." << endl;
+    MITK_DEBUG << "Loading the the files..." << endl;
     //d->setLastFileOpenPath(fileNames.front());
 
 
