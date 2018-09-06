@@ -3,7 +3,7 @@
 
 #include <QmitkAbstractView.h>
 #include "ui_TissuePanelControls.h"
-#include <a.out.h>
+//#include <a.out.h>
 #include <mitkDataNode.h>
 
 #include <mitkMessage.h>
