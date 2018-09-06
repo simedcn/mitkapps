@@ -14,8 +14,8 @@ TissuTypeService::TissuTypeService()
     TissuType * tissuType;
 
     tissuType= new TissuType(0,"Gray matter");
-    tissuType->pushProperty(0.2);
-    tissuType->pushProperty(0.3);
+    tissuType->pushProperty(0.2f);
+    tissuType->pushProperty(0.3f);
     tissuTypeList->push_back(tissuType);
     cout << "Added the first tissu" << endl;
     tissuType = new TissuType(1,"Bone");

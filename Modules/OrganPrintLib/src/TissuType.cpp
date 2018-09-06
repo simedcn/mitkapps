@@ -1,5 +1,11 @@
 #include "../include/TissuType.h"
 
+#include <algorithm>
+
+#if defined(_WIN32) || defined(_WIN64)
+using uint = size_t;
+#endif
+
 std::string TissuType::PROPERTY_KEY = "Tissu type";
 
 TissuType::TissuType(int id,TissuType::String * m_name):
