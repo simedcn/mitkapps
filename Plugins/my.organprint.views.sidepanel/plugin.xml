@@ -19,9 +19,9 @@
         class="orgpnt::ExportPanel"
         icon="resources/AwesomeIcon.png" />
 
-<view id="my.organprint.views.tissupanel"
-      name="TissuPanel Panel"
-      class="orgpnt::TissuPanel"
+<view id="my.organprint.views.tissuepanel"
+      name="TissuePanel Panel"
+      class="orgpnt::TissuePanel"
       icon="resources/AwesomeIcon.png" />
     </extension>
 </plugin>

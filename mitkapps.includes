@@ -13,3 +13,5 @@ Plugins/my.popeproject.mainapplication/src/internal
 Plugins/my.popeproject.renderwindoweditor/src/internal
 Plugins/my.popeproject.segmentation/src/internal
 Plugins/my.popeproject.toolsplugin/src/internal
+Plugins/my.pacs.views.dicomview/src
+Modules/OrganPrintLib/src

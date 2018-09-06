@@ -34,10 +34,14 @@ Modules/OrganPrintLib/cmdapps/OffsetImageCmdApp.cpp
 Modules/OrganPrintLib/files.cmake
 Modules/OrganPrintLib/include/AwesomeImageFilter.h
 Modules/OrganPrintLib/include/AwesomeImageInteractor.h
+Modules/OrganPrintLib/include/TissuType.h
+Modules/OrganPrintLib/include/TissuTypeService.h
 Modules/OrganPrintLib/resource/Interactions/Paint.xml
 Modules/OrganPrintLib/resource/Interactions/PaintConfig.xml
 Modules/OrganPrintLib/src/AwesomeImageFilter.cpp
 Modules/OrganPrintLib/src/AwesomeImageInteractor.cpp
+Modules/OrganPrintLib/src/TissuType.cpp
+Modules/OrganPrintLib/src/TissuTypeService.cpp
 Modules/PopeLib/CMakeLists.txt
 Modules/PopeLib/cmdapps/CMakeLists.txt
 Modules/PopeLib/cmdapps/OffsetImageCmdApp.cpp
@@ -89,6 +93,8 @@ Plugins/my.organprint.renderwindoweditor/src/internal/DataManager.h
 Plugins/my.organprint.renderwindoweditor/src/internal/MainWindow.cpp
 Plugins/my.organprint.renderwindoweditor/src/internal/MainWindow.h
 Plugins/my.organprint.renderwindoweditor/src/internal/MainWindow.ui
+Plugins/my.organprint.renderwindoweditor/src/internal/PatientSelector.cpp
+Plugins/my.organprint.renderwindoweditor/src/internal/PatientSelector.h
 Plugins/my.organprint.renderwindoweditor/src/internal/QmitkAwesomeRenderWindowEditor.cpp
 Plugins/my.organprint.renderwindoweditor/src/internal/QmitkAwesomeRenderWindowEditor.h
 Plugins/my.organprint.renderwindoweditor/src/internal/my_awesomeproject_renderwindoweditor_Activator.cpp
@@ -109,6 +115,9 @@ Plugins/my.organprint.views.sidepanel/src/internal/ImportPanel.h
 Plugins/my.organprint.views.sidepanel/src/internal/ImportPanelControls.ui
 Plugins/my.organprint.views.sidepanel/src/internal/STLExportService.cpp
 Plugins/my.organprint.views.sidepanel/src/internal/STLExportService.h
+Plugins/my.organprint.views.sidepanel/src/internal/TissuePanel.cpp
+Plugins/my.organprint.views.sidepanel/src/internal/TissuePanel.h
+Plugins/my.organprint.views.sidepanel/src/internal/TissuePanelControls.ui
 Plugins/my.organprint.views.sidepanel/src/internal/my_awesomeproject_exampleplugin_PluginActivator.cpp
 Plugins/my.organprint.views.sidepanel/src/internal/my_awesomeproject_exampleplugin_PluginActivator.h
 Plugins/my.organprint.views.stepselector/CMakeLists.txt
@@ -126,8 +135,11 @@ Plugins/my.pacs.views.dicomview/files.cmake
 Plugins/my.pacs.views.dicomview/manifest_headers.cmake
 Plugins/my.pacs.views.dicomview/plugin.xml
 Plugins/my.pacs.views.dicomview/resources/DicomView.qrc
+Plugins/my.pacs.views.dicomview/src/DicomViewDialog.cpp
+Plugins/my.pacs.views.dicomview/src/DicomViewDialog.h
 Plugins/my.pacs.views.dicomview/src/internal/DicomView.cpp
 Plugins/my.pacs.views.dicomview/src/internal/DicomView.h
+Plugins/my.pacs.views.dicomview/src/internal/DicomViewConstants.h
 Plugins/my.pacs.views.dicomview/src/internal/DicomViewControls.ui
 Plugins/my.pacs.views.dicomview/src/internal/DicomViewDialog.cpp
 Plugins/my.pacs.views.dicomview/src/internal/DicomViewDialog.h

@@ -2,8 +2,8 @@
 #define TISSUPANEL_H
 
 #include <QmitkAbstractView.h>
-#include "ui_TissuPanelControls.h"
-//#include <a.out.h>
+#include "ui_TissuePanelControls.h"
+#include <a.out.h>
 #include <mitkDataNode.h>
 
 #include <mitkMessage.h>
@@ -11,15 +11,15 @@
 namespace orgpnt {
 
 
-class TissuPanel : public QmitkAbstractView
+class TissuePanel : public QmitkAbstractView
 {
 
-    typedef mitk::MessageDelegate1<orgpnt::TissuPanel, const mitk::DataNode *> StorageListener;
+    typedef mitk::MessageDelegate1<orgpnt::TissuePanel, const mitk::DataNode *> StorageListener;
 
     Q_OBJECT
 public:
-    TissuPanel();
-    ~TissuPanel();
+    TissuePanel();
+    ~TissuePanel();
     static const std::string VIEW_ID;
 
 
@@ -42,7 +42,7 @@ public slots:
 
 protected:
 
-    Ui::OrganPrintTissuPanelControls m_Controls;
+    Ui::OrganPrintTissuePanelControls m_Controls;
 
     mitk::DataNode * GetSelectedNode();
 
