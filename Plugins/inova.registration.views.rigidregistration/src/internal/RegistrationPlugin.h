@@ -66,6 +66,8 @@ protected:
 	void OnPreferencesChanged(const berry::IBerryPreferences*) override;
 
 protected:
+	void CheckInputs();
+protected:
 	void updateButton(bool enabled = true);
 	void AddImage(const string& name, mitk::Image::Pointer image);
 
@@ -81,6 +83,8 @@ protected slots:
 signals:
 	void GonnaAddNewDataNode(const ctkDictionary&);
 	void NewDataNodeAdded(const ctkDictionary&);
+	void PluginIsBusy(const ctkDictionary&);
+	void PluginIsIdle(const ctkDictionary&);
 
 private:
 	// Generated from the associated UI file, it encapsulates all the widgets of our view.

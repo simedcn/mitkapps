@@ -302,13 +302,13 @@ void ToolsPlugin::updateAfterSelectionChanged()
 	auto dataNode = getFirstSelectedNode();
 	bool is_selected_node = (dataNode != nullptr);
 
-	//ui.label_ImageNotSelected->setVisible(!is_selected_node);
+	//ui.label_Image->setVisible(!is_selected_node);
 	if (is_selected_node)
 	{
 		string name = dataNode->GetName();
 		if (name.empty())
 		{
-			ui.label_ImageNotSelected->setText("");//("<b>Profile</b>");
+			ui.label_Image->setText("");//("<b>Profile</b>");
 		}
 		else
 		{
@@ -323,18 +323,18 @@ void ToolsPlugin::updateAfterSelectionChanged()
 				ss << name.substr(0, half) << str_center_replacement << name.substr(name.length() - half, half);
 				short_name = QString::fromStdString(ss.str());
 			}
-			ui.label_ImageNotSelected->setText(short_name);
-			ui.label_ImageNotSelected->setToolTip(str_name);
+			ui.label_Image->setText(short_name);
+			ui.label_Image->setToolTip(str_name);
 		}
-		ui.label_ImageNotSelected->setStyleSheet("");
-		ui.label_ImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		ui.label_Image->setStyleSheet("");
+		ui.label_Image->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		ui.label_ImageNotSelected->setText("Please load and select a dataset in Data Manager.");
-		ui.label_ImageNotSelected->setToolTip("");
-		ui.label_ImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
-		ui.label_ImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		ui.label_Image->setText("Please load and select a dataset in Data Manager.");
+		ui.label_Image->setToolTip("");
+		ui.label_Image->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_Image->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}
 	ui.label_SelectedImage->setVisible(is_selected_node);
 
@@ -978,35 +978,6 @@ void ToolsPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList
 	*nodes = selectedDataNodes.toStdList();
 	auto firstSelectedNode = getFirstSelectedNode(nodes);
 
-	// Make invisible all the nodes but the first selected node
-	auto pluginContext = inova_popeproject_views_tools_PluginActivator::GetPluginContext();
-	ctkServiceReference serviceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
-	mitk::IDataStorageService* storageService = pluginContext->getService<mitk::IDataStorageService>(serviceReference);
-	mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
-	auto all_nodes = dataStorage->GetAll();
-	for (auto datanode : *all_nodes)
-	{
-		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
-		if (!image)
-			continue;
-
-		//bool is_visible = false;
-		//bool is_property_found = datanode->GetBoolProperty("visible", is_visible);
-		//bool is_selected_node = (datanode.GetPointer() == firstSelectedNode);
-		//if (is_property_found && is_visible)
-		//	datanode->SetBoolProperty("visible", is_selected_node);
-		bool is_selected_node = false;
-		for (auto selected_node : selectedDataNodes)
-		{
-			if (datanode.GetPointer() == selected_node.GetPointer())
-			{
-				is_selected_node = true;
-				break;
-			}
-		}
-		datanode->SetBoolProperty("visible", is_selected_node);
-	}
-
 	// Process the event in SelectionChanged()
 	SelectionChanged(firstSelectedNode);
 }
@@ -1182,7 +1153,7 @@ void ToolsPlugin::SelectionChanged(mitk::DataNode* dataNode)
 	m_StatisticsUpdatePending = false;
 	m_DataNodeSelectionChanged = false;
 
-	this->RequestRenderWindowUpdate();
+	//this->RequestRenderWindowUpdate();
 }
 void ToolsPlugin::SelectedDataModified()
 {

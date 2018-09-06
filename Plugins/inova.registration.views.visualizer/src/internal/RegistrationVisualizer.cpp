@@ -1,5 +1,6 @@
 #include "inova_registration_views_visualizer_Activator.h"
 #include "RegistrationVisualizer.h"
+#include <PopeElements.h>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -25,35 +26,38 @@
 const std::string RegistrationVisualizer::VIEW_ID = "inova.registration.views.visualizer";
 
 RegistrationVisualizer::RegistrationVisualizer()
-	: m_Parent(nullptr), m_internalUpdateGuard(false), m_spSelectedFOVRefNode(nullptr), m_spSelectedRegNode(nullptr)
+	: m_Parent(nullptr)
+	, m_internalUpdateGuard(false)
+	, m_spSelectedFOVRefNode(nullptr)
+	, m_spSelectedRegNode(nullptr)
 {
 }
 
 void RegistrationVisualizer::SetFocus()
 {
-	//m_Controls->buttonPerformImageProcessing->setFocus();
+	//ui->buttonPerformImageProcessing->setFocus();
 }
 
 void RegistrationVisualizer::CreateConnections()
 {
 	// show first page
-	connect(m_Controls->m_pbLockReg, SIGNAL(clicked()), this, SLOT(OnLockRegButtonPushed()));
+	connect(ui->m_pbLockReg, SIGNAL(clicked()), this, SLOT(OnLockRegButtonPushed()));
 
-	connect(m_Controls->m_pbStyleGrid, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
-	connect(m_Controls->m_pbStyleGlyph, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
-	connect(m_Controls->m_pbStylePoints, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
+	connect(ui->m_pbStyleGrid, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
+	connect(ui->m_pbStyleGlyph, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
+	connect(ui->m_pbStylePoints, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
 
-	connect(m_Controls->m_comboDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(OnDirectionChanged(int)));
-	connect(m_Controls->m_pbUpdateViz, SIGNAL(clicked()), this, SLOT(OnUpdateBtnPushed()));
+	connect(ui->m_comboDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(OnDirectionChanged(int)));
+	connect(ui->m_pbUpdateViz, SIGNAL(clicked()), this, SLOT(OnUpdateBtnPushed()));
 
-	connect(m_Controls->m_pbUseFOVRef, SIGNAL(clicked()), this, SLOT(OnUseFOVRefBtnPushed()));
+	connect(ui->m_pbUseFOVRef, SIGNAL(clicked()), this, SLOT(OnUseFOVRefBtnPushed()));
 
-	connect(m_Controls->radioColorUni, SIGNAL(toggled(bool)), m_Controls->btnUniColor, SLOT(setEnabled(bool)));
-	connect(m_Controls->radioColorVecMag, SIGNAL(toggled(bool)), m_Controls->groupColorCoding, SLOT(setEnabled(bool)));
+	connect(ui->radioColorUni, SIGNAL(toggled(bool)), ui->btnUniColor, SLOT(setEnabled(bool)));
+	connect(ui->radioColorVecMag, SIGNAL(toggled(bool)), ui->groupColorCoding, SLOT(setEnabled(bool)));
 
-	connect(m_Controls->m_pbStyleGrid, SIGNAL(toggled(bool)), m_Controls->tabGrid, SLOT(setEnabled(bool)));
+	connect(ui->m_pbStyleGrid, SIGNAL(toggled(bool)), ui->tabGrid, SLOT(setEnabled(bool)));
 
-	connect(m_Controls->cbVevMagInterlolate, SIGNAL(toggled(bool)), this, SLOT(OnColorInterpolationChecked(bool)));
+	connect(ui->cbVevMagInterlolate, SIGNAL(toggled(bool)), this, SLOT(OnColorInterpolationChecked(bool)));
 }
 
 void RegistrationVisualizer::Error(QString msg)
@@ -64,24 +68,24 @@ void RegistrationVisualizer::Error(QString msg)
 
 void RegistrationVisualizer::CreateQtPartControl(QWidget* parent)
 {
-	m_Controls = new Ui::RegistrationVisualizerControls;
+	ui = new Ui::RegistrationVisualizerControls;
 
 	// create GUI widgets from the Qt Designer's .ui file
-	m_Controls->setupUi(parent);
+	ui->setupUi(parent);
 
 	m_Parent = parent;
 
-	this->m_Controls->btnVecMagColorSmall->setDisplayColorName(false);
-	this->m_Controls->btnVecMagColorMedium->setDisplayColorName(false);
-	this->m_Controls->btnVecMagColorLarge->setDisplayColorName(false);
-	this->m_Controls->btnVecMagColorNeg->setDisplayColorName(false);
-	this->m_Controls->btnUniColor->setDisplayColorName(false);
-	this->m_Controls->btnStartGridColor->setDisplayColorName(false);
+	this->ui->btnVecMagColorSmall->setDisplayColorName(false);
+	this->ui->btnVecMagColorMedium->setDisplayColorName(false);
+	this->ui->btnVecMagColorLarge->setDisplayColorName(false);
+	this->ui->btnVecMagColorNeg->setDisplayColorName(false);
+	this->ui->btnUniColor->setDisplayColorName(false);
+	this->ui->btnStartGridColor->setDisplayColorName(false);
 
 	this->CreateConnections();
 
-	this->m_Controls->radioColorUni->setChecked(false);
-	this->m_Controls->radioColorVecMag->setChecked(true);
+	this->ui->radioColorUni->setChecked(false);
+	this->ui->radioColorVecMag->setChecked(true);
 
 	this->CheckInputs();
 	this->LoadStateFromNode();
@@ -152,16 +156,14 @@ mitk::DataNode::Pointer RegistrationVisualizer::GetRefNodeOfReg(bool target) con
 
 mitk::DataNode::Pointer RegistrationVisualizer::GetSelectedDataNode()
 {
-	typedef QList<mitk::DataNode::Pointer> NodeListType;
-
-	NodeListType nodes = this->GetDataManagerSelection();
 	mitk::DataNode::Pointer result;
 
-	for (NodeListType::iterator pos = nodes.begin(); pos != nodes.end(); ++pos)
+	QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+	for (auto& node : nodes)
 	{
-		if (!mitk::MITKRegistrationHelper::IsRegNode(*pos) && (*pos)->GetData() && (*pos)->GetData()->GetGeometry())
+		if (!mitk::MITKRegistrationHelper::IsRegNode(node) && node->GetData() && node->GetData()->GetGeometry())
 		{
-			result = *pos;
+			result = node;
 			break;
 		}
 	}
@@ -173,7 +175,7 @@ void RegistrationVisualizer::CheckInputs()
 {
 	mitk::DataNode::Pointer regNode = this->GetSelectedRegNode();
 
-	if (!m_Controls->m_pbLockReg->isChecked())
+	if (!ui->m_pbLockReg->isChecked())
 	{
 		this->m_spSelectedRegNode = regNode;
 	}
@@ -182,7 +184,7 @@ void RegistrationVisualizer::CheckInputs()
 
 	mitk::DataNode::Pointer fovNode = this->GetSelectedDataNode();
 
-	if (!m_Controls->m_pbLockFOVRef->isChecked())
+	if (!ui->m_pbLockFOVRef->isChecked())
 	{
 		this->m_spSelectedFOVRefNode = fovNode;
 	}
@@ -193,38 +195,40 @@ void RegistrationVisualizer::ConfigureVisualizationControls()
 	if (!m_internalUpdateGuard)
 	{
 		m_internalUpdateGuard = true;
-		m_Controls->groupViz->setVisible(this->m_spSelectedRegNode.IsNotNull());
+		ui->groupViz->setVisible(this->m_spSelectedRegNode.IsNotNull());
 
-		m_Controls->m_pbUpdateViz->setEnabled(this->m_spSelectedRegNode.IsNotNull());
-		m_Controls->m_boxSettings->setEnabled(this->m_spSelectedRegNode.IsNotNull());
-		m_Controls->m_boxStyles->setEnabled(this->m_spSelectedRegNode.IsNotNull());
+		ui->m_pbUpdateViz->setEnabled(this->m_spSelectedRegNode.IsNotNull());
+		ui->m_boxSettings->setEnabled(this->m_spSelectedRegNode.IsNotNull());
+		ui->m_boxStyles->setEnabled(this->m_spSelectedRegNode.IsNotNull());
 
 		this->ActualizeRegInfo(this->GetCurrentRegistration());
 
 		if (this->m_spSelectedRegNode.IsNull())
 		{
-			m_Controls->m_lbRegistrationName->setText(QString("<font color='red'>no registration selected!</font>"));
+			ui->m_lbRegistrationName->setText(QString("<font color='red'>no registration selected!</font>"));
 		}
 		else
 		{
-			m_Controls->m_lbRegistrationName->setText(QString::fromStdString(this->m_spSelectedRegNode->GetName()));
+			QString short_name = Elements::get_short_name_for_image(this->m_spSelectedRegNode->GetName(), 40);
+			ui->m_lbRegistrationName->setText(short_name);
 		}
 
-		this->m_Controls->m_pbLockReg->setEnabled(this->m_spSelectedRegNode.IsNotNull());
-		this->m_Controls->m_pbUseFOVRef->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
-		this->m_Controls->m_checkUseRefSize->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
-		this->m_Controls->m_checkUseRefOrigin->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
-		this->m_Controls->m_checkUseRefSpacing->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
+		this->ui->m_pbLockReg->setEnabled(this->m_spSelectedRegNode.IsNotNull());
+		this->ui->m_pbUseFOVRef->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
+		this->ui->m_checkUseRefSize->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
+		this->ui->m_checkUseRefOrigin->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
+		this->ui->m_checkUseRefSpacing->setEnabled(this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedFOVRefNode.IsNotNull());
 
-		this->m_Controls->m_pbLockFOVRef->setEnabled(this->m_spSelectedFOVRefNode.IsNotNull());
+		this->ui->m_pbLockFOVRef->setEnabled(this->m_spSelectedFOVRefNode.IsNotNull());
 
 		if (this->m_spSelectedFOVRefNode.IsNull())
 		{
-			m_Controls->m_lbFOVRef->setText(QString("<font color='red'>no valid reference selected!</font>"));
+			ui->m_lbFOVRef->setText(QString("<font color='red'>no valid reference selected!</font>"));
 		}
 		else
 		{
-			m_Controls->m_lbFOVRef->setText(QString::fromStdString(this->m_spSelectedFOVRefNode->GetName()));
+			QString short_name = Elements::get_short_name_for_image(this->m_spSelectedFOVRefNode->GetName(), 40);
+			ui->m_lbFOVRef->setText(short_name);
 		}
 
 		m_internalUpdateGuard = false;
@@ -236,14 +240,14 @@ void RegistrationVisualizer::StoreStateInNode()
 	if (this->m_spSelectedRegNode.IsNotNull())
 	{
 		//general
-		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisDirection, mitk::RegVisDirectionProperty::New(this->m_Controls->m_comboDirection->currentIndex()));
+		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisDirection, mitk::RegVisDirectionProperty::New(this->ui->m_comboDirection->currentIndex()));
 
-		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisGrid, this->m_Controls->m_pbStyleGrid->isChecked());
-		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisGlyph, this->m_Controls->m_pbStyleGlyph->isChecked());
-		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisPoints, this->m_Controls->m_pbStylePoints->isChecked());
+		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisGrid, this->ui->m_pbStyleGrid->isChecked());
+		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisGlyph, this->ui->m_pbStyleGlyph->isChecked());
+		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisPoints, this->ui->m_pbStylePoints->isChecked());
 
 		//Visualization
-		if (this->m_Controls->radioColorUni->isChecked())
+		if (this->ui->radioColorUni->isChecked())
 		{
 			this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisColorStyle, mitk::RegVisColorStyleProperty::New(0));
 		}
@@ -254,60 +258,60 @@ void RegistrationVisualizer::StoreStateInNode()
 
 		float tmpColor[3];
 
-		tmpColor[0] = this->m_Controls->btnUniColor->color().redF();
-		tmpColor[1] = this->m_Controls->btnUniColor->color().greenF();
-		tmpColor[2] = this->m_Controls->btnUniColor->color().blueF();
+		tmpColor[0] = this->ui->btnUniColor->color().redF();
+		tmpColor[1] = this->ui->btnUniColor->color().greenF();
+		tmpColor[2] = this->ui->btnUniColor->color().blueF();
 		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColorUni, mitk::ColorProperty::New(tmpColor), nullptr, true);
 
-		tmpColor[0] = this->m_Controls->btnVecMagColorNeg->color().redF();
-		tmpColor[1] = this->m_Controls->btnVecMagColorNeg->color().greenF();
-		tmpColor[2] = this->m_Controls->btnVecMagColorNeg->color().blueF();
+		tmpColor[0] = this->ui->btnVecMagColorNeg->color().redF();
+		tmpColor[1] = this->ui->btnVecMagColorNeg->color().greenF();
+		tmpColor[2] = this->ui->btnVecMagColorNeg->color().blueF();
 		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor1Value, mitk::ColorProperty::New(tmpColor), nullptr, true);
 
-		tmpColor[0] = this->m_Controls->btnVecMagColorSmall->color().redF();
-		tmpColor[1] = this->m_Controls->btnVecMagColorSmall->color().greenF();
-		tmpColor[2] = this->m_Controls->btnVecMagColorSmall->color().blueF();
+		tmpColor[0] = this->ui->btnVecMagColorSmall->color().redF();
+		tmpColor[1] = this->ui->btnVecMagColorSmall->color().greenF();
+		tmpColor[2] = this->ui->btnVecMagColorSmall->color().blueF();
 		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor2Value, mitk::ColorProperty::New(tmpColor), nullptr, true);
-		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor2Magnitude, mitk::DoubleProperty::New(this->m_Controls->sbVecMagSmall->value()), nullptr, true);
+		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor2Magnitude, mitk::DoubleProperty::New(this->ui->sbVecMagSmall->value()), nullptr, true);
 
-		tmpColor[0] = this->m_Controls->btnVecMagColorMedium->color().redF();
-		tmpColor[1] = this->m_Controls->btnVecMagColorMedium->color().greenF();
-		tmpColor[2] = this->m_Controls->btnVecMagColorMedium->color().blueF();
+		tmpColor[0] = this->ui->btnVecMagColorMedium->color().redF();
+		tmpColor[1] = this->ui->btnVecMagColorMedium->color().greenF();
+		tmpColor[2] = this->ui->btnVecMagColorMedium->color().blueF();
 		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor3Value, mitk::ColorProperty::New(tmpColor), nullptr, true);
-		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor3Magnitude, mitk::DoubleProperty::New(this->m_Controls->sbVecMagMedium->value()), nullptr, true);
+		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor3Magnitude, mitk::DoubleProperty::New(this->ui->sbVecMagMedium->value()), nullptr, true);
 
-		tmpColor[0] = this->m_Controls->btnVecMagColorLarge->color().redF();
-		tmpColor[1] = this->m_Controls->btnVecMagColorLarge->color().greenF();
-		tmpColor[2] = this->m_Controls->btnVecMagColorLarge->color().blueF();
+		tmpColor[0] = this->ui->btnVecMagColorLarge->color().redF();
+		tmpColor[1] = this->ui->btnVecMagColorLarge->color().greenF();
+		tmpColor[2] = this->ui->btnVecMagColorLarge->color().blueF();
 		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor4Value, mitk::ColorProperty::New(tmpColor), nullptr, true);
-		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor4Magnitude, mitk::DoubleProperty::New(this->m_Controls->sbVecMagLarge->value()), nullptr, true);
+		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor4Magnitude, mitk::DoubleProperty::New(this->ui->sbVecMagLarge->value()), nullptr, true);
 
-		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColorInterpolate, mitk::BoolProperty::New(this->m_Controls->cbVevMagInterlolate->isChecked()), nullptr, true);
+		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColorInterpolate, mitk::BoolProperty::New(this->ui->cbVevMagInterlolate->isChecked()), nullptr, true);
 
 		//Grid Settings
-		this->m_spSelectedRegNode->SetIntProperty(mitk::nodeProp_RegVisGridFrequence, this->m_Controls->m_sbGridFrequency->value());
-		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisGridShowStart, this->m_Controls->m_groupShowStartGrid->isChecked());
-		tmpColor[0] = this->m_Controls->btnStartGridColor->color().redF();
-		tmpColor[1] = this->m_Controls->btnStartGridColor->color().greenF();
-		tmpColor[2] = this->m_Controls->btnStartGridColor->color().blueF();
+		this->m_spSelectedRegNode->SetIntProperty(mitk::nodeProp_RegVisGridFrequence, this->ui->m_sbGridFrequency->value());
+		this->m_spSelectedRegNode->SetBoolProperty(mitk::nodeProp_RegVisGridShowStart, this->ui->m_groupShowStartGrid->isChecked());
+		tmpColor[0] = this->ui->btnStartGridColor->color().redF();
+		tmpColor[1] = this->ui->btnStartGridColor->color().greenF();
+		tmpColor[2] = this->ui->btnStartGridColor->color().blueF();
 		this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisGridStartColor, mitk::ColorProperty::New(tmpColor), nullptr, true);
 
 		//FOV
 		mitk::Vector3D value;
-		value[0] = this->m_Controls->m_sbFOVSizeX->value();
-		value[1] = this->m_Controls->m_sbFOVSizeY->value();
-		value[2] = this->m_Controls->m_sbFOVSizeZ->value();
+		value[0] = this->ui->m_sbFOVSizeX->value();
+		value[1] = this->ui->m_sbFOVSizeY->value();
+		value[2] = this->ui->m_sbFOVSizeZ->value();
 		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVSize, mitk::Vector3DProperty::New(value));
 
-		value[0] = this->m_Controls->m_sbGridSpX->value();
-		value[1] = this->m_Controls->m_sbGridSpY->value();
-		value[2] = this->m_Controls->m_sbGridSpZ->value();
+		value[0] = this->ui->m_sbGridSpX->value();
+		value[1] = this->ui->m_sbGridSpY->value();
+		value[2] = this->ui->m_sbGridSpZ->value();
 		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVSpacing, mitk::Vector3DProperty::New(value));
 
 		mitk::Point3D origin;
-		origin[0] = this->m_Controls->m_sbFOVOriginX->value();
-		origin[1] = this->m_Controls->m_sbFOVOriginY->value();
-		origin[2] = this->m_Controls->m_sbFOVOriginZ->value();
+		origin[0] = this->ui->m_sbFOVOriginX->value();
+		origin[1] = this->ui->m_sbFOVOriginY->value();
+		origin[2] = this->ui->m_sbFOVOriginZ->value();
 		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVOrigin, mitk::Point3dProperty::New(origin));
 
 		mitk::Vector3D orientationRow1;
@@ -319,7 +323,6 @@ void RegistrationVisualizer::StoreStateInNode()
 		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVOrientation1, mitk::Vector3DProperty::New(orientationRow1));
 		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVOrientation2, mitk::Vector3DProperty::New(orientationRow2));
 		this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVOrientation3, mitk::Vector3DProperty::New(orientationRow3));
-
 	}
 }
 
@@ -331,7 +334,7 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetProperty(directionProp, mitk::nodeProp_RegVisDirection))
 		{
-			this->m_Controls->m_comboDirection->setCurrentIndex(directionProp->GetValueAsId());
+			this->ui->m_comboDirection->setCurrentIndex(directionProp->GetValueAsId());
 		}
 		else
 		{
@@ -342,8 +345,8 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisGrid, styleActive))
 		{
-			this->m_Controls->m_pbStyleGrid->setChecked(styleActive);
-			this->m_Controls->tabGrid->setEnabled(styleActive);
+			this->ui->m_pbStyleGrid->setChecked(styleActive);
+			this->ui->tabGrid->setEnabled(styleActive);
 		}
 		else
 		{
@@ -352,7 +355,7 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisGlyph, styleActive))
 		{
-			this->m_Controls->m_pbStyleGlyph->setChecked(styleActive);
+			this->ui->m_pbStyleGlyph->setChecked(styleActive);
 		}
 		else
 		{
@@ -361,7 +364,7 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisPoints, styleActive))
 		{
-			this->m_Controls->m_pbStylePoints->setChecked(styleActive);
+			this->ui->m_pbStylePoints->setChecked(styleActive);
 		}
 		else
 		{
@@ -374,8 +377,8 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetProperty(colorStyleProp, mitk::nodeProp_RegVisColorStyle))
 		{
-			this->m_Controls->radioColorUni->setChecked(colorStyleProp->GetValueAsId() == 0);
-			this->m_Controls->radioColorVecMag->setChecked(colorStyleProp->GetValueAsId() == 1);
+			this->ui->radioColorUni->setChecked(colorStyleProp->GetValueAsId() == 0);
+			this->ui->radioColorVecMag->setChecked(colorStyleProp->GetValueAsId() == 1);
 		}
 		else
 		{
@@ -386,27 +389,27 @@ void RegistrationVisualizer::LoadStateFromNode()
 		float colorUni[3] = { 0.0, 0.0, 0.0 };
 		this->m_spSelectedRegNode->GetColor(colorUni, nullptr, mitk::nodeProp_RegVisColorUni);
 		tmpColor.setRgbF(colorUni[0], colorUni[1], colorUni[2]);
-		this->m_Controls->btnUniColor->setColor(tmpColor);
+		this->ui->btnUniColor->setColor(tmpColor);
 
 		float color1[3] = { 0.0, 0.0, 0.0 };
 		this->m_spSelectedRegNode->GetColor(color1, nullptr, mitk::nodeProp_RegVisColor1Value);
 		tmpColor.setRgbF(color1[0], color1[1], color1[2]);
-		this->m_Controls->btnVecMagColorNeg->setColor(tmpColor);
+		this->ui->btnVecMagColorNeg->setColor(tmpColor);
 
 		float color2[3] = { 0.25, 0.25, 0.25 };
 		this->m_spSelectedRegNode->GetColor(color2, nullptr, mitk::nodeProp_RegVisColor2Value);
 		tmpColor.setRgbF(color2[0], color2[1], color2[2]);
-		this->m_Controls->btnVecMagColorSmall->setColor(tmpColor);
+		this->ui->btnVecMagColorSmall->setColor(tmpColor);
 
 		float color3[3] = { 0.5, 0.5, 0.5 };
 		this->m_spSelectedRegNode->GetColor(color3, nullptr, mitk::nodeProp_RegVisColor3Value);
 		tmpColor.setRgbF(color3[0], color3[1], color3[2]);
-		this->m_Controls->btnVecMagColorMedium->setColor(tmpColor);
+		this->ui->btnVecMagColorMedium->setColor(tmpColor);
 
 		float color4[3] = { 1.0, 1.0, 1.0 };
 		this->m_spSelectedRegNode->GetColor(color4, nullptr, mitk::nodeProp_RegVisColor4Value);
 		tmpColor.setRgbF(color4[0], color4[1], color4[2]);
-		this->m_Controls->btnVecMagColorLarge->setColor(tmpColor);
+		this->ui->btnVecMagColorLarge->setColor(tmpColor);
 
 		double mag2 = 0;
 		this->m_spSelectedRegNode->GetPropertyValue(mitk::nodeProp_RegVisColor2Magnitude, mag2);
@@ -418,11 +421,11 @@ void RegistrationVisualizer::LoadStateFromNode()
 		bool interpolate = true;
 		this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisColorInterpolate, interpolate);
 
-		this->m_Controls->sbVecMagSmall->setValue(mag2);
-		this->m_Controls->sbVecMagMedium->setValue(mag3);
-		this->m_Controls->sbVecMagLarge->setValue(mag4);
+		this->ui->sbVecMagSmall->setValue(mag2);
+		this->ui->sbVecMagMedium->setValue(mag3);
+		this->ui->sbVecMagLarge->setValue(mag4);
 
-		this->m_Controls->cbVevMagInterlolate->setChecked(interpolate);
+		this->ui->cbVevMagInterlolate->setChecked(interpolate);
 
 		///////////////////////////////////////////////////////
 		//Grid general
@@ -430,7 +433,7 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisGridShowStart, showStart))
 		{
-			this->m_Controls->m_groupShowStartGrid->setChecked(showStart);
+			this->ui->m_groupShowStartGrid->setChecked(showStart);
 		}
 		else
 		{
@@ -441,7 +444,7 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetIntProperty(mitk::nodeProp_RegVisGridFrequence, gridFrequ))
 		{
-			this->m_Controls->m_sbGridFrequency->setValue(gridFrequ);
+			this->ui->m_sbGridFrequency->setValue(gridFrequ);
 		}
 		else
 		{
@@ -451,7 +454,7 @@ void RegistrationVisualizer::LoadStateFromNode()
 		float colorStart[3] = { 0.0, 0.0, 0.0 };
 		this->m_spSelectedRegNode->GetColor(colorStart, nullptr, mitk::nodeProp_RegVisGridStartColor);
 		tmpColor.setRgbF(colorStart[0], colorStart[1], colorStart[2]);
-		this->m_Controls->btnStartGridColor->setColor(tmpColor);
+		this->ui->btnStartGridColor->setColor(tmpColor);
 
 		///////////////////////////////////////////////////////
 		//FOV
@@ -459,9 +462,9 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetProperty(valueProp, mitk::nodeProp_RegVisFOVSize))
 		{
-			this->m_Controls->m_sbFOVSizeX->setValue(valueProp->GetValue()[0]);
-			this->m_Controls->m_sbFOVSizeY->setValue(valueProp->GetValue()[1]);
-			this->m_Controls->m_sbFOVSizeZ->setValue(valueProp->GetValue()[2]);
+			this->ui->m_sbFOVSizeX->setValue(valueProp->GetValue()[0]);
+			this->ui->m_sbFOVSizeY->setValue(valueProp->GetValue()[1]);
+			this->ui->m_sbFOVSizeZ->setValue(valueProp->GetValue()[2]);
 		}
 		else
 		{
@@ -470,9 +473,9 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetProperty(valueProp, mitk::nodeProp_RegVisFOVSpacing))
 		{
-			this->m_Controls->m_sbGridSpX->setValue(valueProp->GetValue()[0]);
-			this->m_Controls->m_sbGridSpY->setValue(valueProp->GetValue()[1]);
-			this->m_Controls->m_sbGridSpZ->setValue(valueProp->GetValue()[2]);
+			this->ui->m_sbGridSpX->setValue(valueProp->GetValue()[0]);
+			this->ui->m_sbGridSpY->setValue(valueProp->GetValue()[1]);
+			this->ui->m_sbGridSpZ->setValue(valueProp->GetValue()[2]);
 		}
 		else
 		{
@@ -483,9 +486,9 @@ void RegistrationVisualizer::LoadStateFromNode()
 
 		if (this->m_spSelectedRegNode->GetProperty(originProp, mitk::nodeProp_RegVisFOVOrigin))
 		{
-			this->m_Controls->m_sbFOVOriginX->setValue(originProp->GetValue()[0]);
-			this->m_Controls->m_sbFOVOriginY->setValue(originProp->GetValue()[1]);
-			this->m_Controls->m_sbFOVOriginZ->setValue(originProp->GetValue()[2]);
+			this->ui->m_sbFOVOriginX->setValue(originProp->GetValue()[0]);
+			this->ui->m_sbFOVOriginY->setValue(originProp->GetValue()[1]);
+			this->ui->m_sbFOVOriginZ->setValue(originProp->GetValue()[2]);
 		}
 		else
 		{
@@ -500,9 +503,9 @@ void RegistrationVisualizer::LoadStateFromNode()
 			this->m_spSelectedRegNode->GetProperty(orientationProp2, mitk::nodeProp_RegVisFOVOrientation2) &&
 			this->m_spSelectedRegNode->GetProperty(orientationProp3, mitk::nodeProp_RegVisFOVOrientation3))
 		{
-			this->m_Controls->m_sbFOVOriginX->setValue(originProp->GetValue()[0]);
-			this->m_Controls->m_sbFOVOriginY->setValue(originProp->GetValue()[1]);
-			this->m_Controls->m_sbFOVOriginZ->setValue(originProp->GetValue()[2]);
+			this->ui->m_sbFOVOriginX->setValue(originProp->GetValue()[0]);
+			this->ui->m_sbFOVOriginY->setValue(originProp->GetValue()[1]);
+			this->ui->m_sbFOVOriginZ->setValue(originProp->GetValue()[2]);
 			m_FOVRefOrientation.GetVnlMatrix().set_row(0, orientationProp1->GetValue().GetVnlVector());
 			m_FOVRefOrientation.GetVnlMatrix().set_row(1, orientationProp2->GetValue().GetVnlVector());
 			m_FOVRefOrientation.GetVnlMatrix().set_row(2, orientationProp3->GetValue().GetVnlVector());
@@ -523,17 +526,17 @@ void RegistrationVisualizer::LoadStateFromNode()
 void RegistrationVisualizer::CheckAndSetDefaultFOVRef()
 {
 	//check if node has a default reference node.
-	mitk::DataNode::Pointer defaultRef = this->GetRefNodeOfReg(this->m_Controls->m_comboDirection->currentIndex() == 1); //direction value 1 = show inverse mapping -> we need the target image used for the registration.
+	mitk::DataNode::Pointer defaultRef = this->GetRefNodeOfReg(ui->m_comboDirection->currentIndex() == 1); //direction value 1 = show inverse mapping -> we need the target image used for the registration.
 
 	//if there is a default node and no m_spSelectedFOVRefNode is set -> set default node and transfer values
-	if (defaultRef.IsNotNull() && this->m_spSelectedFOVRefNode.IsNull() && !(this->m_Controls->m_pbLockFOVRef->isDown()))
+	if (defaultRef.IsNotNull() && this->m_spSelectedFOVRefNode.IsNull() && !(this->ui->m_pbLockFOVRef->isDown()))
 	{
 		//there is a default ref and no ref lock -> select default ref and transfer its values
 		this->m_spSelectedFOVRefNode = defaultRef;
-		this->m_Controls->m_checkUseRefSize->setChecked(true);
-		this->m_Controls->m_checkUseRefOrigin->setChecked(true);
-		this->m_Controls->m_checkUseRefSpacing->setChecked(true);
-		this->m_Controls->m_checkUseRefOrientation->setChecked(true);
+		this->ui->m_checkUseRefSize->setChecked(true);
+		this->ui->m_checkUseRefOrigin->setChecked(true);
+		this->ui->m_checkUseRefSpacing->setChecked(true);
+		this->ui->m_checkUseRefOrientation->setChecked(true);
 
 		//auto transfere values
 		this->OnUseFOVRefBtnPushed();
@@ -552,7 +555,7 @@ void RegistrationVisualizer::ActualizeRegInfo(mitk::MAPRegistrationWrapper* curr
 {
 	std::stringstream descriptionString;
 
-	m_Controls->m_teRegInfo->clear();
+	ui->m_teRegInfo->clear();
 
 	if (currentReg)
 	{
@@ -575,7 +578,7 @@ void RegistrationVisualizer::ActualizeRegInfo(mitk::MAPRegistrationWrapper* curr
 		descriptionString << "<font color='red'>no registration selected!</font>";
 	}
 
-	m_Controls->m_teRegInfo->insertHtml(QString::fromStdString(descriptionString.str()));
+	ui->m_teRegInfo->insertHtml(QString::fromStdString(descriptionString.str()));
 
 }
 
@@ -587,7 +590,7 @@ void RegistrationVisualizer::OnDirectionChanged(int)
 
 void RegistrationVisualizer::OnLockRegButtonPushed()
 {
-	if (this->m_Controls->m_pbLockReg->isChecked())
+	if (this->ui->m_pbLockReg->isChecked())
 	{
 		if (this->m_spSelectedRegNode.IsNotNull())
 		{
@@ -623,15 +626,15 @@ void RegistrationVisualizer::OnColorInterpolationChecked(bool checked)
 {
 	if (checked)
 	{
-		this->m_Controls->labelVecMagSmall->setText(QString("="));
-		this->m_Controls->labelVecMagMedium->setText(QString("="));
-		this->m_Controls->labelVecMagLarge->setText(QString("="));
+		this->ui->labelVecMagSmall->setText(QString("="));
+		this->ui->labelVecMagMedium->setText(QString("="));
+		this->ui->labelVecMagLarge->setText(QString("="));
 	}
 	else
 	{
-		this->m_Controls->labelVecMagSmall->setText(QString(">"));
-		this->m_Controls->labelVecMagMedium->setText(QString(">"));
-		this->m_Controls->labelVecMagLarge->setText(QString(">"));
+		this->ui->labelVecMagSmall->setText(QString(">"));
+		this->ui->labelVecMagMedium->setText(QString(">"));
+		this->ui->labelVecMagLarge->setText(QString(">"));
 	}
 };
 
@@ -663,30 +666,30 @@ void RegistrationVisualizer::OnUseFOVRefBtnPushed()
 		mitk::AffineTransform3D::ConstPointer fovTransform = gridRef->GetIndexToWorldTransform();
 
 
-		if (this->m_Controls->m_checkUseRefSize->isChecked())
+		if (this->ui->m_checkUseRefSize->isChecked())
 		{
-			this->m_Controls->m_sbFOVSizeX->setValue((bounds[1] - bounds[0])*spacing[0]);
-			this->m_Controls->m_sbFOVSizeY->setValue((bounds[3] - bounds[2])*spacing[1]);
-			this->m_Controls->m_sbFOVSizeZ->setValue((bounds[5] - bounds[4])*spacing[2]);
+			this->ui->m_sbFOVSizeX->setValue((bounds[1] - bounds[0])*spacing[0]);
+			this->ui->m_sbFOVSizeY->setValue((bounds[3] - bounds[2])*spacing[1]);
+			this->ui->m_sbFOVSizeZ->setValue((bounds[5] - bounds[4])*spacing[2]);
 		}
 
-		if (this->m_Controls->m_checkUseRefSpacing->isChecked())
+		if (this->ui->m_checkUseRefSpacing->isChecked())
 		{
 
-			this->m_Controls->m_sbGridSpX->setValue(GetSaveSpacing((bounds[1] - bounds[0]), spacing[0], 20));
-			this->m_Controls->m_sbGridSpY->setValue(GetSaveSpacing((bounds[3] - bounds[2]), spacing[1], 20));
-			this->m_Controls->m_sbGridSpZ->setValue(GetSaveSpacing((bounds[5] - bounds[4]), spacing[2], 20));
+			this->ui->m_sbGridSpX->setValue(GetSaveSpacing((bounds[1] - bounds[0]), spacing[0], 20));
+			this->ui->m_sbGridSpY->setValue(GetSaveSpacing((bounds[3] - bounds[2]), spacing[1], 20));
+			this->ui->m_sbGridSpZ->setValue(GetSaveSpacing((bounds[5] - bounds[4]), spacing[2], 20));
 
 		}
 
-		if (this->m_Controls->m_checkUseRefOrigin->isChecked())
+		if (this->ui->m_checkUseRefOrigin->isChecked())
 		{
-			this->m_Controls->m_sbFOVOriginX->setValue(origin[0]);
-			this->m_Controls->m_sbFOVOriginY->setValue(origin[1]);
-			this->m_Controls->m_sbFOVOriginZ->setValue(origin[2]);
+			this->ui->m_sbFOVOriginX->setValue(origin[0]);
+			this->ui->m_sbFOVOriginY->setValue(origin[1]);
+			this->ui->m_sbFOVOriginZ->setValue(origin[2]);
 		}
 
-		if (this->m_Controls->m_checkUseRefOrientation->isChecked())
+		if (this->ui->m_checkUseRefOrientation->isChecked())
 		{
 			this->m_FOVRefOrientation = fovTransform->GetMatrix();
 			this->UpdateOrientationMatrixWidget();
@@ -701,7 +704,7 @@ void RegistrationVisualizer::UpdateOrientationMatrixWidget()
 	{
 		for (unsigned int c = 0; c < 3; ++c)
 		{
-			this->m_Controls->m_tableOrientation->item(r, c)->setText(QString::number(this->m_FOVRefOrientation.GetVnlMatrix().get(r, c)));
+			this->ui->m_tableOrientation->item(r, c)->setText(QString::number(this->m_FOVRefOrientation.GetVnlMatrix().get(r, c)));
 		}
 	}
 }

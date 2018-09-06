@@ -43,7 +43,6 @@ public:
 protected:
 	/// \brief called by QmitkFunctionality when DataManager's selection has changed
 	virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer>& nodes) override;
-
 	virtual void NodeRemoved(const mitk::DataNode* node) override;
 
 	virtual void SetFocus();
@@ -58,11 +57,13 @@ private:
 	* Checks if appropriated nodes are selected in the data manager. If nodes are selected,
 	* they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
 	* They are also checked for vadility.*/
-	void CheckInputs();
+	bool CheckInputs();
 
 	/**
 	* Updates the state of controls regarding to the state of the view and it objects.*/
 	void ConfigureControls();
+
+	void StartRegistration();
 
 	/** Initialize the state of the view, so the manipulation can start.*/
 	void InitSession();
@@ -82,8 +83,8 @@ private:
 
 protected slots:
 	/// \brief Called when the user clicks the GUI button
-	void OnStartBtnPushed();
-	void OnCancelBtnPushed();
+	//void OnStartBtnPushed();
+	//void OnCancelBtnPushed();
 	void OnStoreBtnPushed();
 	void OnSettingsChanged(mitk::DataNode*);
 

@@ -6,167 +6,158 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>348</width>
-    <height>850</height>
+    <width>408</width>
+    <height>859</height>
    </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QPushButton
+{
+    font: Roboto;
+    font: bold;
+    font-size: 14px;
+ /*   color: #FFF;*/
+    background-color: transparent;
+    border: 0px;
+    padding: 6px;
+}
+QPushButton:disabled
+{
+   color: #595B5C;
+}
+
+QPushButton:hover
+{
+    background-color:rgba(0,0,0,20%);
+}
+QLabel
+{
+    font: Roboto;
+/*    font: bold;*/
+    font-size: 10pt;
+/*    color: #FFF; */
+}
+
+QSpinBox, QSpinBox::before
+{
+    background-color: transparent;
+    font: Roboto;
+    font: normal;
+    font-size: 10pt;
+    color: #FFF; 
+    border:0px;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>5</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>5</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
     <number>5</number>
    </property>
    <item>
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Loaded algorithm:</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_PreRegistration">
+       <property name="text">
+        <string>Algorithm:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_Algorithm">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string>Rigid: Translation</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Rigid: Translation + Euler Angles</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Rigid: Translation + Euler Angles (Mutual Info, Multi Resolution)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Rigid: Translation + Euler Angles (Mutual Info)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Deformable: Level Set Motion (Multi Resolution)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Deformable: Level Set Motion</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Deformable: Thiron's demons (Fast, Multi Resolution)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Deformable: Thiron's demons (Fast)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Deformable: Thiron's demons (Fast, Refined)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Deformable: Thiron's demons</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Affine: Translation + Rotation + Scaling + Shearing</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLabel" name="m_lbLoadedAlgorithmName">
-     <property name="maximumSize">
-      <size>
-       <width>400</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>159</red>
-           <green>158</green>
-           <blue>158</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
-     </property>
-     <property name="midLineWidth">
-      <number>1</number>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout_7">
+     <item>
+      <widget class="QLabel" name="label_TargetImage">
+       <property name="styleSheet">
+        <string notr="true">color: #E02000;
+background-color: #efef95;</string>
+       </property>
+       <property name="text">
+        <string>Please load and select a dataset in Data Manager.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Image:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="m_lbTargetName">
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>159</red>
-           <green>158</green>
-           <blue>158</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
-     </property>
-     <property name="midLineWidth">
-      <number>1</number>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupMasks">
-     <property name="title">
-      <string>Masks</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <property name="spacing">
-       <number>5</number>
-      </property>
-      <property name="margin">
-       <number>5</number>
-      </property>
+    <widget class="QWidget" name="groupMasks" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <widget class="QCheckBox" name="checkTargetMask">
         <property name="text">
@@ -176,58 +167,6 @@
       </item>
       <item>
        <widget class="QLabel" name="m_lbTargetMaskName">
-        <property name="palette">
-         <palette>
-          <active>
-           <colorrole role="Text">
-            <brush brushstyle="SolidPattern">
-             <color alpha="255">
-              <red>0</red>
-              <green>170</green>
-              <blue>0</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </active>
-          <inactive>
-           <colorrole role="Text">
-            <brush brushstyle="SolidPattern">
-             <color alpha="255">
-              <red>0</red>
-              <green>170</green>
-              <blue>0</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </inactive>
-          <disabled>
-           <colorrole role="Text">
-            <brush brushstyle="SolidPattern">
-             <color alpha="255">
-              <red>159</red>
-              <green>158</green>
-              <blue>158</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </disabled>
-         </palette>
-        </property>
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="lineWidth">
-         <number>2</number>
-        </property>
-        <property name="midLineWidth">
-         <number>1</number>
-        </property>
         <property name="text">
          <string/>
         </property>
@@ -248,7 +187,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -261,90 +200,28 @@
      </property>
      <widget class="QWidget" name="m_tabSelection">
       <attribute name="title">
-       <string>Selection</string>
+       <string>Description</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
         <number>5</number>
        </property>
        <property name="spacing">
         <number>5</number>
        </property>
        <item row="0" column="0">
-        <widget class="QLabel" name="label_Heading1">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Load an algorithm</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_algo">
-         <property name="text">
-          <string>Algorithm browser selection:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="m_pbLoadSelected">
-         <property name="text">
-          <string>Load selected algorithm</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_algoInfo">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Selected algorithm information:</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <property name="indent">
-          <number>-1</number>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
         <widget class="QmitkAlgorithmProfileViewer" name="m_teAlgorithmDetails" native="true"/>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="m_lbSelectedAlgorithm">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="lineWidth">
-          <number>2</number>
-         </property>
-         <property name="midLineWidth">
-          <number>1</number>
-         </property>
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
       </layout>
-      <zorder>label_Heading1</zorder>
-      <zorder>m_teAlgorithmDetails</zorder>
-      <zorder>label_algo</zorder>
-      <zorder>label_algoInfo</zorder>
-      <zorder>m_pbLoadSelected</zorder>
-      <zorder>m_lbSelectedAlgorithm</zorder>
      </widget>
      <widget class="QWidget" name="m_tabExecution">
       <attribute name="title">
@@ -354,44 +231,38 @@
        <property name="spacing">
         <number>5</number>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
         <number>5</number>
        </property>
        <item>
-        <widget class="QLabel" name="label_Heading3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Perform frame correction</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Correction job name:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="m_leRegJobName">
-         <property name="toolTip">
-          <string>Name of the resulting mapped image</string>
-         </property>
-         <property name="text">
-          <string>Unnamed RegJob</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Correction job name:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="m_leRegJobName">
+           <property name="toolTip">
+            <string>Name of the resulting mapped image</string>
+           </property>
+           <property name="text">
+            <string>Unnamed RegJob</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -518,7 +389,10 @@
             <item>
              <widget class="QCheckBox" name="m_checkClearLog">
               <property name="text">
-               <string>Clear log on algorithm start</string>
+               <string>Clear log at startup</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -544,37 +418,20 @@
        <property name="spacing">
         <number>5</number>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
         <number>5</number>
        </property>
        <item>
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Configure mapping parameters</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QmitkMapperSettingsWidget" name="m_mapperSettings" native="true"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_Heading2">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Configure algorithm parameters</string>
-         </property>
-        </widget>
        </item>
        <item>
         <widget class="QmitkAlgorithmSettingsConfig" name="m_AlgoConfigurator" native="true">

@@ -25,12 +25,10 @@
 	*/
 class RegistrationVisualizer : public QmitkAbstractView
 {
-	// this is needed for all Qt objects that should have a Qt meta-object
-	// (everything that derives from QObject and wants to have signal/slots)
+	// this is needed for all Qt objects that should have a Qt meta-object (everything that derives from QObject and wants to have signal/slots)
 	Q_OBJECT
 
 public:
-
 	static const std::string VIEW_ID;
 
 	/**
@@ -47,8 +45,7 @@ public:
 	 * the plugin*/
 	mitk::MAPRegistrationWrapper* GetCurrentRegistration();
 
-	protected slots:
-
+protected slots:
 	/**
 	 * @brief Connect all GUI elements to its corresponding slots
 	 */
@@ -71,11 +68,7 @@ protected:
 
 	void ActualizeRegInfo(mitk::MAPRegistrationWrapper* currentReg);
 
-	Ui::RegistrationVisualizerControls* m_Controls;
-
 private:
-	QWidget* m_Parent;
-
 	void Error(QString msg);
 
 	void CheckInputs();
@@ -87,7 +80,7 @@ private:
 
 	/** If a registration node is set, this function determines the relevant referenced node.
 	 * The reference node is the node of the target or moving data (depending on the selected directions)
-	 * used to determine the* registration object.
+	 * used to determine the registration object.
 	 * @return Pointer to the reference node (moving or target data of the registration algorithm run).
 	 * Function may return nullptr if the referenced node cannot be found or is not defined
 	 * by the registration.*/
@@ -127,6 +120,11 @@ private:
 	void CheckAndSetDefaultFOVRef();
 
 	void UpdateOrientationMatrixWidget();
+
+private:
+	QWidget* m_Parent;
+protected:
+	Ui::RegistrationVisualizerControls* ui;
 
 	/**indicates if the gui updates is triggered internally or by user. Needed to
 	 * avoid update loops by ConfigureVisualizationControlls();*/

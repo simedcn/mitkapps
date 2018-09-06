@@ -102,16 +102,9 @@ QLabel#logo_label
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <widget class="QLabel" name="label_SelectedMovingImage">
-       <property name="text">
-        <string>Moving image:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_MovingImageNotSelected">
+      <widget class="QLabel" name="label_MovingImage">
        <property name="styleSheet">
         <string notr="true">color: #E02000;
 background-color: #efef95;</string>
@@ -122,31 +115,7 @@ background-color: #efef95;</string>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="label_SelectedTargetImage">
-       <property name="text">
-        <string>Target image:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_TargetImageNotSelected">
+      <widget class="QLabel" name="label_TargetImage">
        <property name="styleSheet">
         <string notr="true">color: #E02000;
 background-color: #efef95;</string>
@@ -155,19 +124,6 @@ background-color: #efef95;</string>
         <string>Please load and select a dataset in Data Manager.</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>

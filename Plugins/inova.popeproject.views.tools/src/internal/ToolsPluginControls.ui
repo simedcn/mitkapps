@@ -111,7 +111,7 @@ QLabel#logo_label
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_ImageNotSelected">
+      <widget class="QLabel" name="label_Image">
        <property name="styleSheet">
         <string notr="true">color: #E02000;
 background-color: rgb(255, 255, 159);

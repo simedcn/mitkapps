@@ -7,9 +7,9 @@ mitk_create_plugin(
   PACKAGE_DEPENDS PRIVATE DCMTK
 )
 
-install(DIRECTORY "${BOOST_ROOT}/src/DCMTK-build/bin/Release/" DESTINATION "bin/bin")
-
 # Workaround //!!
+#   For some reason, the folder created by CPack (the PACKAGE project) does not contain required libraries.
+install(DIRECTORY "${BOOST_ROOT}/src/DCMTK-build/bin/Release/" DESTINATION "bin/bin")
 #   For some reason, the folder created by CPack (the PACKAGE project) does not contain dcmjpeg.dll and dcmnet.dll.
 #   Without these files the plugin cannot be loaded.
 install(DIRECTORY "${BOOST_ROOT}/src/DCMTK-build/bin/Release/" DESTINATION "bin" FILES_MATCHING PATTERN "dcmjpeg*"  PATTERN "dcmnet*")

@@ -80,10 +80,17 @@ RegistrationPlugin::RegistrationPlugin()
 {}
 RegistrationPlugin::~RegistrationPlugin()
 {
+	//if (m_CalculationThread.isRunning())
+	//{
+	//	m_CalculationThread.Abort();
+	//}
 	while (this->m_CalculationThread.isRunning())
 	{
 		itksys::SystemTools::Delay(100);
 	}
+	//ctkDictionary properties;
+	//properties["id"] = QString::fromStdString(VIEW_ID);
+	//emit PluginIsIdle(properties);
 }
 
 void RegistrationPlugin::CreateQtPartControl(QWidget* parent)
@@ -110,7 +117,11 @@ void RegistrationPlugin::CreateQtPartControl(QWidget* parent)
 		ctkEventAdmin* eventAdmin = pluginContext->getService<ctkEventAdmin>(ref);
 		eventAdmin->publishSignal(this, SIGNAL(GonnaAddNewDataNode(const ctkDictionary&)), "data/GONNAADDNEWDATANODE", Qt::DirectConnection);
 		eventAdmin->publishSignal(this, SIGNAL(NewDataNodeAdded(const ctkDictionary&)), "data/NEWDATANODEADDED", Qt::DirectConnection);
+		eventAdmin->publishSignal(this, SIGNAL(PluginIsBusy(const ctkDictionary&)), "registration/PLUGINISBUSY", Qt::DirectConnection);
+		eventAdmin->publishSignal(this, SIGNAL(PluginIsIdle(const ctkDictionary&)), "registration/PLUGINISIDLE", Qt::DirectConnection);
 	}
+
+	CheckInputs();
 }
 
 void RegistrationPlugin::SetFocus()
@@ -147,24 +158,28 @@ void RegistrationPlugin::AddImage(const string& name, mitk::Image::Pointer image
 	emit NewDataNodeAdded(properties);//??
 }
 
-void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
+void RegistrationPlugin::CheckInputs()
 {
+	if (m_CalculationThread.isRunning())
+		return;
+
 	/// Update selected images.
 	mitk::DataNode::Pointer moving_image = nullptr;
 	mitk::DataNode::Pointer target_image = nullptr;
+	QList<mitk::DataNode::Pointer> selectedDataNodes = this->GetDataManagerSelection();
 	for (auto datanode : selectedDataNodes)
 	{
 		mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
 		if (!image)
 			continue;
 		// Reverse direction
-		if (target_image == nullptr)
+		if (moving_image == nullptr)
 		{
-			target_image = datanode;
+			moving_image = datanode;
 		}
 		else
 		{
-			moving_image = datanode;
+			target_image = datanode;
 			break;
 		}
 	}
@@ -173,56 +188,44 @@ void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, cons
 	if (moving_image != nullptr)
 	{
 		string name = moving_image->GetName();
-		if (name.empty())
-		{
-			ui.label_MovingImageNotSelected->setText("");//("<b>Profile</b>");
-		}
-		else
-		{
-			QString short_name = Elements::get_short_name_for_image(name);
-			ui.label_MovingImageNotSelected->setText(short_name);
-			ui.label_MovingImageNotSelected->setToolTip(QString::fromStdString(name));
-		}
-		ui.label_MovingImageNotSelected->setStyleSheet("");
-		ui.label_MovingImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		QString short_name = Elements::get_short_name_for_image(name);
+		ui.label_MovingImage->setText("<b>Moving image:</b> " + short_name);
+		ui.label_MovingImage->setToolTip(QString::fromStdString(name));
+		ui.label_MovingImage->setStyleSheet("");
+		ui.label_MovingImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		ui.label_MovingImageNotSelected->setText("Please select a moving image in Data Manager.");
-		ui.label_MovingImageNotSelected->setToolTip("");
-		ui.label_MovingImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
-		ui.label_MovingImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		ui.label_MovingImage->setText("<b>Moving image:</b> Please select in Data Manager.");
+		ui.label_MovingImage->setToolTip("");
+		ui.label_MovingImage->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_MovingImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
-	ui.label_SelectedMovingImage->setVisible(moving_image != nullptr);
 
 	/// Set target image.
 	if (target_image != nullptr)
 	{
 		string name = target_image->GetName();
-		if (name.empty())
-		{
-			ui.label_TargetImageNotSelected->setText("");//("<b>Profile</b>");
-		}
-		else
-		{
-			QString short_name = Elements::get_short_name_for_image(name);
-			ui.label_TargetImageNotSelected->setText(short_name);
-			ui.label_TargetImageNotSelected->setToolTip(QString::fromStdString(name));
-		}
-		ui.label_TargetImageNotSelected->setStyleSheet("");
-		ui.label_TargetImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		QString short_name = Elements::get_short_name_for_image(name);
+		ui.label_TargetImage->setText("<b>Target image:</b> " + short_name);
+		ui.label_TargetImage->setToolTip(QString::fromStdString(name));
+		ui.label_TargetImage->setStyleSheet("");
+		ui.label_TargetImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		ui.label_TargetImageNotSelected->setText("Please select a target image in Data Manager.");
-		ui.label_TargetImageNotSelected->setToolTip("");
-		ui.label_TargetImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
-		ui.label_TargetImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		ui.label_TargetImage->setText("<b>Target image:</b> Please select in Data Manager.");
+		ui.label_TargetImage->setToolTip("");
+		ui.label_TargetImage->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_TargetImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
-	ui.label_SelectedTargetImage->setVisible(target_image != nullptr);
 
 	bool enabled = (moving_image != nullptr && target_image != nullptr);
 	updateButton(enabled);
+}
+void RegistrationPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
+{
+	CheckInputs(); //selectedDataNodes
 }
 void RegistrationPlugin::OnPreferencesChanged(const berry::IBerryPreferences*)
 {
@@ -293,6 +296,7 @@ void RegistrationPlugin::on_pushButton_Registration_clicked()
 		// updateButton()
 		return;
 	}
+
 	/// Get selected images.
 	auto selection = GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager");
 	if (selection == nullptr)
@@ -358,6 +362,10 @@ void RegistrationPlugin::on_pushButton_Registration_clicked()
 		translated_image = moving_image;
 	}*/
 
+	ctkDictionary properties;
+	properties["id"] = QString::fromStdString(VIEW_ID);
+	emit PluginIsBusy(properties);
+
 	/// Start the processing in a separate thread.
 	m_CalculationThread.Initialize(translated_image, target_image);
 	m_CalculationThread.start();
@@ -365,10 +373,14 @@ void RegistrationPlugin::on_pushButton_Registration_clicked()
 }
 void RegistrationPlugin::on_ThreadedRegistrationCalculation_finished()
 {
+	ctkDictionary properties;
+	properties["id"] = QString::fromStdString(VIEW_ID);
+	emit PluginIsIdle(properties);
 	bool is_ok = m_CalculationThread.GetRegistrationUpdateSuccessFlag();
 	if (!is_ok)
 	{
 		updateButton(ui.pushButton_Registration->isEnabled());
+		CheckInputs();
 		return;
 	}
 	auto result_image = m_CalculationThread.GetResultImage();
@@ -401,8 +413,8 @@ void RegistrationPlugin::on_ThreadedRegistrationCalculation_finished()
 		}
 	}
 	mitk::DataNode::Pointer datanode = mitk::DataNode::New();
-
 	datanode->SetName(ss.str());
 	datanode->SetData(result_image);
 	dataStorage->Add(datanode);
+	CheckInputs();
 }

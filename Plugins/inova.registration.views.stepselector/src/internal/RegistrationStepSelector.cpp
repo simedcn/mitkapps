@@ -76,7 +76,9 @@ const QString RegistrationStepSelector::PLUGIN_ID = QString::fromStdString(VIEW_
 
 
 StepDescriptor::StepDescriptor(const QString& pluginId, QPushButton* button)
-	: pluginId(pluginId), button(button)
+	: pluginId(pluginId)
+	, button(button)
+	, is_busy(false)
 {}
 
 
@@ -94,6 +96,10 @@ RegistrationStepSelector::RegistrationStepSelector()
 		eventAdmin->subscribeSlot(this, SLOT(on_Plugin_visible(ctkEvent)), propsForSlot);
 		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "plugin/HIDDEN";
 		eventAdmin->subscribeSlot(this, SLOT(on_Plugin_hidden(ctkEvent)), propsForSlot);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "registration/PLUGINISBUSY";
+		eventAdmin->subscribeSlot(this, SLOT(on_Plugin_isBusy(ctkEvent)), propsForSlot);
+		propsForSlot[ctkEventConstants::EVENT_TOPIC] = "registration/PLUGINISIDLE";
+		eventAdmin->subscribeSlot(this, SLOT(on_Plugin_isIdle(ctkEvent)), propsForSlot);
 	}
 }
 RegistrationStepSelector::~RegistrationStepSelector()
@@ -114,10 +120,10 @@ void RegistrationStepSelector::CreateQtPartControl(QWidget* parent)
 		{ "inova.registration.views.manualregistration", ui.pushButton_ManualRegistration },
 		{ "inova.registration.views.registrationalgorithms", ui.pushButton_AutomaticRegistration },
 		{ "inova.registration.views.frameregistration", ui.pushButton_TimeFrameRegistration },
+		{"inova.registration.views.rigidregistration", ui.pushButton_RigidRegistration },
 		{ "inova.registration.views.comparison", ui.pushButton_JuxtaposeResults },
 		{ "inova.registration.views.visualizer", ui.pushButton_VisualizeResults },
-		//"inova.registration.views.rigidregistration", },
-		//"inova.registration.views.mapper", },
+		//{"inova.registration.views.mapper", },
 	};
 	current_item = 0;
 
@@ -141,6 +147,62 @@ void RegistrationStepSelector::on_Plugin_hidden(ctkEvent event)
 	if (plugin_id == PLUGIN_ID)
 		selectItem();
 }
+void RegistrationStepSelector::on_Plugin_isBusy(ctkEvent event)
+{
+	QString plugin_id = event.getProperty("id").toString();
+	for (auto& plugin : item_IDs)
+	{
+		if (plugin.pluginId == plugin_id)
+		{
+			plugin.is_busy = true;
+			break;
+		}
+	}
+	updateButtons();
+}
+void RegistrationStepSelector::on_Plugin_isIdle(ctkEvent event)
+{
+	QString plugin_id = event.getProperty("id").toString();
+	for (auto& plugin : item_IDs)
+	{
+		if (plugin.pluginId == plugin_id)
+		{
+			plugin.is_busy = false;
+			break;
+		}
+	}
+	updateButtons();
+}
+
+void RegistrationStepSelector::updateButtons()
+{
+	bool is_busy_plugin = false;
+	for (auto& plugin : item_IDs)
+	{
+		if (plugin.is_busy)
+		{
+			is_busy_plugin = true;
+			break;
+		}
+	}
+	for (auto& plugin : item_IDs)
+	{
+		QString styleSheet = plugin.button->styleSheet();
+		const QString sColor = "color: #E0B000;\n";
+		bool is_colored = styleSheet.contains(sColor);
+		if (plugin.is_busy && !is_colored)
+		{
+			plugin.button->setStyleSheet(sColor + styleSheet);
+		}
+		else if (!plugin.is_busy && is_colored)
+		{
+			styleSheet.remove(sColor);
+			plugin.button->setStyleSheet(styleSheet);
+		}
+		plugin.button->setEnabled(!is_busy_plugin);
+	}
+}
+
 void RegistrationStepSelector::SetFocus()
 {
 	ui.pushButton_ManualRegistration->setFocus();
@@ -167,17 +229,24 @@ void RegistrationStepSelector::selectItem(size_t n)
 		berry::IViewPart::Pointer view = page->FindView(item.pluginId);
 		try
 		{
+			const QString bkgColor = "background-color: #3399cc;\n";
+			QString styleSheet = item.button->styleSheet();
 			if (i == n)
 			{// Open
 				if (view == nullptr)
 					view = page->ShowView(item.pluginId);
-				item.button->setStyleSheet("background-color: #3399cc");
+				if (!styleSheet.contains(bkgColor))
+					item.button->setStyleSheet(bkgColor + styleSheet);
 			}
 			else
 			{// Close
 				if (view != nullptr)
 					page->HideView(view);
-				item.button->setStyleSheet("");
+				if (styleSheet.contains(bkgColor))
+				{
+					styleSheet.remove(bkgColor);
+					item.button->setStyleSheet(styleSheet);
+				}
 			}
 		}
 		catch (const berry::PartInitException& e)

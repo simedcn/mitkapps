@@ -359,12 +359,12 @@ string Elements::get_short_name(string name)
 	short_name << name.substr(0, first_part) << "..." << name.substr(len - second_part - 1, second_part);
 	return short_name.str();
 }
-QString Elements::get_short_name_for_image(const string& name)
+QString Elements::get_short_name_for_image(const string& name, const int max_length)
 {
 	QString str_name = QString::fromStdString(name);
 	QString short_name = str_name;
 	const string str_center_replacement = "...";
-	const int max_length = 28 + str_center_replacement.length();
+	//const int max_length = max_len + str_center_replacement.length();
 	if (name.length() > max_length)
 	{
 		stringstream ss;
@@ -375,6 +375,56 @@ QString Elements::get_short_name_for_image(const string& name)
 	return short_name;
 }
 
+string Elements::get_next_name(const string& name, mitk::DataStorage::Pointer dataStorage)
+{
+	{
+		int num = 1;
+		string new_name_basis;
+		// Find number in the end
+		size_t i = name.rfind('#');
+		if (i == string::npos || i + 1 >= name.length())
+		{
+			new_name_basis = name;
+		}
+		else
+		{
+			string str_num = name.substr(i + 1);
+			int i_num = 0;
+			try
+			{
+				int i_num = stoi(str_num);
+				num = i_num + 1;
+				new_name_basis = name.substr(0, i);
+			}
+			catch (...)
+			{
+				new_name_basis = name;
+			}
+		}
+		bool is_space = (name.find(' ') != string::npos);
+		bool is_underscore = (name.find('_') != string::npos);
+		bool is_dash = (name.find('-') != string::npos);
+		char last_character = (new_name_basis.length() == 0) ? '\0' : new_name_basis[new_name_basis.length() - 1];
+		stringstream new_name;
+		for (int n = num; n < INT_MAX; n++)
+		{
+			new_name.str("");
+			new_name << new_name_basis;
+			if (is_space)
+				new_name << ((last_character == ' ') ? "#" : " #") << n;
+			else if (is_underscore)
+				new_name << ((last_character == '_') ? "#" : "_#") << n;
+			else if (is_dash)
+				new_name << ((last_character == '-') ? "#" : "-#") << n;
+			else
+				new_name << '#' << n;
+			bool is_unique = (dataStorage->GetNamedNode(new_name.str()) == nullptr);
+			if (is_unique)
+				break;
+		}
+		return new_name.str();
+	}
+}
 
 bool Elements::recognize_property(QString* property, int* count)
 {

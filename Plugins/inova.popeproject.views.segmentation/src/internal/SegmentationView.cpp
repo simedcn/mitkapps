@@ -109,29 +109,29 @@ void SegmentationView::updateAfterSelectionChanged()
 	auto dataNode = getFirstSelectedNode();
 	bool is_selected_node = (dataNode != nullptr);
 
-	//ui.label_ImageNotSelected->setVisible(!is_selected_node);
+	//ui.label_Image->setVisible(!is_selected_node);
 	if (is_selected_node)
 	{
 		string name = dataNode->GetName();
 		if (name.empty())
 		{
-			ui.label_ImageNotSelected->setText("");//("<b>Profile</b>");
+			ui.label_Image->setText("");//("<b>Profile</b>");
 		}
 		else
 		{
 			QString str_name = QString::fromStdString(name);
-			ui.label_ImageNotSelected->setText(str_name);
-			ui.label_ImageNotSelected->setToolTip(str_name);
+			ui.label_Image->setText(str_name);
+			ui.label_Image->setToolTip(str_name);
 		}
-		ui.label_ImageNotSelected->setStyleSheet("");
-		ui.label_ImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		ui.label_Image->setStyleSheet("");
+		ui.label_Image->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		ui.label_ImageNotSelected->setText("Please load and select a dataset in Data Manager.");
-		ui.label_ImageNotSelected->setToolTip("");
-		ui.label_ImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
-		ui.label_ImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		ui.label_Image->setText("Please load and select a dataset in Data Manager.");
+		ui.label_Image->setToolTip("");
+		ui.label_Image->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_Image->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	}
 	ui.label_SelectedImage->setVisible(is_selected_node);
 

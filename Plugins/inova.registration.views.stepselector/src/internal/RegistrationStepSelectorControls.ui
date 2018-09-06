@@ -70,6 +70,9 @@ QSpinBox, QSpinBox::before
    </property>
    <item>
     <layout class="QFormLayout" name="formLayout">
+     <property name="verticalSpacing">
+      <number>0</number>
+     </property>
      <item row="0" column="0">
       <widget class="QPushButton" name="pushButton_ManualRegistration">
        <property name="text">
@@ -91,17 +94,33 @@ QSpinBox, QSpinBox::before
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="pushButton_JuxtaposeResults">
+     <item row="2" column="1">
+      <widget class="QPushButton" name="pushButton_VisualizeResults">
+       <property name="styleSheet">
+        <string notr="true">color: 'gray';</string>
+       </property>
        <property name="text">
-        <string>4. Juxtapose results</string>
+        <string>*6. Visualize results</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QPushButton" name="pushButton_VisualizeResults">
+      <widget class="QPushButton" name="pushButton_JuxtaposeResults">
+       <property name="styleSheet">
+        <string notr="true">color: 'gray';</string>
+       </property>
        <property name="text">
-        <string>5. Visualize results</string>
+        <string>*5. Image Fusion</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="pushButton_RigidRegistration">
+       <property name="styleSheet">
+        <string notr="true">color: 'gray';</string>
+       </property>
+       <property name="text">
+        <string>*4. Accurate registration</string>
        </property>
       </widget>
      </item>

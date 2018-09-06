@@ -35,15 +35,9 @@ public:
 
 	virtual void CreateQtPartControl(QWidget *parent);
 
-	protected slots:
-
-	/// \brief Called when the user clicks the GUI button
-
-	void OnEvalBtnPushed();
-	void OnStopBtnPushed();
+protected slots:
 	void OnSettingsChanged(mitk::DataNode*);
-
-		void OnSliceChanged();
+	void OnSliceChanged();
 
 protected:
 	/// \brief called by QmitkFunctionality when DataManager's selection has changed
@@ -56,26 +50,28 @@ protected:
 	virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
 	virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
 
-	Ui::RegistrationComparisonControls m_Controls;
-
 private:
-	QWidget *m_Parent;
-
 	void Error(QString msg);
-
-	/** Methods returns a list of all eval nodes in the data manager.*/
-	QList<mitk::DataNode::Pointer> GetEvalNodes();
 
 	/**
 	* Checks if appropriated nodes are selected in the data manager. If nodes are selected,
 	* they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
 	* They are also checked for vadility and stored in m_ValidInput,... .
 	* It also sets the info lables accordingly.*/
-	void CheckInputs();
+	bool CheckInputs();
+
+	void StartEvaluation();
+	void StopEvaluation();
 
 	/**
 	* Updates the state of controls regarding to selected eval object.*/
 	void ConfigureControls();
+
+protected:
+	Ui::RegistrationComparisonControls ui;
+
+private:
+	QWidget *m_Parent;
 
 	mitk::DataNode::Pointer m_selectedEvalNode;
 

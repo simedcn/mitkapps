@@ -46,6 +46,9 @@
 
 #include <boost/math/constants/constants.hpp>
 
+#include <sstream>
+#include <climits>
+
 using string = std::string;
 
 
@@ -92,8 +95,8 @@ void ManualRegistration::CreateQtPartControl(QWidget* parent)
 
 	m_Parent = parent;
 
-	connect(ui.pbStart, SIGNAL(clicked()), this, SLOT(OnStartBtnPushed()));
-	connect(ui.pbCancel, SIGNAL(clicked()), this, SLOT(OnCancelBtnPushed()));
+	//connect(ui.pbStart, SIGNAL(clicked()), this, SLOT(OnStartBtnPushed()));
+	//connect(ui.pbCancel, SIGNAL(clicked()), this, SLOT(OnCancelBtnPushed()));
 	connect(ui.pbStore, SIGNAL(clicked()), this, SLOT(OnStoreBtnPushed()));
 	connect(ui.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
 
@@ -129,12 +132,15 @@ void ManualRegistration::CreateQtPartControl(QWidget* parent)
 
 	ui.groupScale->setVisible(false);
 	ui.label_PreRegistration->setVisible(false);
+	ui.checkMapEntity->setVisible(false);
+	ui.checkMapEntity->setChecked(true);
 
 	m_EvalNode = this->GetDataStorage()->GetNamedNode(HelperNodeName);
 
 	this->CheckInputs();
 	this->StopSession();
 	this->ConfigureControls();
+	this->StartRegistration();
 }
 
 void ManualRegistration::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -147,85 +153,99 @@ void ManualRegistration::RenderWindowPartDeactivated(mitk::IRenderWindowPart* re
 	this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
-void ManualRegistration::CheckInputs()
+bool ManualRegistration::CheckInputs()
 {
-	if (m_activeManipulation)
-		return;
-
-	/// Reset the current selection.
-	this->m_SelectedPreReg = nullptr;
-	this->m_SelectedMovingNode = nullptr;
-	this->m_SelectedTargetNode = nullptr;
-	this->m_SelectedPreRegNode = nullptr;
+	// Current selection
+	MAPRegistrationType::ConstPointer SelectedPreReg = nullptr;
+	mitk::DataNode::Pointer SelectedPreRegNode = nullptr;
+	mitk::DataNode::Pointer SelectedMovingNode = nullptr;
+	mitk::DataNode::Pointer SelectedTargetNode = nullptr;
 
 	QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
-	if (dataNodes.size() == 0)
-		return;
-
-	/// Check if a registration node is selected.
-	for (auto datanode : dataNodes)
+	if (dataNodes.size() != 0)
 	{
-		if (!mitk::MITKRegistrationHelper::IsRegNode(datanode))
-			continue;
-
-		mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<mitk::MAPRegistrationWrapper*>(datanode->GetData());
-		const MAPRegistrationType* selected_reg = nullptr;
-		if (regWrapper)
-			selected_reg = dynamic_cast<const MAPRegistrationType*>(regWrapper->GetRegistration());
-		else
-			continue;
-
-		if (selected_reg == nullptr)
-			continue;
-
-		mitk::BaseProperty* uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
-		if (uidProp == nullptr)
-			continue;
-		// Prepare the moving node
-		mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
-		auto selectedMovingNode = this->GetDataStorage()->GetNode(predicate);
-
-		uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
-		if (uidProp == nullptr)
-			continue;
-
-		// Set the target node
-		predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
-		this->m_SelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
-
-		// Set the selected items if everithing has been found
-		this->m_SelectedMovingNode = selectedMovingNode;
-		this->m_SelectedPreReg = selected_reg;
-		this->m_SelectedPreRegNode = datanode;
-		break;
-	}
-
-	/// If not, set tagret and moving images.
-	if (this->m_SelectedPreRegNode == nullptr)
-	{
+		/// Check if a registration node is selected.
 		for (auto datanode : dataNodes)
 		{
-			mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
-			if (!image)
+			if (!mitk::MITKRegistrationHelper::IsRegNode(datanode))
 				continue;
-			// Reverse direction
-			if (m_SelectedTargetNode == nullptr)
-			{
-				m_SelectedTargetNode = datanode;
-			}
+
+			mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<mitk::MAPRegistrationWrapper*>(datanode->GetData());
+			const MAPRegistrationType* selected_reg = nullptr;
+			if (regWrapper)
+				selected_reg = dynamic_cast<const MAPRegistrationType*>(regWrapper->GetRegistration());
 			else
+				continue;
+
+			if (selected_reg == nullptr)
+				continue;
+
+			mitk::BaseProperty* uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
+			if (uidProp == nullptr)
+				continue;
+			// Prepare the moving node
+			mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
+			auto selectedMovingNode = this->GetDataStorage()->GetNode(predicate);
+
+			uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
+			if (uidProp == nullptr)
+				continue;
+
+			// Set the target node
+			predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
+			SelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
+
+			// Set the selected items if everithing has been found
+			SelectedMovingNode = selectedMovingNode;
+			SelectedPreReg = selected_reg;
+			SelectedPreRegNode = datanode;
+			break;
+		}
+
+		/// If not, set tagret and moving images.
+		if (SelectedPreRegNode == nullptr)
+		{
+			for (auto datanode : dataNodes)
 			{
-				m_SelectedMovingNode = datanode;
-				break;
+				mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+				if (!image)
+					continue;
+				// Reverse direction
+				if (SelectedMovingNode == nullptr)
+				{
+					SelectedMovingNode = datanode;
+				}
+				else
+				{
+					SelectedTargetNode = datanode;
+					break;
+				}
 			}
 		}
 	}
+
+	bool is_changed = (m_SelectedPreReg != SelectedPreReg || m_SelectedMovingNode != SelectedMovingNode || m_SelectedTargetNode != SelectedTargetNode || m_SelectedPreRegNode != SelectedPreRegNode);
+	/// Reset the current selection if not active.
+	if (is_changed && !m_activeManipulation)
+	{
+		this->m_SelectedPreReg = SelectedPreReg;
+		this->m_SelectedMovingNode = SelectedMovingNode;
+		this->m_SelectedTargetNode = SelectedTargetNode;
+		this->m_SelectedPreRegNode = SelectedPreRegNode;
+	}
+	return is_changed;
 }
 
 void ManualRegistration::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&)
 {
-	this->CheckInputs();
-	this->ConfigureControls();
+	bool is_changed = CheckInputs();
+	if (is_changed && m_activeManipulation)
+	{
+		StopSession();
+		CheckInputs();
+	}
+	ConfigureControls();
+	StartRegistration();
 };
 
 void ManualRegistration::NodeRemoved(const mitk::DataNode* node)
@@ -241,7 +261,11 @@ void ManualRegistration::NodeRemoved(const mitk::DataNode* node)
 		}
 		else
 		{
-			this->OnCancelBtnPushed();
+			//this->OnCancelBtnPushed();
+			this->StopSession();
+			this->CheckInputs();
+			this->ConfigureControls();
+			this->GetRenderWindowPart()->RequestUpdate();
 		}
 		MITK_INFO << "Stopped current MatchPoint manual registration session because at least one relevant node was removed from storage.";
 	}
@@ -256,7 +280,7 @@ void ManualRegistration::ConfigureControls()
 	{
 		string name = m_SelectedPreRegNode->GetName();
 		QString short_name = Elements::get_short_name_for_image(name);
-		ui.label_PreRegistration->setText("Pre-Registration: " + short_name);
+		ui.label_PreRegistration->setText("<b>Pre-Registration:</b> " + short_name);
 		ui.label_PreRegistration->setToolTip(QString::fromStdString(name));
 	}
 	else
@@ -270,17 +294,17 @@ void ManualRegistration::ConfigureControls()
 	{
 		string name = m_SelectedMovingNode->GetName();
 		QString short_name = Elements::get_short_name_for_image(name);
-		ui.label_MovingImageNotSelected->setText("Moving image: " + short_name);
-		ui.label_MovingImageNotSelected->setToolTip(QString::fromStdString(name));
-		ui.label_MovingImageNotSelected->setStyleSheet("");
-		ui.label_MovingImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		ui.label_MovingImage->setText("<b>Moving image:</b> " + short_name);
+		ui.label_MovingImage->setToolTip(QString::fromStdString(name));
+		ui.label_MovingImage->setStyleSheet("");
+		ui.label_MovingImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		ui.label_MovingImageNotSelected->setText("Please select a moving image in Data Manager.");
-		ui.label_MovingImageNotSelected->setToolTip("");
-		ui.label_MovingImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
-		ui.label_MovingImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		ui.label_MovingImage->setText("<b>Moving image:</b> Please select in Data Manager.");
+		ui.label_MovingImage->setToolTip("");
+		ui.label_MovingImage->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_MovingImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 
 	bool is_target_image = (m_SelectedTargetNode != nullptr);
@@ -288,36 +312,68 @@ void ManualRegistration::ConfigureControls()
 	{
 		string name = m_SelectedTargetNode->GetName();
 		QString short_name = Elements::get_short_name_for_image(name);
-		ui.label_TargetImageNotSelected->setText("Target image: " + short_name);
-		ui.label_TargetImageNotSelected->setToolTip(QString::fromStdString(name));
-		ui.label_TargetImageNotSelected->setStyleSheet("");
-		ui.label_TargetImageNotSelected->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		ui.label_TargetImage->setText("<b>Target image:</b> " + short_name);
+		ui.label_TargetImage->setToolTip(QString::fromStdString(name));
+		ui.label_TargetImage->setStyleSheet("");
+		ui.label_TargetImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		ui.label_TargetImageNotSelected->setText("Please select a target image in Data Manager.");
-		ui.label_TargetImageNotSelected->setToolTip("");
-		ui.label_TargetImageNotSelected->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
-		ui.label_TargetImageNotSelected->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		ui.label_TargetImage->setText("<b>Target image:</b> Please select in Data Manager.");
+		ui.label_TargetImage->setToolTip("");
+		ui.label_TargetImage->setStyleSheet("color: #E02000;\nbackground-color: #efef95;");
+		ui.label_TargetImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 
 	if (!m_activeManipulation)
 	{
-		QString name = "ManualRegistration";
-		if (m_SelectedPreRegNode.IsNotNull())
-			name = QString::fromStdString(m_SelectedPreRegNode->GetName()) + " Refined";
-		this->ui.lbNewRegName->setText(name);
+		//QString name = "ManualRegistration";
+		//if (m_SelectedPreRegNode.IsNotNull())
+		//	name = QString::fromStdString(m_SelectedPreRegNode->GetName()) + " Refined";
+		//this->ui.lbNewRegName->setText(name);
+		auto dataStorage = GetDataStorage();
+		string name;
+		if (m_SelectedPreRegNode != nullptr)
+		{
+			string reg_name = m_SelectedPreRegNode->GetName();
+			if (reg_name.length() >= 4 && reg_name.substr(0, 4) == "Reg_")
+				reg_name = reg_name.substr(4);
+			name = Elements::get_next_name(reg_name, dataStorage);
+		}
+		else
+		{
+			name = is_moving_image ? 
+				Elements::get_next_name(m_SelectedMovingNode->GetName(), dataStorage) :
+				"ManualRegistration";
+		}
+		this->ui.lbNewRegName->setText(QString::fromStdString(name));
 	}
 
 	//config settings widget
-	this->ui.pbStart->setEnabled(m_SelectedMovingNode.IsNotNull() && m_SelectedTargetNode.IsNotNull() && !m_activeManipulation);
+	//this->ui.pbStart->setEnabled(m_SelectedMovingNode.IsNotNull() && m_SelectedTargetNode.IsNotNull() && !m_activeManipulation);
 	this->ui.lbNewRegName->setEnabled(m_activeManipulation);
+	this->ui.label_NewRegName->setEnabled(m_activeManipulation);
+	this->ui.label_Reg->setEnabled(m_activeManipulation);
 	this->ui.checkMapEntity->setEnabled(m_activeManipulation);
 	this->ui.tabWidget->setEnabled(m_activeManipulation);
-	this->ui.pbCancel->setEnabled(m_activeManipulation);
+	//this->ui.pbCancel->setEnabled(m_activeManipulation);
 	this->ui.pbStore->setEnabled(m_activeManipulation);
 
 	this->UpdateTransformWidgets();
+}
+
+void ManualRegistration::StartRegistration()
+{
+	if (m_SelectedMovingNode == nullptr || m_SelectedTargetNode == nullptr || m_activeManipulation)
+		return;
+
+	this->InitSession();
+	this->OnSliceChanged();
+
+	this->GetRenderWindowPart()->RequestUpdate();
+
+	this->CheckInputs();
+	this->ConfigureControls();
 }
 
 void ManualRegistration::InitSession()
@@ -494,26 +550,6 @@ void ManualRegistration::OnSettingsChanged(mitk::DataNode*)
 	this->GetRenderWindowPart()->RequestUpdate();
 };
 
-void ManualRegistration::OnStartBtnPushed()
-{
-	this->InitSession();
-	this->OnSliceChanged();
-
-	this->GetRenderWindowPart()->RequestUpdate();
-
-	this->CheckInputs();
-	this->ConfigureControls();
-}
-
-void ManualRegistration::OnCancelBtnPushed()
-{
-	this->StopSession();
-
-	this->CheckInputs();
-	this->ConfigureControls();
-	this->GetRenderWindowPart()->RequestUpdate();
-}
-
 void ManualRegistration::OnStoreBtnPushed()
 {
 	mitk::MAPRegistrationWrapper::Pointer newRegWrapper = mitk::MAPRegistrationWrapper::New();
@@ -540,13 +576,13 @@ void ManualRegistration::OnStoreBtnPushed()
 		newRegWrapper->SetRegistration(newReg);
 	}
 
-	mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(
-		this->ui.lbNewRegName->text().toStdString(), newRegWrapper, "org.mitk::manual_registration",
+	string regName = ("Reg_" + this->ui.lbNewRegName->text()).toStdString();
+	mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(regName, newRegWrapper, "org.mitk::manual_registration",
 		mitk::EnsureUID(m_SelectedMovingNode->GetData()), mitk::EnsureUID(m_SelectedTargetNode->GetData()));
 
 	this->GetDataStorage()->Add(spResultRegistrationNode);
 
-	if (ui.checkMapEntity->checkState() == Qt::Checked)
+	if (ui.checkMapEntity->isChecked())
 	{
 		QmitkMappingJob* pMapJob = new QmitkMappingJob();
 		pMapJob->setAutoDelete(true);
@@ -557,7 +593,7 @@ void ManualRegistration::OnStoreBtnPushed()
 		pMapJob->m_doGeometryRefinement = false;
 		pMapJob->m_spRefGeometry = this->m_SelectedTargetNode->GetData()->GetGeometry()->Clone().GetPointer();
 
-		pMapJob->m_MappedName = this->ui.lbNewRegName->text().toStdString() + std::string(" mapped moving data");
+		pMapJob->m_MappedName = this->ui.lbNewRegName->text().toStdString();// +std::string(" mapped moving data");
 		pMapJob->m_allowUndefPixels = true;
 		pMapJob->m_paddingValue = 100;
 		pMapJob->m_allowUnregPixels = true;
@@ -579,10 +615,10 @@ void ManualRegistration::OnStoreBtnPushed()
 	this->CheckInputs();
 	this->ConfigureControls();
 	this->GetRenderWindowPart()->RequestUpdate();
+	this->StartRegistration();
 }
 
-void ManualRegistration::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
-	const QmitkMappingJob* job)
+void ManualRegistration::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job)
 {
 	mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
 		spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
@@ -590,7 +626,6 @@ void ManualRegistration::OnMapResultIsAvailable(mitk::BaseData::Pointer spMapped
 	this->GetDataStorage()->Add(spMappedNode);
 	this->GetRenderWindowPart()->RequestUpdate();
 };
-
 
 void ManualRegistration::OnRotXChanged(double x)
 {

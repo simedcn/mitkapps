@@ -1,4 +1,3 @@
-
 #ifndef PopeElements_h
 #define PopeElements_h
 
@@ -8,6 +7,7 @@
 #include <PopeLibExports.h>
 
 #include <mitkDataNode.h>
+#include <mitkDataStorage.h>
 #include <QString>
 #include <QStringList>
 
@@ -61,12 +61,15 @@ public:
 	static std::string recognize_gender(const std::string& gender);
 	static std::string recognize_birthday(const std::string& birthday);
 	static std::string get_short_name(std::string name);
-	static QString get_short_name_for_image(const std::string& name);
+	static QString get_short_name_for_image(const std::string& name, const int max_length = 31);
+
+	static std::string get_next_name(const std::string& name, mitk::DataStorage::Pointer dataStorage);
 
 	static bool recognize_property(QString* property, int* count);
 	static bool split_properties(const std::string& str_prop, QStringList* properties, std::vector<int>* nums = nullptr);
 
 	static size_t get_hash(mitk::BaseData* baseData);
 };
+
 
 #endif

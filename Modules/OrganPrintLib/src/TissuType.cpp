@@ -5,11 +5,10 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 using uint = size_t;
+//using uint = unsigned long int;
 #endif
 
 std::string TissuType::PROPERTY_KEY = "Tissu type";
-
-using uint = unsigned long int;
 
 TissuType::TissuType(int id,TissuType::String * m_name):
 

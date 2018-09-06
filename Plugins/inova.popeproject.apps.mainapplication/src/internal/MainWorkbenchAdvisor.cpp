@@ -26,7 +26,7 @@ const initializer_list<PluginDescriptor> plugins =
 	{ "04",		"inova.registration.views.registrationalgorithms","Registration Algorithms",			"sel_item",		"no",	"bottom",		"no"  },
 	{ "05",		"inova.registration.views.frameregistration",	"Frame Registration",					"sel_item",		"no",	"bottom",		"no"  },
 	{ "06",		"inova.registration.views.comparison",			"Registration Comparison",				"sel_item",		"no",	"bottom",		"no"  },
-	{ "07",		"inova.registration.views.mapper",				"Registration Mapper",					"sel_item",		"no",	"bottom",		"no"  },
+//	{ "07",		"inova.registration.views.mapper",				"Registration Mapper",					"sel_item",		"no",	"bottom",		"no"  },
 	{ "08",		"inova.registration.views.visualizer",			"Registration Visualizer",				"sel_item",		"no",	"bottom",		"no"  },
 	{ "21",		"org.mitk.views.basicimageprocessing",			"Image Processing",						"secondary", 	"no",	"right",		"no"  },
 	{ "23",		"inova.popeproject.views.segmentation",			"Segmentation Tools",					"secondary",	"no",	"right",		"no"  },
@@ -47,7 +47,7 @@ const initializer_list<PluginDescriptor> plugins =
 	{ "30",		"org.mitk.views.matchpoint.algorithm.browser",	"MatchPoint Algorithm Browser",			"secondary",	"no",	"right", 		"no"  },
 	//{ "31",	"org.mitk.views.matchpoint.algorithm.control",	"MatchPoint Algorithm Control",			"secondary",	"no",	"right", 		"no"  },
 	//{ "32",	"org.mitk.views.matchpoint.algorithm.framereg",	"MatchPoint Frame Correction",			"secondary",	"no",	"right", 		"no"  },
-	//{ "33",	"org.mitk.views.matchpoint.mapper",				"MatchPoint Mapper",					"secondary",	"no",	"right", 		"no"  },
+	{ "33",		"org.mitk.views.matchpoint.mapper",				"MatchPoint Mapper",					"secondary",	"no",	"right", 		"no"  },
 	{ "34",		"org.mitk.views.matchpoint.algorithm.batch",	"MatchPoint Registration Batch Processing","secondary",	"no",	"right", 		"no"  },
 	//{ "35",	"org.mitk.views.matchpoint.evaluation.editor",	"MatchPoint Registration Evaluator",	"secondary",	"no",	"right", 		"no"  },
 	//{ "37",	"org.mitk.views.matchpoint.visualizer",			"MatchPoint Registration Vizualizer",	"secondary",	"no",	"right", 		"no"  },
@@ -109,12 +109,21 @@ berry::WorkbenchWindowAdvisor* MainWorkbenchAdvisor::CreateWorkbenchWindowAdviso
 	excludeViews.push_back("org.blueberry.views.helpsearch");
 	excludeViews.push_back("org.mitk.views.aicpregistration");
 	excludeViews.push_back("inova.pacs.views.dicomviewdialog");
+	// MatchPoint
 	excludeViews.push_back("org.mitk.views.matchpoint.manipulator");
 	excludeViews.push_back("org.mitk.views.matchpoint.algorithm.control");
 	excludeViews.push_back("org.mitk.views.matchpoint.algorithm.framereg");
-	excludeViews.push_back("org.mitk.views.matchpoint.mapper");
+	//excludeViews.push_back("org.mitk.views.matchpoint.mapper");
 	excludeViews.push_back("org.mitk.views.matchpoint.evaluation.editor");
 	excludeViews.push_back("org.mitk.views.matchpoint.visualizer");
+	// Registration
+	excludeViews.push_back("inova.registration.views.manualregistration");
+	excludeViews.push_back("inova.registration.views.registrationalgorithms");
+	excludeViews.push_back("inova.registration.views.frameregistration");
+	excludeViews.push_back("inova.registration.views.rigidregistration");
+	excludeViews.push_back("inova.registration.views.comparison");
+	excludeViews.push_back("inova.registration.views.mapper");
+	excludeViews.push_back("inova.registration.views.visualizer");
 
 	advisor->SetViewExcludeList(excludeViews);
 

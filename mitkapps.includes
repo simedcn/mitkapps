@@ -8,10 +8,10 @@ Plugins/my.organprint.minimalapplication/src/internal
 Plugins/my.organprint.renderwindoweditor/src/internal
 Plugins/my.organprint.views.sidepanel/src/internal
 Plugins/my.organprint.views.stepselector/src/internal
-Plugins/my.pacs.views.dicomview/src/internal
-Plugins/my.popeproject.mainapplication/src/internal
-Plugins/my.popeproject.renderwindoweditor/src/internal
-Plugins/my.popeproject.segmentation/src/internal
-Plugins/my.popeproject.toolsplugin/src/internal
-Plugins/my.pacs.views.dicomview/src
+Plugins/inova.pacs.views.dicomview/src/internal
+Plugins/inova.popeproject.apps.mainapplication/src/internal
+Plugins/inova.popeproject.editors.renderwindow/src/internal
+Plugins/inova.popeproject.views.segmentation/src/internal
+Plugins/inova.popeproject.views.tools/src/internal
+Plugins/inova.pacs.views.dicomview/src
 Modules/OrganPrintLib/src

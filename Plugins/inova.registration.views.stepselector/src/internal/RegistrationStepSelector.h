@@ -55,6 +55,7 @@ public:
 
 protected:
 	void selectItem(size_t n = ULLONG_MAX);
+	void updateButtons();
 
 protected:
 	void SetFocus() override;
@@ -65,8 +66,8 @@ protected slots:
 	void on_pushButton_clicked(int step);
 	void on_Plugin_visible(ctkEvent event);
 	void on_Plugin_hidden(ctkEvent event);
-
-signals:
+	void on_Plugin_isBusy(ctkEvent event);
+	void on_Plugin_isIdle(ctkEvent event);
 
 protected:
 	Ui::RegistrationStepSelectorControls ui;
@@ -79,6 +80,7 @@ struct StepDescriptor
 {
 	QString pluginId;
 	QPushButton* button;
+	bool is_busy;
 
 	StepDescriptor(const QString& pluginId, QPushButton* button);
 };

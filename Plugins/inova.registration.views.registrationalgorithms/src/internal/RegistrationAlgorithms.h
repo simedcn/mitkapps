@@ -1,8 +1,6 @@
 #ifndef __Q_RegistrationAlgorithms_H
 #define __Q_RegistrationAlgorithms_H
 
-#include <berryISelectionListener.h>
-
 #include <QmitkAbstractView.h>
 
 #include "ui_RegistrationAlgorithmsControls.h"
@@ -18,9 +16,14 @@
 #include <mapStoppableAlgorithmInterface.h>
 
 #include <mitkMAPRegistrationWrapper.h>
+#include <service/event/ctkEventAdmin.h>
+
+#include <initializer_list>
 
 class QmitkRegistrationJob;
 class QmitkMappingJob;
+
+struct AlgorithmDescription;
 
 /*!
 \brief MatchPoint
@@ -36,7 +39,6 @@ class RegistrationAlgorithms : public QmitkAbstractView
 	Q_OBJECT
 
 public:
-
 	static const std::string VIEW_ID;
 
 	/**
@@ -47,39 +49,15 @@ public:
 	RegistrationAlgorithms();
 	~RegistrationAlgorithms();
 
-protected slots:
-
-	/**
-	* @brief Connect all GUI elements to its corresponding slots
-	*/
-	virtual void CreateConnections();
-
-	/// \brief Called when the user clicks the GUI button
-	void OnMaskCheckBoxToggeled(bool checked);
-	void OnLoadAlgorithmButtonPushed();
-	void OnSelectedAlgorithmChanged();
-
-	void OnStartRegBtnPushed();
-	void OnStopRegBtnPushed();
-	void OnSaveLogBtnPushed();
-
-	void OnRegJobError(QString err);
-	void OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer spResultRegistration, const QmitkRegistrationJob* pRegJob);
-	void OnRegJobFinished();
-	void OnMapJobError(QString err);
-	void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
-	void OnAlgorithmIterated(QString info, bool hasIterationCount, unsigned long currentIteration);
-	void OnLevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel);
-	void OnAlgorithmStatusChanged(QString info);
-	void OnAlgorithmInfo(QString info);
-
 protected:
 	virtual void CreateQtPartControl(QWidget* parent);
+	virtual void CreateConnections();
 
 	virtual void SetFocus();
 
 	/// \brief called by QmitkFunctionality when DataManager's selection has changed
 	virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer>& nodes);
+	virtual void NodeRemoved(const mitk::DataNode* node) override;
 
 private:
 
@@ -89,8 +67,6 @@ private:
 	void AdaptFolderGUIElements();
 
 	void Error(QString msg);
-
-	void UpdateAlgorithmList();
 
 	/**
 	* checks if appropriated nodes are selected in the data manager. If nodes are selected,
@@ -119,7 +95,7 @@ private:
 	/** Returns the display name of the passed node. Normally it is just node->GetName().
 	 * if the node contains a point set it is additionally checked if the point set node
 	 * has a source node and its name will be added in parentheses.*/
-	std::string GetInputNodeDisplayName(const mitk::DataNode* node) const;
+	QString GetInputNodeDisplayName(const mitk::DataNode* node, std::string name = "") const;
 
 	/** Returns the Pointer to the DLL info of the algorithm currently selected by the system.
 	The info is received via m_AlgorithmSelectionListener.
@@ -127,33 +103,50 @@ private:
 	will be null.
 	*/
 	const map::deployment::DLLInfo* GetSelectedAlgorithmDLL() const;
+	void LoadAlgorithmInfo();
+	void SetListOfAlgorithms();
 
-	//! [Qt Selection Listener method and pointer]
-	/**
-	* @brief Method of berry::ISelectionListener that implements the selection listener functionality.
-	* @param sourcepart The workbench part responsible for the selection change.
-	* @param selection This parameter holds the current selection.
-	*
-	* @see ISelectionListener
-	*/
-	void OnAlgorithmSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart, const berry::ISelection::ConstPointer& selection);
+	void UpdateAlgorithmSelection();
 
-	void UpdateAlgorithmSelection(berry::ISelection::ConstPointer selection);
+	void StopAlgorithm(bool force = false);
+
+signals:
+	void PluginIsBusy(const ctkDictionary&);
+	void PluginIsIdle(const ctkDictionary&);
+
+protected slots:
+
+	/// \brief Called when the user clicks the GUI button
+	void OnMaskCheckBoxToggeled(bool checked);
+
+	void OnStartRegBtnPushed();
+	void OnStopRegBtnPushed();
+	void OnSaveLogBtnPushed();
+
+	void OnRegJobError(QString err);
+	void OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer spResultRegistration, const QmitkRegistrationJob* pRegJob);
+	void OnRegJobFinished();
+	void OnMapJobError(QString err);
+	void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
+	void OnAlgorithmIterated(QString info, bool hasIterationCount, unsigned long currentIteration);
+	void OnLevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel);
+	void OnAlgorithmStatusChanged(QString info);
+	void OnAlgorithmInfo(QString info);
+
+	void on_comboBox_Algorithm_currentIndexChanged(int);
 
 	friend struct berry::SelectionChangedAdapter<RegistrationAlgorithms>;
 
+protected:
 	QWidget* m_Parent;
 
-	/** @brief this pointer holds the algorithm selection listener */
-	QScopedPointer<berry::ISelectionListener> m_AlgorithmSelectionListener;
+	map::deployment::DLLHandle::Pointer m_LoadedDLLHandle;
+	map::algorithm::RegistrationAlgorithmBase::Pointer m_LoadedAlgorithm;
+	map::deployment::DLLInfo::ConstPointer m_SelectedAlgorithmInfo;
 
-	::map::deployment::DLLHandle::Pointer m_LoadedDLLHandle;
-	::map::algorithm::RegistrationAlgorithmBase::Pointer m_LoadedAlgorithm;
-	::map::deployment::DLLInfo::ConstPointer m_SelectedAlgorithmInfo;
-
-	typedef map::algorithm::facet::IterativeAlgorithmInterface IIterativeAlgorithm;
-	typedef map::algorithm::facet::MultiResRegistrationAlgorithmInterface IMultiResAlgorithm;
-	typedef map::algorithm::facet::StoppableAlgorithmInterface IStoppableAlgorithm;
+	using IIterativeAlgorithm = map::algorithm::facet::IterativeAlgorithmInterface;
+	using IMultiResAlgorithm = map::algorithm::facet::MultiResRegistrationAlgorithmInterface;
+	using IStoppableAlgorithm = map::algorithm::facet::StoppableAlgorithmInterface;
 
 	mitk::DataNode::Pointer m_spSelectedTargetNode;
 	mitk::DataNode::Pointer m_spSelectedMovingNode;
@@ -181,9 +174,23 @@ private:
 	bool m_CanLoadAlgorithm;
 	bool m_ValidInputs;
 	bool m_Working;
+	bool m_Quitting;
 
-	Ui::RegistrationAlgorithmsControls m_Controls;
+	Ui::RegistrationAlgorithmsControls ui;
+
+	std::vector<AlgorithmDescription> algorithm_descs;
+	static std::string def_algorithm_short_name;
 };
 
+struct AlgorithmDescription
+{
+	AlgorithmDescription(const std::string& short_name, const std::string& name, const std::string& matchPoint_name, map::deployment::DLLInfo* info);
+	AlgorithmDescription(std::initializer_list<std::string> args);
+
+	std::string short_name;
+	std::string name;
+	std::string matchPoint_name;
+	map::deployment::DLLInfo::Pointer info = nullptr;
+};
 #endif // RegistrationAlgorithms_h
 

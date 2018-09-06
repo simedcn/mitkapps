@@ -1,3 +1,6 @@
+#include "RegistrationComparison.h"
+#include <PopeElements.h>
+
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -16,7 +19,6 @@
 
 // Qmitk
 #include "QmitkRenderWindow.h"
-#include "RegistrationComparison.h"
 
 // Qt
 #include <QMessageBox>
@@ -40,6 +42,8 @@ RegistrationComparison::RegistrationComparison()
 
 RegistrationComparison::~RegistrationComparison()
 {
+	//if (m_activeEvaluation)
+	//	StopEvaluation();
 	if (this->m_selectedEvalNode.IsNotNull() && this->GetDataStorage().IsNotNull())
 	{
 		this->GetDataStorage()->Remove(this->m_selectedEvalNode);
@@ -60,13 +64,11 @@ void RegistrationComparison::Error(QString msg)
 void RegistrationComparison::CreateQtPartControl(QWidget* parent)
 {
 	// create GUI widgets from the Qt Designer's .ui file
-	m_Controls.setupUi(parent);
+	ui.setupUi(parent);
 
 	m_Parent = parent;
 
-	connect(m_Controls.pbEval, SIGNAL(clicked()), this, SLOT(OnEvalBtnPushed()));
-	connect(m_Controls.pbStop, SIGNAL(clicked()), this, SLOT(OnStopBtnPushed()));
-	connect(m_Controls.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
+	connect(ui.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
 
 	this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
 	connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
@@ -75,6 +77,7 @@ void RegistrationComparison::CreateQtPartControl(QWidget* parent)
 
 	this->CheckInputs();
 	this->ConfigureControls();
+	this->StartEvaluation();
 }
 
 void RegistrationComparison::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -87,79 +90,159 @@ void RegistrationComparison::RenderWindowPartDeactivated(mitk::IRenderWindowPart
 	this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
-void RegistrationComparison::CheckInputs()
+bool RegistrationComparison::CheckInputs()
 {
-	if (!m_activeEvaluation)
+	bool autoMoving = false;
+	bool autoTarget = false;
+	mitk::DataNode::Pointer spSelectedRegNode = nullptr;
+	mitk::DataNode::Pointer spSelectedMovingNode = nullptr;
+	mitk::DataNode::Pointer spSelectedTargetNode = nullptr;
+
+	QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
+	if (dataNodes.size() > 0)
 	{
-		QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
-		this->m_autoMoving = false;
-		this->m_autoTarget = false;
-		this->m_spSelectedMovingNode = nullptr;
-		this->m_spSelectedTargetNode = nullptr;
-		this->m_spSelectedRegNode = nullptr;
-
-		if (dataNodes.size() > 0)
+		/// Check if a registration node is selected.
+		for (auto datanode : dataNodes)
 		{
-			//test if auto select works
-			if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]) && dataNodes[0]->GetData())
+			// Test if auto select works
+			if (!mitk::MITKRegistrationHelper::IsRegNode(datanode) || !datanode->GetData())
+				continue;
+
+			mitk::BaseProperty* uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
+			if (!uidProp)
+				continue;
+			// Search for the moving node
+			mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
+			mitk::DataNode::Pointer selectedMovingNode = this->GetDataStorage()->GetNode(predicate);
+			if (!selectedMovingNode)
+				continue;
+
+			uidProp = datanode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
+			if (!uidProp)
+				continue;
+			// Search for the target node
+			predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
+			mitk::DataNode::Pointer selectedTargetNode = this->GetDataStorage()->GetNode(predicate);
+			if (!selectedTargetNode)
+				continue;
+
+			spSelectedRegNode = datanode;
+			spSelectedMovingNode = selectedMovingNode;
+			spSelectedTargetNode = selectedTargetNode;
+			autoMoving = spSelectedMovingNode.IsNotNull();
+			autoTarget = spSelectedTargetNode.IsNotNull();
+		}
+
+		/// If not, set tagret and moving images.
+		if (spSelectedRegNode == nullptr)
+		{
+			for (auto datanode : dataNodes)
 			{
-				this->m_spSelectedRegNode = dataNodes[0];
-				dataNodes.pop_front();
-
-				mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
-
-				if (uidProp)
+				mitk::Image* image = dynamic_cast<mitk::Image*>(datanode->GetData());
+				if (!image)
+					continue;
+				// Reverse direction
+				if (spSelectedMovingNode == nullptr)
 				{
-					//search for the moving node
-					mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
-					this->m_spSelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
-					this->m_autoMoving = this->m_spSelectedMovingNode.IsNotNull();
+					spSelectedMovingNode = datanode;
 				}
-
-				uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
-
-				if (uidProp)
+				else
 				{
-					//search for the target node
-					mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID, uidProp);
-					this->m_spSelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
-					this->m_autoTarget = this->m_spSelectedTargetNode.IsNotNull();
-				}
-			}
-
-			//if still nodes are selected -> ignore possible auto select
-			if (!dataNodes.empty())
-			{
-				mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
-
-				if (inputImage)
-				{
-					this->m_spSelectedMovingNode = dataNodes[0];
-					this->m_autoMoving = false;
-					dataNodes.pop_front();
-				}
-			}
-
-			if (!dataNodes.empty())
-			{
-				mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
-
-				if (inputImage)
-				{
-					this->m_spSelectedTargetNode = dataNodes[0];
-					this->m_autoTarget = false;
-					dataNodes.pop_front();
+					spSelectedTargetNode = datanode;
+					break;
 				}
 			}
 		}
 	}
+
+	bool is_changed = (m_autoMoving != autoMoving || m_autoTarget != autoTarget || m_spSelectedMovingNode != spSelectedMovingNode
+		|| m_spSelectedTargetNode != spSelectedTargetNode || m_spSelectedRegNode != spSelectedRegNode);
+	/// Reset the current selection if not active.
+	if (is_changed && !m_activeEvaluation)
+	{
+		this->m_autoMoving = autoMoving;
+		this->m_autoTarget = autoTarget;
+		this->m_spSelectedMovingNode = spSelectedMovingNode;
+		this->m_spSelectedTargetNode = spSelectedTargetNode;
+		this->m_spSelectedRegNode = spSelectedRegNode;
+	}
+	return is_changed;
+}
+
+void RegistrationComparison::StartEvaluation()
+{
+	if (this->m_spSelectedMovingNode == nullptr || this->m_spSelectedTargetNode == nullptr || m_activeEvaluation)
+		return;
+
+	//reinit view
+	mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+
+	mitk::RegEvaluationObject::Pointer regEval = mitk::RegEvaluationObject::New();
+
+	mitk::MAPRegistrationWrapper::Pointer reg;
+
+	if (m_spSelectedRegNode.IsNotNull())
+	{
+		reg = dynamic_cast<mitk::MAPRegistrationWrapper*>(this->m_spSelectedRegNode->GetData());
+	}
+	else
+	{
+		//generate a dymme reg to use
+		reg = mitk::GenerateIdentityRegistration3D();
+	}
+
+	regEval->SetRegistration(reg);
+	regEval->SetTargetNode(this->m_spSelectedTargetNode);
+	regEval->SetMovingNode(this->m_spSelectedMovingNode);
+
+	if (this->m_selectedEvalNode.IsNotNull() && this->GetDataStorage().IsNotNull())
+	{
+		this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+	}
+
+	this->m_selectedEvalNode = mitk::DataNode::New();
+	this->m_selectedEvalNode->SetData(regEval);
+
+	mitk::RegEvaluationMapper2D::SetDefaultProperties(this->m_selectedEvalNode);
+	this->m_selectedEvalNode->SetName(HelperNodeName);
+	this->m_selectedEvalNode->SetBoolProperty("helper object", true);
+	this->GetDataStorage()->Add(this->m_selectedEvalNode);
+
+	this->ui.evalSettings->SetNode(this->m_selectedEvalNode);
+	this->OnSliceChanged();
+
+	this->GetRenderWindowPart()->RequestUpdate();
+
+	this->m_activeEvaluation = true;
+	this->CheckInputs();
+	this->ConfigureControls();
+}
+void RegistrationComparison::StopEvaluation()
+{
+	this->m_activeEvaluation = false;
+
+	if (this->m_selectedEvalNode.IsNotNull())
+	{
+		if (this->GetDataStorage().IsNotNull())
+			this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+		this->m_selectedEvalNode = nullptr;
+		//this->m_selectedEvalNode = mitk::DataNode::New();
+	}
+
+	//this->ui.evalSettings->SetNode(this->m_selectedEvalNode);
 }
 
 
 void RegistrationComparison::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&)
 {
-	this->CheckInputs();
+	bool is_changed = CheckInputs();
+	if (is_changed && m_activeEvaluation)
+	{
+		StopEvaluation();
+		CheckInputs();
+	}
 	this->ConfigureControls();
+	this->StartEvaluation();
 };
 
 
@@ -170,76 +253,97 @@ void RegistrationComparison::NodeRemoved(const mitk::DataNode* node)
 		|| node == this->m_spSelectedTargetNode
 		|| node == this->m_selectedEvalNode)
 	{
-		if (node == this->m_selectedEvalNode)
+		bool is_evalNode_removed = (node == this->m_selectedEvalNode);		
+		StopEvaluation();
+		if (!is_evalNode_removed)
 		{
-			this->m_selectedEvalNode = nullptr;
+			CheckInputs();
+			ConfigureControls();
+			this->GetRenderWindowPart()->RequestUpdate();
 		}
-		this->OnStopBtnPushed();
+
 		MITK_INFO << "Stopped current registration comparison session because at least one relevant node was removed from storage.";
 	}
 }
 
 void RegistrationComparison::ConfigureControls()
 {
-	//configure input data widgets
-	if (this->m_spSelectedRegNode.IsNull())
+	/// Configure input data widgets.
+	bool is_reg = (m_spSelectedRegNode != nullptr);
+	//ui.label_Registration->setVisible(is_prereg);
+	if (is_reg)
 	{
-		if (this->m_spSelectedMovingNode.IsNotNull() && this->m_spSelectedTargetNode.IsNotNull())
-		{
-			m_Controls.lbRegistrationName->setText(QString("<font color='gray'>No registration selected! Direct comparison</font>"));
-		}
-		else
-		{
-			m_Controls.lbRegistrationName->setText(QString("<font color='red'>No registration selected!</font>"));
-		}
+		std::string name = m_spSelectedRegNode->GetName();
+		QString short_name = Elements::get_short_name_for_image(name);
+		ui.label_Registration->setText("<b>Registration:</b> " + short_name);
+		ui.label_Registration->setToolTip(QString::fromStdString(name));
+		ui.label_Registration->setStyleSheet("");
+		ui.label_Registration->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		m_Controls.lbRegistrationName->setText(QString::fromStdString(this->m_spSelectedRegNode->GetName()));
-	}
-
-	if (this->m_spSelectedMovingNode.IsNull())
-	{
-		m_Controls.lbMovingName->setText(QString("<font color='red'>no moving image selected!</font>"));
-	}
-	else
-	{
-		if (this->m_autoMoving)
+		if (m_spSelectedMovingNode != nullptr && m_spSelectedTargetNode != nullptr)
 		{
-			m_Controls.lbMovingName->setText(QString("<font color='gray'>") + QString::fromStdString(this->m_spSelectedMovingNode->GetName()) + QString(" (auto selected)</font>"));
+			ui.label_Registration->setText(QString("<font color='gray'>No registration selected. Direct comparison.</font>"));
+			ui.label_Registration->setStyleSheet("");
 		}
 		else
 		{
-			m_Controls.lbMovingName->setText(QString::fromStdString(this->m_spSelectedMovingNode->GetName()));
+			ui.label_Registration->setText(QString("<font color=#E02000><b>Registration:</b> Please select in Data Manager.</font>"));
+			ui.label_Registration->setStyleSheet("background-color: #efef95;");
 		}
+		ui.label_Registration->setToolTip("");
+		ui.label_Registration->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 
-	if (this->m_spSelectedTargetNode.IsNull())
+	bool is_moving_image = (m_spSelectedMovingNode != nullptr);
+	if (is_moving_image)
 	{
-		m_Controls.lbTargetName->setText(QString("<font color='red'>no target image selected!</font>"));
+		std::string name = m_spSelectedMovingNode->GetName();
+		QString short_name = Elements::get_short_name_for_image(name);
+		if (m_autoMoving)
+			ui.label_MovingImage->setText(QString("<b>Moving image:</b> <font color='gray'>") + short_name + QString("</font>")); // + QString(" (auto selected)</font>"));
+		else
+			ui.label_MovingImage->setText("<b>Moving image:</b> " + short_name);
+		ui.label_MovingImage->setToolTip(QString::fromStdString(name));
+		ui.label_MovingImage->setStyleSheet("");
+		ui.label_MovingImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 	else
 	{
-		if (this->m_autoTarget)
-		{
-			m_Controls.lbTargetName->setText(QString("<font color='gray'>") + QString::fromStdString(this->m_spSelectedTargetNode->GetName()) + QString(" (auto selected)</font>"));
-		}
-		else
-		{
-			m_Controls.lbTargetName->setText(QString::fromStdString(this->m_spSelectedTargetNode->GetName()));
-		}
+		ui.label_MovingImage->setText("<font color=#E02000><b>Moving image:</b> Please select in Data Manager.</font>");
+		ui.label_MovingImage->setToolTip("");
+		ui.label_MovingImage->setStyleSheet("background-color: #efef95;");
+		ui.label_MovingImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 
-	//config settings widget
-	this->m_Controls.evalSettings->setVisible(m_activeEvaluation);
-	this->m_Controls.pbEval->setEnabled(this->m_spSelectedMovingNode.IsNotNull() && this->m_spSelectedTargetNode.IsNotNull());
-	this->m_Controls.pbEval->setVisible(!m_activeEvaluation);
-	this->m_Controls.pbStop->setVisible(m_activeEvaluation);
-	this->m_Controls.lbMovingName->setEnabled(!m_activeEvaluation);
-	this->m_Controls.lbRegistrationName->setEnabled(!m_activeEvaluation);
-	this->m_Controls.lbTargetName->setEnabled(!m_activeEvaluation);
+	bool is_target_image = (m_spSelectedTargetNode != nullptr);
+	if (is_target_image)
+	{
+		std::string name = m_spSelectedTargetNode->GetName();
+		QString short_name = Elements::get_short_name_for_image(name);
+		if (m_autoTarget)
+			ui.label_TargetImage->setText(QString("<b>Target image:</b> <font color='gray'>") + short_name + QString("</font>"));// + QString(" (auto selected)</font>"));
+		else
+			ui.label_TargetImage->setText("<b>Target image:</b> " + short_name);
+		ui.label_TargetImage->setToolTip(QString::fromStdString(name));
+		ui.label_TargetImage->setStyleSheet("");
+		ui.label_TargetImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	}
+	else
+	{
+		ui.label_TargetImage->setText("<font color=#E02000><b>Target image:</b> Please select in Data Manager.</font>");
+		ui.label_TargetImage->setToolTip("");
+		ui.label_TargetImage->setStyleSheet("background-color: #efef95;");
+		ui.label_TargetImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	}
+
+	/// Config settings widget.
+	this->ui.evalSettings->setVisible(m_activeEvaluation);
+	this->ui.label_Registration->setEnabled(!m_activeEvaluation);
+	this->ui.label_MovingImage->setEnabled(!m_activeEvaluation);
+	this->ui.label_TargetImage->setEnabled(!m_activeEvaluation);
 }
-
 
 void RegistrationComparison::OnSliceChanged()
 {
@@ -266,66 +370,3 @@ void RegistrationComparison::OnSettingsChanged(mitk::DataNode*)
 {
 	this->GetRenderWindowPart()->RequestUpdate();
 };
-
-void RegistrationComparison::OnEvalBtnPushed()
-{
-	//reinit view
-	mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-
-	mitk::RegEvaluationObject::Pointer regEval = mitk::RegEvaluationObject::New();
-
-	mitk::MAPRegistrationWrapper::Pointer reg;
-
-	if (m_spSelectedRegNode.IsNotNull())
-	{
-		reg = dynamic_cast<mitk::MAPRegistrationWrapper*>(this->m_spSelectedRegNode->GetData());
-	}
-	else
-	{
-		//generate a dymme reg to use
-		reg = mitk::GenerateIdentityRegistration3D();
-	}
-
-	regEval->SetRegistration(reg);
-	regEval->SetTargetNode(this->m_spSelectedTargetNode);
-	regEval->SetMovingNode(this->m_spSelectedMovingNode);
-
-	if (this->m_selectedEvalNode.IsNotNull())
-	{
-		this->GetDataStorage()->Remove(this->m_selectedEvalNode);
-	}
-
-	this->m_selectedEvalNode = mitk::DataNode::New();
-	this->m_selectedEvalNode->SetData(regEval);
-
-	mitk::RegEvaluationMapper2D::SetDefaultProperties(this->m_selectedEvalNode);
-	this->m_selectedEvalNode->SetName(HelperNodeName);
-	this->m_selectedEvalNode->SetBoolProperty("helper object", true);
-	this->GetDataStorage()->Add(this->m_selectedEvalNode);
-
-	this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
-	this->OnSliceChanged();
-
-	this->GetRenderWindowPart()->RequestUpdate();
-
-	this->m_activeEvaluation = true;
-	this->CheckInputs();
-	this->ConfigureControls();
-}
-
-void RegistrationComparison::OnStopBtnPushed()
-{
-	this->m_activeEvaluation = false;
-
-	if (this->m_selectedEvalNode.IsNotNull())
-	{
-		this->GetDataStorage()->Remove(this->m_selectedEvalNode);
-	}
-	this->m_selectedEvalNode = nullptr;
-
-	this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
-
-	this->CheckInputs();
-	this->ConfigureControls();
-	this->GetRenderWindowPart()->RequestUpdate();
-}
