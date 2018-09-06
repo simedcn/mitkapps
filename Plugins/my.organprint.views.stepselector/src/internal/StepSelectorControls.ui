@@ -64,7 +64,7 @@ Segment</string>
     <widget class="QPushButton" name="pushButton_3">
      <property name="text">
       <string>3
-Configure</string>
+Material</string>
      </property>
      <property name="checkable">
       <bool>true</bool>

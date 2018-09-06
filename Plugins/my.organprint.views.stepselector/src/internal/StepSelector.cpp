@@ -135,7 +135,7 @@ StepSelector::~StepSelector()
 
 void StepSelector::selectView(int n)
 {
-    cout << "Selecting view " << n << endl;
+    MITK_DEBUG << "Selecting view " << n << endl;
 
     const std::string editorArea = "org.mitk.editors.stdmultiwidget";
 
@@ -151,7 +151,7 @@ void StepSelector::selectView(int n)
     if (page == nullptr)
         return;
 
-    cout << "Settting step to " << n << endl;
+    MITK_INFO<< "Settting step to " << n << endl;
     const auto& current = m_steps[m_currentStep];
 
     if(m_currentStep >= 0) {
@@ -214,11 +214,11 @@ void StepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QLis
 
 void StepSelector::on_pushButton_clicked(int step)
 {
-    cout << "on_pushButton_clicked " << step << endl;
+    MITK_DEBUG << "on_pushButton_clicked " << step << endl;
     selectView(step);
 }
 void StepSelector::onChangeStepEvent(const ctkEvent & event) {
-    cout << "onChangeStepEvent " << event.getProperty("step").toInt() << endl;
+    MITK_DEBUG << "onChangeStepEvent " << event.getProperty("step").toInt() << endl;
     int id = event.getProperty("step").toInt();
     //group->buttonClicked(id);
     group->button(id)->setChecked(true);
@@ -228,7 +228,7 @@ void StepSelector::onChangeStepEvent(const ctkEvent & event) {
 
 void StepSelector::onNodeListChanged(const mitk::DataNode*) {
 
-    cout << "The list has changed ! " << endl;
+    MITK_DEBUG << "The list has changed ! " << endl;
 
     SetOfObjects::ConstPointer nodes = GetDataStorage()->GetSubset(mitk::NodePredicateProperty::New("visible",mitk::BoolProperty::New(true)));
 
@@ -257,7 +257,7 @@ void StepSelector::onNodeListChanged(const mitk::DataNode*) {
 
     }
 
-    cout << "Number of nodes : " << nodes->Size() << endl;
+    MITK_INFO << "Number of nodes : " << nodes->Size() << endl;
 
     for (int i = 0; i < (int) m_steps.size(); i++) {
 
@@ -268,7 +268,7 @@ void StepSelector::onNodeListChanged(const mitk::DataNode*) {
 
     }
 
-    cout << "Step selector over" << endl;
+    MITK_INFO << "Step selector over" << endl;
 }
 
 void StepSelector::initListeners() {

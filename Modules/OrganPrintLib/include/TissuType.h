@@ -33,9 +33,13 @@ public:
     Properties * GetWeightedVector(float weight);
 
 #if defined(_WIN32) || defined(_WIN64)
+#pragma warning(push)
 #pragma warning(disable:4251)
 #endif
     static std::string PROPERTY_KEY;
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(pop)
+#endif
 
 private:
     int id;
