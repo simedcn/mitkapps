@@ -15,3 +15,4 @@ Plugins/my.popeproject.segmentation/src/internal
 Plugins/my.popeproject.toolsplugin/src/internal
 Plugins/my.pacs.views.dicomview/src
 Modules/OrganPrintLib/src
+Plugins/my.organprint.views.sidepanel/src
