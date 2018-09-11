@@ -57,7 +57,7 @@ void orgpnt::ImportPanel::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.openImageButton, SIGNAL(clicked()), this, SLOT(OpenImageFromDisk()));
     connect(m_Controls.queryPacsButton, SIGNAL(clicked()), this, SLOT(QueryPacs()));
 
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->InitializeTools();
 
 }
 
