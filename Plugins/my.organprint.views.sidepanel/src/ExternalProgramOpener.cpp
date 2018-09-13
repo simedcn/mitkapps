@@ -38,6 +38,11 @@ ExternalProgramOpener::ExternalProgramOpener(const char * programName
  * inside the other methods
  */
 void ExternalProgramOpener::run() {
+
+    if(arguments.size() == 0) {
+        return;
+    }
+
     if(runSystemCommand()== false) {
         QString path = askForProgramPath();
         if(path == NO_PATH) {

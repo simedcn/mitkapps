@@ -50,6 +50,7 @@ void orgpnt::TissuePanel::CreateQtPartControl(QWidget *parent) {
     connect(cb,SIGNAL(currentIndexChanged(int)),this,SLOT(onCurrentTissuTypeChanged(int)));
 
 
+
 }
 
 void orgpnt::TissuePanel::onCurrentTissuTypeChanged(int newType) {
@@ -83,14 +84,10 @@ void orgpnt::TissuePanel::OnNodeChanged(const mitk::DataNode *node) {
 
         node->GetBoolProperty("selected",isSelected);
 
-        if(node == GetSelectedNode()) {
-
+        if(isSelected) {
             UpdateSelectionLabel(node);
         }
-
     }
-
-
     UpdateTissuSelection();
 
 
