@@ -10,9 +10,11 @@
 
 #include <QSortFilterProxyModel>
 
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapper.h>
 
 #include "ui_RegistrationVisualizerControls.h"
+
+#include <QTimer>
 
 
 /*!
@@ -32,33 +34,23 @@ public:
 	static const std::string VIEW_ID;
 
 	/**
-		* Creates smartpointer typedefs
-		*/
+	* Creates smartpointer typedefs
+	*/
 	berryObjectMacro(RegistrationVisualizer)
 
 	RegistrationVisualizer();
 
 	virtual void CreateQtPartControl(QWidget* parent);
 
+	/**
+	* @brief Connect all GUI elements to its corresponding slots
+	*/
+	virtual void CreateConnections();
+
 	/** Returns the registration currently handled by the plugin.
 	 * May return nullptr, if no registration is selected/handled by
 	 * the plugin*/
 	mitk::MAPRegistrationWrapper* GetCurrentRegistration();
-
-protected slots:
-	/**
-	 * @brief Connect all GUI elements to its corresponding slots
-	 */
-	virtual void CreateConnections();
-
-	void OnLockRegButtonPushed();
-	void OnStyleButtonPushed();
-	void OnDirectionChanged(int index);
-
-	void OnUseFOVRefBtnPushed();
-	void OnUpdateBtnPushed();
-
-	void OnColorInterpolationChecked(bool);
 
 protected:
 	virtual void SetFocus();
@@ -121,6 +113,20 @@ private:
 
 	void UpdateOrientationMatrixWidget();
 
+
+protected slots:
+	void UpdateVisualization();
+	void RequestUpdateVisualization();
+
+	void OnLockRegButtonPushed();
+	void OnStyleButtonPushed();
+	void OnDirectionChanged(int index);
+
+	void OnUseFOVRefBtnPushed();
+	void OnUpdateBtnPushed();
+
+	void OnColorInterpolationChecked(bool);
+
 private:
 	QWidget* m_Parent;
 protected:
@@ -135,6 +141,10 @@ protected:
 
 	/**Used to store informations about the FOV reference orientation. Default is identity matrix.*/
 	mitk::AffineTransform3D::MatrixType m_FOVRefOrientation;
+
+	QTimer* m_timerForUpdate;
+	bool m_isUpdateNeeded;
+	bool m_isBusy;
 };
 
 #endif // inova_registration_views_visualizer_h

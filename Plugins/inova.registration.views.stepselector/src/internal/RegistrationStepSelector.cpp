@@ -259,8 +259,11 @@ void RegistrationStepSelector::selectItem(size_t n)
 /*void RegistrationStepSelector::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& selectedDataNodes)
 {
 }
-void RegistrationStepSelector::OnPreferencesChanged(const berry::IBerryPreferences*)
+void RegistrationStepSelector::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+	if (prefs == nullptr)
+		return;
+	//MITK_INFO << prefs->
 }*/
 
 void RegistrationStepSelector::on_pushButton_clicked(int item)

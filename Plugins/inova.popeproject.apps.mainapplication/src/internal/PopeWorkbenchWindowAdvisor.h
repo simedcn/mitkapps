@@ -41,6 +41,7 @@ protected slots:
 	void on_action_OpenFolder_triggered();
 	void on_action_PACS_triggered();
 	void on_action_Settings_triggered();
+	virtual void onAbout() override;
 public slots:
 	void on_MainWindow_ShowPACS_triggered(const ctkEvent& event);
 

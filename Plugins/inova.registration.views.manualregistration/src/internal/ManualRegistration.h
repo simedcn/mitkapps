@@ -108,6 +108,7 @@ protected slots:
 
 	void OnSliceChanged();
 
+	void OnMapJobError(QString err);
 	void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
 
 	//void on_Plugin_hidden(ctkEvent event);

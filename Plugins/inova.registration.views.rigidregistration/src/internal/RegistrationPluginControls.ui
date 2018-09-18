@@ -131,6 +131,16 @@ background-color: #efef95;</string>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QPushButton" name="pushButton_Registration">
+       <property name="styleSheet">
+        <string notr="true">QPushButton
+{
+background-color:#883399CC;
+}
+QPushButton:hover
+{
+    background-color:#CC3399CC;
+}</string>
+       </property>
        <property name="text">
         <string>Start Registration</string>
        </property>

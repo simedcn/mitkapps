@@ -339,10 +339,10 @@ void RegistrationComparison::ConfigureControls()
 	}
 
 	/// Config settings widget.
-	this->ui.evalSettings->setVisible(m_activeEvaluation);
-	this->ui.label_Registration->setEnabled(!m_activeEvaluation);
-	this->ui.label_MovingImage->setEnabled(!m_activeEvaluation);
-	this->ui.label_TargetImage->setEnabled(!m_activeEvaluation);
+//	this->ui.evalSettings->setVisible(m_activeEvaluation);
+	//this->ui.label_Registration->setEnabled(!m_activeEvaluation);
+	//this->ui.label_MovingImage->setEnabled(!m_activeEvaluation);
+	//this->ui.label_TargetImage->setEnabled(!m_activeEvaluation);
 }
 
 void RegistrationComparison::OnSliceChanged()

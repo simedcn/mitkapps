@@ -742,7 +742,7 @@ background-color: #efef95;</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QmitkRegEvalSettingsWidget" name="evalSettings" native="true">
+        <widget class="RegEvalSettingsWidget" name="evalSettings" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
@@ -822,6 +822,16 @@ background-color: #efef95;</string>
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Confirm the defined registration.&lt;/p&gt;&lt;p&gt;The registration will be stored (&quot;Reg_XXX&quot;) and a mapped image will be generated (&quot;XXX&quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton
+{
+background-color:#883399CC;
+}
+QPushButton:hover
+{
+    background-color:#CC3399CC;
+}</string>
+       </property>
        <property name="text">
         <string>Save Result</string>
        </property>
@@ -846,9 +856,9 @@ background-color: #efef95;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkRegEvalSettingsWidget</class>
+   <class>RegEvalSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkRegEvalSettingsWidget.h</header>
+   <header>regevalsettingswidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

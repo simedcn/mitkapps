@@ -109,19 +109,18 @@ private:
 
 	void UpdateAlgorithmSelection();
 
+	void StopAlgorithm(bool force = false);
+
 signals:
 	void PluginIsBusy(const ctkDictionary&);
 	void PluginIsIdle(const ctkDictionary&);
 
 protected slots:
-	/**
-	* @brief Connect all GUI elements to its corresponding slots
-	*/
-
 	/// \brief Called when the user clicks the GUI button
 	void OnMaskCheckBoxToggeled(bool checked);
 
 	void OnStartRegBtnPushed();
+	void OnStopRegBtnPushed();
 	void OnSaveLogBtnPushed();
 
 	void OnFramesSelectAllPushed();
@@ -171,6 +170,7 @@ protected:
 	bool m_CanLoadAlgorithm;
 	bool m_ValidInputs;
 	bool m_Working;
+	bool m_Quitting;
 
 	Ui::FrameRegistrationControls ui;
 

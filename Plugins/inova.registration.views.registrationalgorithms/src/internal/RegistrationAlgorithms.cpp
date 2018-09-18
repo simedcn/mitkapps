@@ -110,7 +110,7 @@ void RegistrationAlgorithms::CreateQtPartControl(QWidget* parent)
 	ui.m_checkStoreReg->setChecked(true);
 	ui.m_checkMapEntity->setVisible(false);
 	ui.m_checkMapEntity->setChecked(true);
-	ui.m_tabs->setCurrentIndex(0);
+	ui.m_tabs->setCurrentIndex(1);
 
 	this->CreateConnections();
 	this->AdaptFolderGUIElements();
@@ -559,7 +559,8 @@ bool RegistrationAlgorithms::CheckInputs()
 	}
 
 	m_ValidInputs = validMoving && validTarget && validMovingMask && validTargetMask;
-	ui.m_tabs->setCurrentIndex(m_ValidInputs ? 1 : 0);
+	//ui.m_tabs->setCurrentIndex(m_ValidInputs ? 1 : 0);
+	ui.m_tabs->setCurrentIndex(1);
 	return m_ValidInputs;
 }
 
@@ -606,17 +607,17 @@ std::string RegistrationAlgorithms::GetDefaultRegJobName() const
 
 	//mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetRegNodes().GetPointer();
 	//mitk::DataStorage::SetOfObjects::ElementIdentifier estimatedIndex = nodes->Size();
-
+	//
 	//bool isUnique = false;
 	//std::string result = "Unnamed Reg";
-
+	//
 	//while (!isUnique)
 	//{
 	//	++estimatedIndex;
 	//	result = "Reg #" + map::core::convert::toStr(estimatedIndex);
 	//	isUnique = (this->GetDataStorage()->GetNamedNode(result) == nullptr);
 	//}
-
+	//
 	//return result;
 }
 void RegistrationAlgorithms::ConfigureRegistrationControls()
@@ -642,19 +643,15 @@ void RegistrationAlgorithms::ConfigureRegistrationControls()
 		ui.m_checkStoreReg->setEnabled(!m_Working);
 
 		const IStoppableAlgorithm* pIterativ = dynamic_cast<const IStoppableAlgorithm*>(m_LoadedAlgorithm.GetPointer());
-
 		if (pIterativ)
-		{
 			ui.m_pbStopReg->setVisible(pIterativ->isStoppable());
-		}
 
 		using MaskRegInterface = map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3>;
 		const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>(m_LoadedAlgorithm.GetPointer());
 
 		ui.groupMasks->setVisible(pMaskReg != nullptr);
 
-		//if the stop button is set to visible and the algorithm is working ->
-		//then the algorithm is stoppable, thus enable the button.
+		//if the stop button is set to visible and the algorithm is working -> then the algorithm is stoppable, thus enable the button.
 		ui.m_pbStopReg->setEnabled(ui.m_pbStopReg->isVisible() && m_Working);
 	}
 	else
@@ -738,6 +735,9 @@ void RegistrationAlgorithms::UpdateAlgorithmSelection()
 }*/
 void RegistrationAlgorithms::StopAlgorithm(bool force)
 {
+	if (!m_Working)
+		return;
+
 	if (m_LoadedAlgorithm.IsNotNull())
 	{
 		IStoppableAlgorithm* pIterativ = dynamic_cast<IStoppableAlgorithm*>(m_LoadedAlgorithm.GetPointer());
@@ -765,7 +765,7 @@ void RegistrationAlgorithms::StopAlgorithm(bool force)
 			MITK_INFO << "Cannot stop the registration process because the algorithm is not stoppable.";
 		}
 	}
-	if (m_Working && force)
+	if (force)
 	{
 		this->m_Working = false;
 		ctkDictionary properties;
@@ -921,7 +921,6 @@ void RegistrationAlgorithms::OnSaveLogBtnPushed()
 
 		file.close();
 	}
-
 }
 void RegistrationAlgorithms::OnRegJobError(QString err)
 {

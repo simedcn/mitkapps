@@ -12,12 +12,13 @@
           standalone="true"-->
   </extension>
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="inova.registration.views.rigidregistrationPreferencePage" name="Registration" class="RegistrationPluginPreferencePage">
+    <page id="inova.registration.views.rigidregistrationPreferencePage" name="Accurate Registration" class="RegistrationPluginPreferencePage">
       <keywordreference id="inova.registration.views.rigidregistrationPreferencePageKeywords">
       </keywordreference>
     </page>
   </extension>
   <extension point="org.blueberry.ui.keywords">
+    <keyword id="inova.registration.views.rigidregistrationPreferencePageKeywords" label="Accurate" />/>
     <keyword id="inova.registration.views.rigidregistrationPreferencePageKeywords" label="Registration" />/>
     <keyword id="inova.registration.views.rigidregistrationPreferencePageKeywords" label="Rigid" />
   </extension>

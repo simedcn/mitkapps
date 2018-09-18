@@ -187,7 +187,7 @@ background-color: #efef95;</string>
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -268,8 +268,35 @@ background-color: #efef95;</string>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QPushButton" name="m_pbStartReg">
+           <property name="styleSheet">
+            <string notr="true">QPushButton
+{
+background-color:#883399CC;
+}
+QPushButton:hover
+{
+    background-color:#CC3399CC;
+}</string>
+           </property>
            <property name="text">
             <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_pbStopReg">
+           <property name="styleSheet">
+            <string notr="true">QPushButton
+{
+background-color:#883399CC;
+}
+QPushButton:hover
+{
+    background-color:#CC3399CC;
+}</string>
+           </property>
+           <property name="text">
+            <string>Stop</string>
            </property>
           </widget>
          </item>

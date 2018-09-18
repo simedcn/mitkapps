@@ -22,6 +22,7 @@ set(INTERNAL_CPP_FILES
   MainApplicationPreferencePage.cpp
   PopeWorkbenchWindowAdvisor.cpp
   PluginListener.cpp
+  PopeAboutDialog.cpp
 )
 
 set(MOC_H_FILES
@@ -33,6 +34,7 @@ set(MOC_H_FILES
   src/internal/MainApplicationPreferencePage.h
   src/internal/PopeWorkbenchWindowAdvisor.h
   src/internal/PluginListener.h
+  src/internal/PopeAboutDialog.h
   ../../Classes/MainWorkbenchWindowAdvisor.h
   ../../Classes/ShowViewAction.h
 )
@@ -41,6 +43,11 @@ set(CACHED_RESOURCE_FILES
   resources/POPE_icon.ico
   resources/logo48.png
   plugin.xml
+)
+
+
+set(UI_FILES
+  src/internal/PopeAboutDialog.ui
 )
 
 set(QRC_FILES

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>315</width>
+    <width>320</width>
     <height>694</height>
    </rect>
   </property>
@@ -105,7 +105,7 @@ background-color: #efef95;</string>
     </widget>
    </item>
    <item>
-    <widget class="QmitkRegEvalSettingsWidget" name="evalSettings" native="true">
+    <widget class="RegEvalSettingsWidget" name="evalSettings" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Maximum">
        <horstretch>0</horstretch>
@@ -137,9 +137,9 @@ background-color: #efef95;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkRegEvalSettingsWidget</class>
+   <class>RegEvalSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkRegEvalSettingsWidget.h</header>
+   <header>RegEvalSettingsWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

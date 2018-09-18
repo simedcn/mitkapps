@@ -325,8 +325,8 @@ void ManualRegistration::ConfigureControls()
 		ui.label_TargetImage->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	}
 
-	if (!m_activeManipulation)
-	{
+	//if (!m_activeManipulation)
+	//{
 		//QString name = "ManualRegistration";
 		//if (m_SelectedPreRegNode.IsNotNull())
 		//	name = QString::fromStdString(m_SelectedPreRegNode->GetName()) + " Refined";
@@ -347,7 +347,7 @@ void ManualRegistration::ConfigureControls()
 				"ManualRegistration";
 		}
 		this->ui.lbNewRegName->setText(QString::fromStdString(name));
-	}
+	//}
 
 	//config settings widget
 	//this->ui.pbStart->setEnabled(m_SelectedMovingNode.IsNotNull() && m_SelectedTargetNode.IsNotNull() && !m_activeManipulation);
@@ -618,12 +618,18 @@ void ManualRegistration::OnStoreBtnPushed()
 	this->StartRegistration();
 }
 
+void ManualRegistration::OnMapJobError(QString err)
+{
+	Error(err);
+}
+
 void ManualRegistration::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job)
 {
 	mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
 		spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
 		job->m_doGeometryRefinement, job->m_InterpolatorLabel);
 	this->GetDataStorage()->Add(spMappedNode);
+	this->ConfigureControls();
 	this->GetRenderWindowPart()->RequestUpdate();
 };
 

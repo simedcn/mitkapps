@@ -2,6 +2,7 @@
 #include "PluginListener.h"
 #include "inova_popeproject_apps_mainapplication_Activator.h"
 #include <DicomViewDialog.h>
+#include "PopeAboutDialog.h"
 
 #include <QmitkPreferencesDialog.h>
 #include <mitkLogMacros.h>
@@ -333,4 +334,9 @@ void PopeWorkbenchWindowAdvisor::on_action_Settings_triggered()
 void PopeWorkbenchWindowAdvisor::on_MainWindow_ShowPACS_triggered(const ctkEvent& event)
 {
 	on_action_PACS_triggered();
+}
+void PopeWorkbenchWindowAdvisor::onAbout()
+{
+	auto   aboutDialog = new PopeAboutDialog(QApplication::activeWindow(), nullptr);
+	aboutDialog->open();
 }

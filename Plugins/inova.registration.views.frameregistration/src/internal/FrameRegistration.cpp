@@ -68,6 +68,7 @@ FrameRegistration::FrameRegistration()
 	, m_CanLoadAlgorithm(false)
 	, m_ValidInputs(false)
 	, m_Working(false)
+	, m_Quitting(false)
 {
 	m_spSelectedTargetData = nullptr;
 	m_spSelectedTargetMaskData = nullptr;
@@ -88,18 +89,20 @@ FrameRegistration::FrameRegistration()
 	};
 }
 FrameRegistration::~FrameRegistration()
-{}
+{
+	this->m_Quitting = true;
+	StopAlgorithm(true);
+}
 
 void FrameRegistration::CreateQtPartControl(QWidget* parent)
 {
-
 	// create GUI widgets from the Qt Designer's .ui file
 	ui.setupUi(parent);
 	m_Parent = parent;
 
 	ui.checkTargetMask->setChecked(false);
-	ui.m_tabs->setCurrentIndex(0);
-
+	//ui.m_tabs->setCurrentIndex(0);
+	ui.m_tabs->setCurrentIndex(1);
 	ui.m_mapperSettings->AllowSampling(false);
 
 	this->CreateConnections();
@@ -128,6 +131,7 @@ void FrameRegistration::CreateConnections()
 	// Tab 2 - Execution
 	// -----
 	connect(ui.m_pbStartReg, SIGNAL(clicked()), this, SLOT(OnStartRegBtnPushed()));
+	connect(ui.m_pbStopReg, SIGNAL(clicked()), this, SLOT(OnStopRegBtnPushed()));
 	connect(ui.m_pbSaveLog, SIGNAL(clicked()), this, SLOT(OnSaveLogBtnPushed()));
 
 	// -----
@@ -217,18 +221,6 @@ void FrameRegistration::Error(QString msg)
 void FrameRegistration::AdaptFolderGUIElements()
 {
 	ui.comboBox_Algorithm->setEnabled(m_CanLoadAlgorithm);
-}
-
-void FrameRegistration::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&)
-{
-	if (!m_Working)
-	{
-		CheckInputs();
-		ConfigureRegistrationControls();
-	}
-}
-void FrameRegistration::NodeRemoved(const mitk::DataNode* node)
-{
 }
 
 bool FrameRegistration::CheckInputs()
@@ -389,7 +381,8 @@ bool FrameRegistration::CheckInputs()
 	}
 
 	m_ValidInputs = validTarget && validTargetMask;
-	ui.m_tabs->setCurrentIndex(m_ValidInputs ? 1 : 0);
+	//ui.m_tabs->setCurrentIndex(m_ValidInputs ? 1 : 0);
+	ui.m_tabs->setCurrentIndex(1);
 	return m_ValidInputs;
 }
 
@@ -422,36 +415,39 @@ mitk::DataStorage::SetOfObjects::Pointer FrameRegistration::GetRegNodes() const
 	for (auto node : *nodes)
 	{
 		if (mitk::MITKRegistrationHelper::IsRegNode(node))
-		{
 			result->push_back(node);
-		}
 	}
 
 	return result;
 }
 std::string FrameRegistration::GetDefaultJobName() const
 {
-	mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetRegNodes().GetPointer();
-	mitk::DataStorage::SetOfObjects::ElementIdentifier newIndex = 0;
+	string name = (m_spSelectedTargetNode != nullptr) ?
+		Elements::get_next_name(m_spSelectedTargetNode->GetName(), GetDataStorage()) :
+		"FrameRegistration";
+	return name;
 
-	bool isUnique = false;
-	std::string baseName = "Corrected #";
-
-	if (m_spSelectedTargetNode.IsNotNull())
-	{
-		baseName = m_spSelectedTargetNode->GetName() + " corrected #";
-	}
-
-	std::string result = baseName;
-
-	while (!isUnique)
-	{
-		++newIndex;
-		result = baseName + map::core::convert::toStr(newIndex);
-		isUnique = (this->GetDataStorage()->GetNamedNode(result) == nullptr);
-	}
-
-	return result;
+	//mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetRegNodes().GetPointer();
+	//mitk::DataStorage::SetOfObjects::ElementIdentifier newIndex = 0;
+	//
+	//bool isUnique = false;
+	//std::string baseName = "Corrected #";
+	//
+	//if (m_spSelectedTargetNode.IsNotNull())
+	//{
+	//	baseName = m_spSelectedTargetNode->GetName() + " corrected #";
+	//}
+	//
+	//std::string result = baseName;
+	//
+	//while (!isUnique)
+	//{
+	//	++newIndex;
+	//	result = baseName + map::core::convert::toStr(newIndex);
+	//	isUnique = (this->GetDataStorage()->GetNamedNode(result) == nullptr);
+	//}
+	//
+	//return result;
 }
 void FrameRegistration::ConfigureRegistrationControls()
 {
@@ -460,6 +456,8 @@ void FrameRegistration::ConfigureRegistrationControls()
 	ui.groupMasks->setEnabled(!m_Working);
 
 	ui.m_pbStartReg->setEnabled(false);
+	ui.m_pbStopReg->setEnabled(false);
+	ui.m_pbStopReg->setVisible(false);
 
 	ui.m_lbTargetMaskName->setVisible(ui.checkTargetMask->isChecked());
 
@@ -471,10 +469,17 @@ void FrameRegistration::ConfigureRegistrationControls()
 		ui.m_pbStartReg->setEnabled(m_ValidInputs && !m_Working);
 		ui.m_leRegJobName->setEnabled(!m_Working);
 
+		const IStoppableAlgorithm* pIterativ = dynamic_cast<const IStoppableAlgorithm*>(m_LoadedAlgorithm.GetPointer());
+		if (pIterativ)
+			ui.m_pbStopReg->setVisible(pIterativ->isStoppable());
+
 		using MaskRegInterface = map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3>;
 		const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>(m_LoadedAlgorithm.GetPointer());
 
 		ui.groupMasks->setVisible(pMaskReg != nullptr);
+
+		//if the stop button is set to visible and the algorithm is working -> then the algorithm is stoppable, thus enable the button.
+		ui.m_pbStopReg->setEnabled(ui.m_pbStopReg->isVisible() && m_Working);
 	}
 	else
 	{
@@ -565,6 +570,66 @@ void FrameRegistration::UpdateAlgorithmSelection()
 	this->AdaptFolderGUIElements();
 };
 
+void FrameRegistration::StopAlgorithm(bool force)
+{
+	if (!m_Working)
+		return;
+
+	if (m_LoadedAlgorithm.IsNotNull())
+	{
+		IStoppableAlgorithm* pIterativ = dynamic_cast<IStoppableAlgorithm*>(m_LoadedAlgorithm.GetPointer());
+
+		if (pIterativ && pIterativ->isStoppable())
+		{
+			bool is_stopped = pIterativ->stopAlgorithm();
+			if (is_stopped)
+			{
+				this->m_Working = false;
+				ctkDictionary properties;
+				properties["id"] = QString::fromStdString(VIEW_ID);
+				emit PluginIsIdle(properties);
+			}
+			else
+			{
+				MITK_INFO << "Cannot stop the registration process.";
+			}
+
+			if (!m_Quitting)
+				ui.m_pbStopReg->setEnabled(false);
+		}
+		else
+		{
+			MITK_INFO << "Cannot stop the registration process because the algorithm is not stoppable.";
+		}
+	}
+	if (force)
+	{
+		this->m_Working = false;
+		ctkDictionary properties;
+		properties["id"] = QString::fromStdString(VIEW_ID);
+		emit PluginIsIdle(properties);
+		if (!m_Quitting)
+			ui.m_pbStopReg->setEnabled(false);
+	}
+}
+
+void FrameRegistration::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&)
+{
+	if (!m_Working)
+	{
+		CheckInputs();
+		ConfigureRegistrationControls();
+	}
+}
+void FrameRegistration::NodeRemoved(const mitk::DataNode* node)
+{
+	if (!m_Working)
+		return;
+
+	if (node == this->m_spSelectedTargetNode)
+		StopAlgorithm();
+}
+
 void FrameRegistration::OnMaskCheckBoxToggeled(bool)
 {
 	if (!m_Working)
@@ -651,6 +716,7 @@ mitk::TimeFramesRegistrationHelper::IgnoreListType FrameRegistration::GenerateIg
 
 	return result;
 }
+
 void FrameRegistration::OnStartRegBtnPushed()
 {
 	this->m_Working = true;
@@ -707,6 +773,10 @@ void FrameRegistration::OnStartRegBtnPushed()
 	QThreadPool* threadPool = QThreadPool::globalInstance();
 	threadPool->start(pJob);
 }
+void FrameRegistration::OnStopRegBtnPushed()
+{
+	StopAlgorithm();
+}
 void FrameRegistration::OnSaveLogBtnPushed()
 {
 	QDateTime currentTime = QDateTime::currentDateTime();
@@ -754,6 +824,9 @@ void FrameRegistration::OnRegJobFinished()
 
 void FrameRegistration::OnMapResultIsAvailable(mitk::Image::Pointer spMappedData, const QmitkFramesRegistrationJob* job)
 {
+	if (m_Quitting)
+		return;
+
 	ui.m_teLog->append(QString("<b><font color='blue'>Corrected image stored. Name: ") + QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
 
 	mitk::DataNode::Pointer spResultNode = mitk::generateMappedResultNode(job->m_MappedName, spMappedData.GetPointer(), "", job->m_TargetDataUID, false, job->m_InterpolatorLabel);
@@ -763,10 +836,16 @@ void FrameRegistration::OnMapResultIsAvailable(mitk::Image::Pointer spMappedData
 };
 void FrameRegistration::OnMapJobError(QString err)
 {
+	if (m_Quitting)
+		return;
+
 	Error(err);
 };
 void FrameRegistration::OnAlgorithmIterated(QString info, bool hasIterationCount, unsigned long currentIteration)
 {
+	if (m_Quitting)
+		return;
+
 	if (hasIterationCount)
 	{
 		ui.m_progBarIteration->setValue(currentIteration);
@@ -776,6 +855,9 @@ void FrameRegistration::OnAlgorithmIterated(QString info, bool hasIterationCount
 };
 void FrameRegistration::OnLevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel)
 {
+	if (m_Quitting)
+		return;
+
 	if (hasLevelCount)
 	{
 		ui.m_progBarLevel->setValue(currentLevel);
@@ -785,25 +867,36 @@ void FrameRegistration::OnLevelChanged(QString info, bool hasLevelCount, unsigne
 };
 void FrameRegistration::OnAlgorithmStatusChanged(QString info)
 {
-	ui.m_teLog->append(QString("<b><font color='blue'>") + info + QString(" </font></b>"));
+	if (!m_Quitting)
+		ui.m_teLog->append(QString("<b><font color='blue'>") + info + QString(" </font></b>"));
 };
 void FrameRegistration::OnAlgorithmInfo(QString info)
 {
-	ui.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
+	if (!m_Quitting)
+		ui.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
 };
 
 void FrameRegistration::OnFrameProcessed(double progress)
 {
+	if (m_Quitting)
+		return;
+
 	ui.m_teLog->append(QString("<b><font color='blue'>Frame processed...</font></b>"));
 	ui.m_progBarFrame->setValue(100 * progress);
 };
 void FrameRegistration::OnFrameRegistered(double progress)
 {
+	if (m_Quitting)
+		return;
+
 	ui.m_teLog->append(QString("<b><font color='blue'>Frame registered...</font></b>"));
 	ui.m_progBarFrame->setValue(100 * progress);
 };
 void FrameRegistration::OnFrameMapped(double progress)
 {
+	if (m_Quitting)
+		return;
+
 	ui.m_teLog->append(QString("<b><font color='blue'>Frame mapped...</font></b>"));
 	ui.m_progBarFrame->setValue(100 * progress);
 };

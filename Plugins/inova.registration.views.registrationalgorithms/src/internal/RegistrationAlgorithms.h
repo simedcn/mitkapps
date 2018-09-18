@@ -60,7 +60,6 @@ protected:
 	virtual void NodeRemoved(const mitk::DataNode* node) override;
 
 private:
-
 	/**
 	* @brief Adapt the visibility of GUI elements depending on the current data	loaded
 	*/
@@ -115,7 +114,6 @@ signals:
 	void PluginIsIdle(const ctkDictionary&);
 
 protected slots:
-
 	/// \brief Called when the user clicks the GUI button
 	void OnMaskCheckBoxToggeled(bool checked);
 
