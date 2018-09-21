@@ -107,7 +107,9 @@ berry::WorkbenchWindowAdvisor* MainWorkbenchAdvisor::CreateWorkbenchWindowAdviso
 	excludeViews.push_back("org.blueberry.views.helpcontents");
 	excludeViews.push_back("org.blueberry.views.helpindex");
 	excludeViews.push_back("org.blueberry.views.helpsearch");
+	excludeViews.push_back("org.blueberry.ui.views.objectbrowser");
 	excludeViews.push_back("org.mitk.views.aicpregistration");
+	excludeViews.push_back("org.mitk.views.datamanagerlight");
 	excludeViews.push_back("inova.pacs.views.dicomviewdialog");
 	// MatchPoint
 	excludeViews.push_back("org.mitk.views.matchpoint.manipulator");
