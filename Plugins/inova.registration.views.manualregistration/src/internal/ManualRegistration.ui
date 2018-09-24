@@ -858,7 +858,7 @@ QPushButton:hover
   <customwidget>
    <class>RegEvalSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>regevalsettingswidget.h</header>
+   <header>RegEvalSettingsWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

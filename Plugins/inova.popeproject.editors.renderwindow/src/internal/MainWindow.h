@@ -55,69 +55,70 @@
 // Forward declaration of ui widget
 namespace Ui
 {
-	class mainwindow;
+class mainwindow;
 }
 
 class MainWindow : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent = nullptr);
-	~MainWindow();
+    MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent = nullptr);
+    ~MainWindow();
 
-	QmitkStdMultiWidget* getStdMultiWidget();
-	void RegisterLevelWindowObserver();
+    QmitkStdMultiWidget* getStdMultiWidget();
+    void RegisterLevelWindowObserver();
 
 protected:
-	void enable3DRepresentation(bool flag);
-	void updateCrosshair(bool is_autorotation_enabled = false);
+    void enable3DRepresentation(bool flag);
+    void updateCrosshair(bool is_autorotation_enabled = false);
 
 signals:
-	void ImageSetHasToBeLoaded(const QString& filename);
-	void ImageFolderHasToBeLoaded(const QString& filename);
-	void EnableAutoRotation(bool);
-	void Representation3D_changed(const ctkDictionary&);
-	void ShowPACS_triggered(const ctkDictionary&);
-	
+    void ImageSetHasToBeLoaded(const QString& filename);
+    void ImageFolderHasToBeLoaded(const QString& filename);
+    void EnableAutoRotation(bool);
+    void Representation3D_changed(const ctkDictionary&);
+    void ShowPACS_triggered(const ctkDictionary&);
+
 public slots:
-	void on_pushButton_OpenDICOM_clicked();
-	void on_pushButton_OpenFolder_clicked();
-	void on_pushButton_PACS_clicked();
-	void on_pushButton_Settings_clicked();
-	void on_pushButton_ViewAll_clicked();
+    void on_pushButton_OpenDICOM_clicked();
+    void on_pushButton_OpenFolder_clicked();
+    void on_pushButton_PACS_clicked();
+    void on_pushButton_Settings_clicked();
+    void on_pushButton_ViewAll_clicked();
 
-	void On_ToolsPlugin_Representation3DHasToBeInitiated(const ctkEvent& event);
-	void On_ToolsPlugin_UpdateCrosshair(const ctkEvent& event);
-	void On_ToolsPlugin_NodeHasManyImages(const ctkEvent& event);
-	void On_ToolsPlugin_SetRange(const ctkEvent& event);
-	void On_ToolsPlugin_SelectedNodeChanged(const ctkEvent& event);
-	void On_RegistrationPlugin_GonnaAddNewDataNode(const ctkEvent& event);
-	void On_RegistrationPlugin_NewDataNodeAdded(const ctkEvent& event);
+    void On_ToolsPlugin_Representation3DHasToBeInitiated(const ctkEvent& event);
+    void On_ToolsPlugin_UpdateCrosshair(const ctkEvent& event);
+    void On_ToolsPlugin_NodeHasManyImages(const ctkEvent& event);
+    void On_ToolsPlugin_SetRange(const ctkEvent& event);
+    void On_ToolsPlugin_SelectedNodeChanged(const ctkEvent& event);
+    void On_RegistrationPlugin_GonnaAddNewDataNode(const ctkEvent& event);
+    void On_RegistrationPlugin_NewDataNodeAdded(const ctkEvent& event);
 
-	void On_DataManager_GonnaAddNewDataNode();
-	void On_DataManager_NewDataNodeAdded();
+    void On_DataManager_GonnaAddNewDataNode();
+    void On_DataManager_NewDataNodeAdded();
 
 public:
-	void on_levelWindow_modified(const itk::EventObject&);
+    void on_levelWindow_modified(const itk::EventObject&);
 
 private:
-	Ui::mainwindow& ui;
-	QmitkStdMultiWidget* multiWidget;
-	mitk::LevelWindowManager* levelWindowManager = nullptr;
-	bool is_LevelWindowObserver_registered = false;
-	QString selectedNodeName;
-	enum StatusChangesInLevelWindow;
-	StatusChangesInLevelWindow status_changesInLevelWindow = StatusChangesInLevelWindow::DontSaveAnyChanges;
-	double savedLevelWindow_min; //= numeric_limits<double>::max();
-	double savedLevelWindow_max; //= numeric_limits<double>::max();
+    QmitkStdMultiWidget* multiWidget;
+    Ui::mainwindow& ui;
+    mitk::LevelWindowManager* levelWindowManager = nullptr;
+    bool is_LevelWindowObserver_registered = false;
+    QString selectedNodeName;
+
+    enum StatusChangesInLevelWindow
+    {
+        SaveAllChanges,
+        SaveUIChanges,
+        DontSaveAnyChanges
+    };
+    StatusChangesInLevelWindow status_changesInLevelWindow = StatusChangesInLevelWindow::DontSaveAnyChanges;
+    double savedLevelWindow_min; //= numeric_limits<double>::max();
+    double savedLevelWindow_max; //= numeric_limits<double>::max();
 
 private:
-	enum StatusChangesInLevelWindow
-	{
-		SaveAllChanges,
-		SaveUIChanges,
-		DontSaveAnyChanges
-	};
+
 };
 
 #endif // MAINWINDOW_H
