@@ -19,6 +19,7 @@
 #include <mitkAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
+#include <mitkIRenderingManager.h>
 
 // CTK
 #include <ctkPluginActivator.h>
@@ -48,6 +49,7 @@
 
 #include <sstream>
 #include <climits>
+#include <memory>
 
 using string = std::string;
 
@@ -69,6 +71,8 @@ ManualRegistration::ManualRegistration()
 
 ManualRegistration::~ManualRegistration()
 {
+	this->m_ServiceRegistration.Unregister();
+
 	if (m_activeManipulation)
 		StopSession();
 	if (this->m_EvalNode.IsNotNull() && this->GetDataStorage().IsNotNull())
@@ -141,6 +145,14 @@ void ManualRegistration::CreateQtPartControl(QWidget* parent)
 	this->StopSession();
 	this->ConfigureControls();
 	this->StartRegistration();
+
+	/// Create the MouseMove Supplier and provide it with the function name it should call.
+	m_MouseMoveSupplier = std::make_unique<MouseMoveSupplier>();
+	m_MouseMoveSupplier->RegisterForUpdates(this, QString::fromLatin1("on_mouse_moved"));
+	//m_MouseMoveSupplier->RegisterForUpdates(this, QString::fromLatin1("on_mouse_rotated"));
+
+	/// Register the MouseMove supplier as MicroService.
+	this->m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(this->m_MouseMoveSupplier.get());
 }
 
 void ManualRegistration::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -520,6 +532,128 @@ void ManualRegistration::UpdateTransform(bool updateRotation)
 	this->m_CurrentRegistrationWrapper->Modified();
 	this->GetRenderWindowPart()->RequestUpdate();
 };
+
+void ManualRegistration::on_mouse_moved(QVector<double> point)
+{
+	if (!m_activeManipulation)
+		return;
+	if (point.size() < 3)
+		return;
+	//const double dbl_min = 6 * DBL_EPSILON;
+	MITK_INFO << point[2] - 100000;
+	bool is_rotation = (point[2] >= 99999.6 && point[2] < 100002.4);
+	if (is_rotation)
+	{
+		on_mouse_rotated(point);
+		return;
+	}
+
+	double new_x = ui.sbTransX->value() + point[0];
+	double new_y = ui.sbTransY->value() + point[1];
+	double new_z = ui.sbTransZ->value() + point[2];
+	new_x = std::min(std::max(new_x, ui.sbTransX->minimum()), ui.sbTransX->maximum());
+	new_y = std::min(std::max(new_y, ui.sbTransY->minimum()), ui.sbTransY->maximum());
+	new_z = std::min(std::max(new_z, ui.sbTransZ->minimum()), ui.sbTransZ->maximum());
+	if (!isnan(new_x) && !isinf(new_x))
+		ui.sbTransX->setValue(new_x);
+	if (!isnan(new_y) && !isinf(new_y))
+		ui.sbTransY->setValue(new_y);
+	if (!isnan(new_z) && !isinf(new_z))
+		ui.sbTransZ->setValue(new_z);
+
+	/*using namespace mitk;
+	// TODO: exlude binary images !!!!!
+	// !!!!!!!!
+	TNodePredicateDataType<Image>::Pointer isImage = TNodePredicateDataType<Image>::New();
+	auto nodePredicateProperty = NodePredicateProperty::New("visible", BoolProperty::New(false));
+	NodePredicateNot::Pointer isNotVisible = NodePredicateNot::New(nodePredicateProperty);
+	NodePredicateAnd::Pointer validVisibleImage = NodePredicateAnd::New(isImage, isNotVisible);
+
+	/// Parse all visible images and list the values of the clicked position
+	DataStorage::SetOfObjects::ConstPointer patientImages = this->GetDataStorage()->GetSubset(validVisibleImage);
+	vector<DataStorage::SetOfObjects::Element> images;
+
+	Point3D p3d;
+	p3d[0] = point[0];
+	p3d[1] = point[1];
+	p3d[2] = point[2];
+
+	for (auto image : *patientImages)
+	{
+		if (image.IsNull())
+			continue;
+		Image* img = dynamic_cast<Image*>(image->GetData());
+		if (img == nullptr)
+			continue;
+
+		images.push_back(image);
+	}
+
+	int images_size = images.size();
+	stringstream text;
+	text << "<html><head/><body>PixelValue(s) <span style=\"vertical-align:sub;\">Shift+Left_Click</span>: ";
+	if (images_size > 1)
+	{
+		text << "<br>";
+	}
+	for (int i = 0; i < images_size; i++)
+	{
+		if (images_size > 1)
+		{
+			text << Elements::get_short_name(images[i]->GetName()) << ": ";
+		}
+		Image* img = dynamic_cast<Image*>(images[i]->GetData());
+		double value = img->GetPixelValueByWorldCoordinate(p3d);
+		text << "<b>" << to_string(int(round(value))) << "</b>";
+		if (i < images_size - 1)
+		{
+			text << "<br>";
+		}
+	}
+	text << "</body></html>";
+	ui.label_PixelValue->setText(QString::fromStdString(text.str()));*/
+}
+
+void ManualRegistration::on_mouse_rotated(QVector<double> point)
+{
+	if (!m_activeManipulation)
+		return;
+	if (point.size() < 3)
+		return;
+	//const double dbl_min = 6 * DBL_EPSILON;
+	if (point[2] < 99999.6 || point[2] > 100002.4)
+		return;
+	int i_view = int(point[2] - 100000);
+	//i_view = (int)this->GetRenderWindowPart()->GetActiveQmitkRenderWindow()->GetLayoutIndex();
+	auto geo = this->GetRenderWindowPart()->GetActiveQmitkRenderWindow()->geometry();
+
+	//double range_x = ui.sbTransX->maximum() - ui.sbTransX->minimum();
+	//double range_y = ui.sbTransY->maximum() - ui.sbTransY->minimum();
+	//double range_z = ui.sbTransZ->maximum() - ui.sbTransZ->minimum();
+	double rot = (point[0] + point[1]) / 4;
+	if (i_view == 1 || i_view == 2)
+		rot *= -1;
+	if (isnan(rot) || isinf(rot))
+		return;
+	if (i_view == 0)
+	{
+		rot = ui.sbRotX->value() + rot;
+		rot = std::min(std::max(rot, -180.0), 180.0);
+		ui.sbRotX->setValue(rot);
+	}
+	if (i_view == 1)
+	{
+		rot = ui.sbRotY->value() + rot;
+		rot = std::min(std::max(rot, -180.0), 180.0);
+		ui.sbRotY->setValue(rot);
+	}
+	if (i_view == 2)
+	{
+		rot = ui.sbRotZ->value() + rot;
+		rot = std::min(std::max(rot, -180.0), 180.0);
+		ui.sbRotZ->setValue(rot);
+	}
+}
 
 void ManualRegistration::OnSliceChanged()
 {

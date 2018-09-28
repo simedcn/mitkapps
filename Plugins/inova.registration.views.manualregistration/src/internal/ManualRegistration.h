@@ -2,12 +2,14 @@
 #ifndef __Q_ManualRegistration_H
 #define __Q_ManualRegistration_H
 
+#include <MouseMoveSupplier.h>
+#include "ui_ManualRegistration.h"
+
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include <itkEuler3DTransform.h>
-#include "ui_ManualRegistration.h"
 
 #include <service/event/ctkEventAdmin.h>
 
@@ -81,6 +83,10 @@ private:
 
 	void ConfigureTransformCenter(int centerType);
 
+public slots:
+	void on_mouse_moved(QVector<double> point);
+	void on_mouse_rotated(QVector<double> point);
+
 protected slots:
 	/// \brief Called when the user clicks the GUI button
 	//void OnStartBtnPushed();
@@ -116,6 +122,9 @@ protected slots:
 protected:
 	QWidget *m_Parent;
 	Ui::ManualRegistrationControls ui;
+
+	std::unique_ptr<MouseMoveSupplier> m_MouseMoveSupplier;
+	us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
 
 	mitk::DataNode::Pointer m_EvalNode;
 

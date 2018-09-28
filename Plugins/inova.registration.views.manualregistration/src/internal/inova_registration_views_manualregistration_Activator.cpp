@@ -2,6 +2,11 @@
 
 #include "ManualRegistration.h"
 
+#include <usModuleInitialization.h>
+#include <usGetModuleContext.h>
+
+US_INITIALIZE_MODULE
+
 
 ctkPluginContext* inova_registration_views_manualregistration_Activator::m_Context = 0;
 

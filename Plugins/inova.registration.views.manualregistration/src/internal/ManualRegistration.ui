@@ -125,7 +125,7 @@ background-color: #efef95;</string>
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Translation</string>
+          <string>Translation (Left Click + Dragging)</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <property name="leftMargin">
@@ -326,7 +326,7 @@ background-color: #efef95;</string>
        <item>
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
-          <string>Rotation</string>
+          <string>Rotation (Ctrl + Left Click + Dragging)</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
           <property name="leftMargin">
@@ -858,7 +858,7 @@ QPushButton:hover
   <customwidget>
    <class>RegEvalSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>regevalsettingswidget.h</header>
+   <header>RegEvalSettingsWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
