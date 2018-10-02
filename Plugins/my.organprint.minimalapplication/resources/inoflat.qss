@@ -648,6 +648,10 @@ QSplitter {
 #StepSelectorControls {
     background-color: #1F1F1F;
     padding-top:10px;
+    position:absolute;
+    left:0;
+    bottom:0;
+    top:0;
 }
 #StepSelectorControls QPushButton {
     background-color:transparent;
