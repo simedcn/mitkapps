@@ -59,6 +59,14 @@ void PopePreferencePage::CreateQtControl(QWidget* parent)
 	m_LineEdit_DefaultPath = new QLineEdit("Default path", m_MainControl);
 	formLayout->addRow("Data folder", m_LineEdit_DefaultPath);
 
+	m_ComboBox_CheckSpacing = new QComboBox(m_MainControl);
+	m_ComboBox_CheckSpacing->clear();
+	QStringList spacingList;
+	spacingList << "Check the Slice Spacing consistency always" << "Check the Slice Spacing consistency only if the spacing has a default value" << "Never check: always use the default value";
+	m_ComboBox_CheckSpacing->insertItems(0, spacingList);
+	m_ComboBox_CheckSpacing->setCurrentIndex(CheckVoxelSpacing::CheckOnlyIf01);
+	formLayout->addRow("Spacing", m_ComboBox_CheckSpacing);
+
 	m_MainControl->setLayout(formLayout);
 	this->Update();
 	m_Initializing = false;
@@ -78,6 +86,7 @@ bool PopePreferencePage::PerformOk()
 	m_PopePreferencesNode->PutInt("moveable plugins", m_ComboBox_MoveablePlugins->currentIndex());
 	m_PopePreferencesNode->PutBool("load rnnd", m_CheckBox_LoadRNND->isChecked());
 	m_PopePreferencesNode->Put("data folder", m_LineEdit_DefaultPath->text());
+	m_PopePreferencesNode->PutInt("check spacing", m_ComboBox_CheckSpacing->currentIndex());
 	return true;
 }
 /// Invoked when the Cancel button was clicked in the preferences dialog
@@ -94,4 +103,6 @@ void PopePreferencePage::Update()
 
 	QString def_path = QCoreApplication::applicationDirPath();
 	m_LineEdit_DefaultPath->setText(m_PopePreferencesNode->Get("data folder", def_path));
+
+	m_ComboBox_CheckSpacing->setCurrentIndex(m_PopePreferencesNode->GetInt("check spacing", CheckVoxelSpacing::CheckOnlyIf01));
 }

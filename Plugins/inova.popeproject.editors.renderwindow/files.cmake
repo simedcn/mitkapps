@@ -5,6 +5,7 @@ SET(INTERNAL_CPP_FILES
   MainWindow.cpp
   DataManager.cpp
   PatientSelector.cpp
+  SpacingSelector.cpp
   PopeSettings.cpp
   PopePreferencePage.cpp
 )
@@ -25,6 +26,7 @@ SET(MOC_H_FILES
   src/internal/MainWindow.h
   src/internal/DataManager.h
   src/internal/PatientSelector.h
+  src/internal/SpacingSelector.h
   src/internal/PopeSettings.h
   src/internal/PopePreferencePage.h
 )
@@ -32,6 +34,7 @@ SET(MOC_H_FILES
 SET(UI_FILES
   src/internal/MainWindow.ui
   src/internal/PatientSelector.ui
+  src/internal/SpacingSelector.ui
   src/internal/PopeSettings.ui
 )
 

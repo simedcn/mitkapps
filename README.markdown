@@ -4,6 +4,25 @@ The MITK Project Template
 This project provides a complete CMake-based set-up to get easily started
 with using [MITK](http://www.mitk.org) and extending it via plug-ins and modules.
 
+
+
+
+Building InovaMITK
+------
+
+Open cmake-gui and indicate a new folder as build folder.
+When configuring the build folder, make sure that the **MITK_SUPERBUILD** parameter is set to **TRUE** and that the MITK_BUILD_CONFIGURATION is set to **Relase**
+
+
+
+Building MITKApps
+------
+
+Open cmake-gui and indicate a new folder as build folder.
+I
+
+
+
 Provided Features
 -----------------
 

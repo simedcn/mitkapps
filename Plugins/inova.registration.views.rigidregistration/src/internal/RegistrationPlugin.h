@@ -63,12 +63,14 @@ protected:
 	void SetFocus() override;
 	// This method is conveniently called whenever the selection of Data Manager items changes.
 	void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer>& dataNodes) override;
+	void NodeRemoved(const mitk::DataNode* node) override;
 	void OnPreferencesChanged(const berry::IBerryPreferences*) override;
 
 protected:
 	void CheckInputs();
 protected:
 	void updateButton(bool enabled = true);
+	std::string updateNewImageName(mitk::DataNode::Pointer datanode);
 	void AddImage(const string& name, mitk::Image::Pointer image);
 
 protected:
@@ -76,6 +78,7 @@ protected:
 	void SelectedDataModified();
 
 private slots:
+	void on_pushButton_Settings_clicked();
 	void on_pushButton_Registration_clicked();
 protected slots:
 	void on_ThreadedRegistrationCalculation_finished();
@@ -90,7 +93,9 @@ private:
 	// Generated from the associated UI file, it encapsulates all the widgets of our view.
 	Ui::RegistrationPluginControls ui;
 	berry::IPreferences::Pointer m_RegistrationPluginPreferencesNode;
-	static int name_counter;
+	//mitk::DataNode::Pointer m_SelectedMovingNode;
+	std::string m_moving_image_name;
+	//static int name_counter;
 protected:
 	ImageRegistrationCalculationThread m_CalculationThread;
 };

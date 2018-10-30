@@ -9,6 +9,8 @@
 // QT
 #include <QVector>
 
+#include <limits>
+
 static mitk::Point3D GetPositionInWorld(mitk::InteractionEvent* event)
 {
 	mitk::Point3D p;
@@ -30,9 +32,9 @@ static mitk::Point3D GetPositionIn2D(mitk::InteractionEvent* event)
 		p[0] = point[0];
 		p[1] = point[1];
 		p[2] = 0;
-		auto r = pe->GetSender()->GetBounds();
-		auto d0 = r[0];
-		auto d1 = r[1];
+		//auto r = pe->GetSender()->GetBounds();
+		//auto d0 = r[0];
+		//auto d1 = r[1];
 	}
 	return p;
 }
@@ -97,7 +99,7 @@ void MouseMoveSupplier::Notify(mitk::InteractionEvent* interactionEvent, bool /*
 			qPoint[1] = point[1] - start_point[1];
 			qPoint[2] = point[2] - start_point[2];
 
-			const double dbl_min = 6 * DBL_EPSILON;
+			const double dbl_min = 6 * std::numeric_limits<double>::epsilon();
 
 			bool is_rotation = (move_event != nullptr && (move_event->GetModifiers() & (mitk::InteractionEvent::ShiftKey | mitk::InteractionEvent::ControlKey)))
 				|| (release_event != nullptr && (release_event->GetModifiers() & (mitk::InteractionEvent::ShiftKey | mitk::InteractionEvent::ControlKey)));

@@ -2,6 +2,7 @@
 #define ToolsPlugin_h
 
 #include "ImageStatisticsCalculationThread.h"
+#include <DisplayCoordinateSupplier.h>
 
 #include <mitkILifecycleAwarePart.h>
 #include <berryIPartListener.h>
@@ -9,7 +10,6 @@
 #include <berryIPreferences.h>
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
-#include <DisplayCoordinateSupplier.h>
 #include <usServiceRegistration.h>
 
 #include <ctkPluginContext.h>

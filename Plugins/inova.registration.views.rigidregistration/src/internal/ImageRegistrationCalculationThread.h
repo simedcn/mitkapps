@@ -52,6 +52,7 @@ public:
 	/*!
 	/brief */
 	mitk::Image::Pointer GetResultImage();
+	mitk::Image::Pointer GetMovingImage();
 	/*!
 	/brief Set the time step of the image you want to process. */
 	void SetTimeStep(int times);

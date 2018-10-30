@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 # Change project and application name to your own
-# Change project and application name to your own
 set(ProjectToGenerate "OrganPrint" CACHE STRING "Project")
 set(ProjectToGenerateValues "OrganPrint;POPE" CACHE STRING "List of possible projects")
 set_property(CACHE ProjectToGenerate PROPERTY STRINGS ${ProjectToGenerateValues})
@@ -387,7 +386,11 @@ add_subdirectory(Modules)
 # The CMake code in this section *must* be in the top-level CMakeLists.txt file
 
 macro(GetMyTargetLibraries all_target_libraries varname)
-  set(re_ctkplugin "^[a-zA-Z0-9_]+$")
+  if("${ProjectToGenerate}" STREQUAL "OrganPrint")
+    set(re_ctkplugin "^my_organprint_[a-zA-Z0-9_]+$" "^inova_pacs_[a-zA-Z0-9_]+$")
+  elseif("${ProjectToGenerate}" STREQUAL "POPE")
+    set(re_ctkplugin "^inova_popeproject_[a-zA-Z0-9_]+$" "^inova_pacs_[a-zA-Z0-9_]+$" "^inova_registration_[a-zA-Z0-9_]+$")
+  endif()
   set(_tmp_list)
   list(APPEND _tmp_list ${all_target_libraries})
   ctkMacroListFilter(_tmp_list re_ctkplugin OUTPUT_VARIABLE ${varname})

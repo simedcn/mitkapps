@@ -63,7 +63,7 @@ protected:
 	//void OnPreferencesChanged(const berry::IBerryPreferences*) override;
 
 protected slots:
-	void on_pushButton_clicked(int step);
+	void on_pushButton_clicked(size_t step);
 	void on_Plugin_visible(ctkEvent event);
 	void on_Plugin_hidden(ctkEvent event);
 	void on_Plugin_isBusy(ctkEvent event);

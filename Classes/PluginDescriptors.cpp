@@ -9,86 +9,86 @@ PluginDescriptors::PluginDescriptors()
 {}
 void PluginDescriptors::set(const initializer_list<PluginDescriptor>& plugins)
 {
-    PluginDescriptors::plugins = plugins;
+	PluginDescriptors::plugins = plugins;
 }
 const vector<PluginDescriptor>& PluginDescriptors::get()
 {
-    return plugins;
+	return plugins;
 }
 shared_ptr<vector<PluginDescriptors::pPluginDescriptor>> PluginDescriptors::plugins_by_order()
 {
-    if (plugins_in_order == nullptr)
-    {
-        // Copy the elements
-        plugins_in_order = make_shared<vector<pPluginDescriptor>>(plugins.size());
-        for (uint i = 0; i < plugins.size(); i++)
-        {
-            plugins_in_order->operator[](i) = &plugins[i];
-        }
-        // Sort the elements by their order
-        sort(plugins_in_order->begin(), plugins_in_order->end(),
-             [](pPluginDescriptor a, pPluginDescriptor b)
-        {
-            return (a->order < b->order);
-        }
-            );
-    }
-    return plugins_in_order;
+	if (plugins_in_order == nullptr)
+	{
+		// Copy the elements
+		plugins_in_order = make_shared<vector<pPluginDescriptor>>(plugins.size());
+		for (size_t i = 0; i < plugins.size(); i++)
+		{
+			plugins_in_order->operator[](i) = &plugins[i];
+		}
+		// Sort the elements by their order
+		sort(plugins_in_order->begin(), plugins_in_order->end(),
+			[](pPluginDescriptor a, pPluginDescriptor b)
+			{
+				return (a->order < b->order);
+			}
+		);
+	}
+	return plugins_in_order;
 }
 const PluginDescriptor* PluginDescriptors::find_plugin(const QString& id)
 {
-    for (const auto& plugin : plugins)
-    {
-        if (plugin.id == id)
-        {
-            return &plugin;
-        }
-    }
-    return nullptr;
+	for (const auto& plugin : plugins)
+	{
+		if (plugin.id == id)
+		{
+			return &plugin;
+		}
+	}
+	return nullptr;
 }
 
 // PluginDescriptor
 PluginDescriptor::PluginDescriptor(initializer_list<QString> params)
 {
-    //	[order] [id] [name] [role] [title] [position] [open]
-    auto it = params.begin();
-    QString str_i = *it++;
-    bool ok = false;
-    int num = str_i.toInt(&ok);
-    this->order = ok ? (num - 1) : -1;
+	//	[order] [id] [name] [role] [title] [position] [open]
+	auto it = params.begin();
+	QString str_i = *it++;
+	bool ok = false;
+	int num = str_i.toInt(&ok);
+	this->order = ok ? (num - 1) : -1;
 
-    this->id = *it++;
-    this->name = *it++;
+	this->id = *it++;
+	this->name = *it++;
 
-    const QString& role = *it++;
-    this->role =
-        (role.toLower() == "main") ? PluginRole_main :
-        (role.toLower() == "pacs") ? PluginRole_pacs :
-        (role.toLower() == "selector") ? PluginRole_selector :
-        (role.toLower() == "sel_item") ? PluginRole_selectorItem :
-        PluginRole_secondary;
+	const QString& role = *it++;
+	this->role = 
+		(role.toLower() == "main") ? PluginRole_main :
+		(role.toLower() == "pacs") ? PluginRole_pacs :
+		(role.toLower() == "selector") ? PluginRole_selector :
+		(role.toLower() == "sel_item") ? PluginRole_selectorItem :
+		PluginRole_secondary;
 
-    const QString& title_visibility = *it++;
-    this->show_title = (title_visibility.toLower() == "yes");
+	const QString& title_visibility = *it++;
+	this->show_title = (title_visibility.toLower() == "yes");
 
-    const QString plugin_position = (*it++).toLower();
-    if (plugin_position == "bottom")
-        this->position = PluginPosistion_bottom;
-    else if (plugin_position == "bottom_left")
-        this->position = PluginPosistion_bottom_left;
-    //else if (plugin_position == "bottom_right")
-    //	this->position = PluginPosistion_bottom_right;
-    else if (plugin_position == "top_left")
-        this->position = PluginPosistion_top_left;
-    else if (plugin_position == "mid_left")
-        this->position = PluginPosistion_mid_left;
-    else if (plugin_position == "bottom_left")
-        this->position = PluginPosistion_bottom_left;
-    else //if (plugin_position == "right")
-        this->position = PluginPosistion_right;
+	const QString plugin_position = (*it++).toLower();
+	if (plugin_position == "bottom")
+		this->position = PluginPosistion_bottom;
+	else if (plugin_position == "bottom_left")
+		this->position = PluginPosistion_bottom_left;
+	//else if (plugin_position == "bottom_right")
+	//	this->position = PluginPosistion_bottom_right;
+	else if (plugin_position == "top_left")
+		this->position = PluginPosistion_top_left;
+	else if (plugin_position == "mid_left")
+		this->position = PluginPosistion_mid_left;
+	else if (plugin_position == "bottom_left")
+		this->position = PluginPosistion_bottom_left;
+	else //if (plugin_position == "right")
+		this->position = PluginPosistion_right;
 
-    const QString& open = *it++;
-    this->is_open = (open.toLower() == "yes");
+	const QString& open = *it++;
+	this->is_open = (open.toLower() == "yes");
 }
 /*const QString& PluginDescriptor::Id() const
 {

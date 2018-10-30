@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ExternalProgramOpener.h>
 #include <sstream>
 #include <mitkNodePredicateProperty.h>
-
+#include <QMessageBox>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ExportPanel::VIEW_ID = "my.organprint.views.exportpanel";
@@ -64,6 +64,13 @@ void orgpnt::ExportPanel::CreateQtPartControl(QWidget* parent)
     mitk::DataStorage * storage = GetDataStorage();
 
     storage->ChangedNodeEvent.AddListener(listener);
+
+    mitk::DataStorage::SetOfObjects::ConstPointer nodes = storage->GetSubset(nullptr);
+
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it!=nodes->End(); it++) {
+        mitk::DataNode::Pointer node = it->Value();
+        OnNodeChanged(node);
+    }
 
 }
 
@@ -126,6 +133,27 @@ void orgpnt::ExportPanel::OpenWith3DSlicer() {
 
         const mitk::DataNode * node = iterator->Value();
 
+        bool isSegmentation = false;
+
+        if(!node) continue;
+
+        node->GetBoolProperty("segmentation",isSegmentation);
+
+        if(!isSegmentation) {
+
+            std::stringstream sstr;
+
+            sstr << "Only segmented node can be exported.\nIgnoring ";
+            sstr << node->GetName();
+
+            QMessageBox msgBox;
+            msgBox.setText(sstr.str().c_str());
+            msgBox.exec();
+            ++iterator;
+            continue;
+        }
+
+
         mitk::StatusBar::GetInstance()->DisplayText("Opening in 3D Slicer...");
 
         // creating file name
@@ -142,7 +170,7 @@ void orgpnt::ExportPanel::OpenWith3DSlicer() {
         exportService->exportToSTL(finalPath,node,smoothing);
         ++iterator;
     }
-    // running the 3DSlicer
+// running the 3DSlicer
     opener.run();
 }
 

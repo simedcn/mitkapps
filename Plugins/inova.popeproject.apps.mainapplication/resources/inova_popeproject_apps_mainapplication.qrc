@@ -6,9 +6,9 @@
     <file alias="POPE_icon">POPE_icon.ico</file>
   </qresource>
   <qresource prefix="/images">
-    <file>./LogoPOPE.png</file>
-    <file>./logo48.png</file>
-    <file>./dicom.svg</file>
-    <file>./preferences-system.png</file>
+    <file>LogoPOPE.png</file>
+    <file>logo48.png</file>
+    <file>dicom.svg</file>
+    <file>preferences-system.png</file>
   </qresource>
 </RCC>

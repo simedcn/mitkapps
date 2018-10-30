@@ -619,7 +619,8 @@ QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:select
 }
 
 QSplitter {
-    background-color: #AEAFB0;
+    background-color:transparent;
+    
 }
 
 
@@ -643,9 +644,14 @@ QSplitter {
     border-radius:4px;
 }
 
+
 #StepSelectorControls {
     background-color: #1F1F1F;
     padding-top:10px;
+    position:absolute;
+    left:0;
+    bottom:0;
+    top:0;
 }
 #StepSelectorControls QPushButton {
     background-color:transparent;
@@ -710,4 +716,17 @@ QTreeView::branch:selected, QTreeView::item:selected {
 
 #OrganPrintExportPanelControls QLabel {
     font-size:15px;
+}
+
+
+#QmitkSegmentationControls, #OrganPrintImportPanelControls, #OrganPrintExportPanelControls, #OrganPrintTissuePanelControls {
+    border-right-width: 1px;
+    border-right-color:  #AEAFB0;
+    border-right-style:solid;
+}
+
+#QmitkDataManagerViewControls {
+    border-left-width: 1px;
+    border-left-color:  #AEAFB0;
+    border-left-style:solid;
 }

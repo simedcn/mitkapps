@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <PopeElements.h>
 #include "ExternalProgramOpener.h"
 
+#include <mitkToolManagerProvider.h>
 
 // Don't forget to initialize the VIEW_ID.
 const std::string orgpnt::ImportPanel::VIEW_ID = "my.organprint.views.importpanel";
@@ -55,6 +56,9 @@ void orgpnt::ImportPanel::CreateQtPartControl(QWidget* parent)
     // Wire up the UI widgets with our functionality.
     connect(m_Controls.openImageButton, SIGNAL(clicked()), this, SLOT(OpenImageFromDisk()));
     connect(m_Controls.queryPacsButton, SIGNAL(clicked()), this, SLOT(QueryPacs()));
+
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->InitializeTools();
+
 }
 
 void orgpnt::ImportPanel::SetFocus()

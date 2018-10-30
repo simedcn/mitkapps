@@ -632,6 +632,12 @@ void RegistrationMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMapped
 	m_Controls.m_teLog->append(QString("<b><font color='blue'>Mapped entity stored. Name: ") + QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
 
 	mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName, spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID, job->m_doGeometryRefinement, job->m_InterpolatorLabel);
+
+	auto original_properties = job->m_spInputData->GetPropertyList();
+	auto new_properties = spMappedData->GetPropertyList();
+	new_properties->ConcatenatePropertyList(original_properties);
+	spMappedData->SetPropertyList(new_properties);
+
 	this->GetDataStorage()->Add(spMappedNode);
 	this->GetRenderWindowPart()->RequestUpdate();
 

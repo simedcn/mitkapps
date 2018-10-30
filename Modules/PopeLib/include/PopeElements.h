@@ -61,14 +61,24 @@ public:
 	static std::string recognize_gender(const std::string& gender);
 	static std::string recognize_birthday(const std::string& birthday);
 	static std::string get_short_name(std::string name);
-	static QString get_short_name_for_image(const std::string& name, const int max_length = 31);
+	static QString get_short_name_for_image(const std::string& name, const size_t max_length = 31);
 
 	static std::string get_next_name(const std::string& name, mitk::DataStorage::Pointer dataStorage);
 
 	static bool recognize_property(QString* property, int* count);
 	static bool split_properties(const std::string& str_prop, QStringList* properties, std::vector<int>* nums = nullptr);
+	static bool split_property(const std::string& str_prop, std::vector<float>* values);
 
 	static size_t get_hash(mitk::BaseData* baseData);
+
+	//template<typename T>
+	//static float get_mean(const std::vector<T>& v);
+	static float get_mean(const std::vector<uint>& v);
+	static float get_mean(const std::vector<float>& v);
+	//template<typename T>
+	//static float get_std_dev(const std::vector<T>& v, float* mean_value = nullptr);
+	static float get_std_dev(const std::vector<uint>& v, float* mean_value = nullptr);
+	static float get_std_dev(const std::vector<float>& v, float* mean_value = nullptr);
 };
 
 

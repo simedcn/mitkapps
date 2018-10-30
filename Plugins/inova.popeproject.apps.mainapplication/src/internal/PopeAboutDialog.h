@@ -22,25 +22,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class inova_popeproject_apps_mainapplication_EXPORT PopeAboutDialog : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    PopeAboutDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-    ~PopeAboutDialog() override;
+	PopeAboutDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+	~PopeAboutDialog() override;
 
-    QString GetAboutText() const;
-    QString GetCaptionText() const;
-    QString GetRevisionText() const;
+	QString GetAboutText() const;
+	QString GetCaptionText() const;
+	QString GetRevisionText() const;
 
-    void SetAboutText(const QString &text);
-    void SetCaptionText(const QString &text);
-    void SetRevisionText(const QString &text);
+	void SetAboutText(const QString &text);
+	void SetCaptionText(const QString &text);
+	void SetRevisionText(const QString &text);
 
 protected slots:
-    void ShowModules();
+	void ShowModules();
 
 private:
-    Ui::PopeAboutDialog ui;
+	Ui::PopeAboutDialog ui;
 };
 
 #endif

@@ -13,6 +13,8 @@
 #include <berryIPreferences.h>
 
 #include <list>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
 
@@ -41,6 +43,9 @@ public slots:
 protected:
 	int AskAboutNewPatient();
 
+	bool IsTimeGeometryOK(mitk::Image::Pointer image);
+	bool IsCentralRegionOK(mitk::Image::Pointer image);
+	void CheckImageSpacing(mitk::Image::Pointer image, const string& image_name);
 	mitk::DataNode::Pointer AddImage(const string& name, mitk::Image::Pointer image);
 
 	void SaveDataOfCurrentPatient();

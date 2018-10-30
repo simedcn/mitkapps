@@ -50,6 +50,7 @@ protected:
 	QComboBox* m_ComboBox_MoveablePlugins;
 	QCheckBox* m_CheckBox_LoadRNND;
 	QLineEdit* m_LineEdit_DefaultPath;
+	QComboBox* m_ComboBox_CheckSpacing;
 	//QDoubleSpinBox* m_SmoothingSpinBox;
 	//QDoubleSpinBox* m_DecimationSpinBox;
 	//QDoubleSpinBox* m_ClosingSpinBox;
@@ -61,5 +62,12 @@ enum CloseableMoveablePlugins : int
 	NotForAll = 0,
 	YesForAllButMain = 1,
 	YesForAll = 2
+};
+
+enum CheckVoxelSpacing : int
+{
+	CheckAlways = 0,
+	CheckOnlyIf01 = 1,
+	UseDefaultValueWithoutChecking = 2
 };
 #endif // POPEPREFERENCEPAGE_H
