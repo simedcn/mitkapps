@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.editors">
+  <!--
+    <editor
+      id="inova.organprint.editors.renderwindow"
+      name="OrganPrint Render Window"
+      default="true"
+      extensions="mitk"
+      class="OrganPrintRenderWindowEditor">
+    </editor>
+    -->
+  </extension>
+</plugin>

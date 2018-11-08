@@ -1,0 +1,15 @@
+/**
+  \defgroup inova_organprint_apps_minimalapplication inova.organprint.gui.minimalapplication
+  \ingroup MITKApplicationPlugins
+
+  \brief A minimal applictaion plug-in.
+*/
+
+/**
+  \defgroup inova_organprint_apps_minimalapplication_internal Internal
+  \ingroup inova_organprint_apps_minimalapplication
+
+  \brief This subcategory includes the internal classes of the inova.organprint.gui.minimalapplication plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

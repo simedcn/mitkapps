@@ -387,7 +387,7 @@ add_subdirectory(Modules)
 
 macro(GetMyTargetLibraries all_target_libraries varname)
   if("${ProjectToGenerate}" STREQUAL "OrganPrint")
-    set(re_ctkplugin "^my_organprint_[a-zA-Z0-9_]+$" "^inova_pacs_[a-zA-Z0-9_]+$")
+    set(re_ctkplugin "^inova_organprint_[a-zA-Z0-9_]+$" "^inova_pacs_[a-zA-Z0-9_]+$")
   elseif("${ProjectToGenerate}" STREQUAL "POPE")
     set(re_ctkplugin "^inova_popeproject_[a-zA-Z0-9_]+$" "^inova_pacs_[a-zA-Z0-9_]+$" "^inova_registration_[a-zA-Z0-9_]+$")
   endif()

@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/StyleSheets">
+        <file alias="StyleSheet">StyleSheet.qss</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="Organ_print_icon">Organ_print_icon.ico</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>logo.png</file>
+        <file>organ-print_fullHD.png</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>logo-color.png</file>
+        <file>organ-print_fullHD.png</file>
+    </qresource>
+    <qresource prefix="/inova.organprint.apps.minimalapplication">
+        <file>inoflat.qss</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,5 @@
+set(Plugin-Name "OrganPrint Application")
+set(Plugin-Version "0.1")
+set(Plugin-Vendor "Inova DE")
+set(Plugin-ContactAddress "http://inova-de.eu")
+set(Require-Plugin org.mitk.gui.qt.ext)

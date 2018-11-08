@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="inova.organprint.views.stepselector"
+          name="Steps"
+          class="StepSelector"
+          icon="resources/OrganPrintIcon.png"
+          closeable="false"
+          moveable="false"
+          showTitle="false"
+          standalone="true"
+          styles="resources/Styles.qss"
+    />
+  </extension>
+</plugin>

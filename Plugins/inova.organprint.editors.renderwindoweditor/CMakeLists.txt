@@ -1,0 +1,11 @@
+PROJECT(inova_organprint_editors_renderwindoweditor)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE ORGANPRINT_EDITORS_RENDERWINDOWEDITOR
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDS MitkQtWidgets MitkDICOMReader OrganPrintLib PopeLib
+    PACKAGE_DEPENDS
+    PUBLIC Qt5|Xml GDCM
+    PRIVATE ITK|ITKIOImageBase+ITKIOGDCM DCMTK
+  SUBPROJECTS MITK-CoreUI
+  )

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/OrganPrintApp">
+        <file>icon_research.xpm</file>
+        <file>InovaLogo.png</file>
+    </qresource>
+</RCC>

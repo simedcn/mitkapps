@@ -1,0 +1,16 @@
+/**
+  \defgroup inova_organprint_views_sidepanel inova.organprint.views.sidepanel Plugin
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup inova_organprint_views_sidepanel_internal Internal
+  \ingroup inova_organprint_views_sidepanel
+
+  \brief This subcategory includes the internal classes of the inova.organprint.views.sidepanel plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

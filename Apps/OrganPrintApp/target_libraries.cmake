@@ -4,7 +4,7 @@
 
 set(target_libraries
   # Enable plug-ins from this project
-  my_organprint_minimalapplication
+  inova_organprint_apps_minimalapplication
 
   # Require external plug-ins
   org_mitk_gui_qt_datamanager

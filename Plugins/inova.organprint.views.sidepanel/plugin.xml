@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+  <!--
+    <view id="inova.organprint.views.sidepanel"
+          name="SidePanel View"
+          class="SidePanelView"
+          icon="resources/OrganPrintIcon.png" />-->
+
+
+<view id="inova.organprint.views.importpanel"
+      name="Import Panel"
+      class="orgpnt::ImportPanel"
+      icon="resources/OrganPrintIcon.png" />
+
+  <view id="inova.organprint.views.exportpanel"
+        name="Export Panel"
+        class="orgpnt::ExportPanel"
+        icon="resources/OrganPrintIcon.png" />
+
+<view id="inova.organprint.views.tissuepanel"
+      name="TissuePanel Panel"
+      class="orgpnt::TissuePanel"
+      icon="resources/OrganPrintIcon.png" />
+    </extension>
+</plugin>

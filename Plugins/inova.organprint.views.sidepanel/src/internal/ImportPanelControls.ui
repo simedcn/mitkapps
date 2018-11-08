@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OrganPrintImportPanelControls</class>
+ <widget class="QWidget" name="OrganPrintImportPanelControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>220</width>
+    <height>160</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Side Panel</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="selectImageLabel">
+     <property name="styleSheet">
+      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+     </property>
+     <property name="text">
+      <string>First, open some image data</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="openImageButton">
+     <property name="toolTip">
+      <string>Process selected image</string>
+     </property>
+     <property name="text">
+      <string>Open data from disk</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="queryPacsButton">
+     <property name="text">
+      <string>Query data from PACS</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+   <widget class="QSlider" name="QSliderExample">
+   	<property name="enabled">
+		<bool>true</bool>
+	</property>
+	<property name="visible">
+		<bool>false</bool>
+	</property>
+	<property name="orientation">
+		<enum>Qt::Horizontal</enum>
+	</property>
+   </widget>
+   </item>
+   <item>
+    <spacer name="spacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>220</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

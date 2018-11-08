@@ -1,11 +1,11 @@
 if("${ProjectToGenerate}" STREQUAL "OrganPrint")
 	set(PROJECT_PLUGINS
-		Plugins/my.organprint.app:OFF
-		Plugins/my.organprint.renderwindoweditor:ON
-		Plugins/my.organprint.minimalapplication:ON
-		Plugins/my.organprint.views.stepselector:ON
+		Plugins/inova.organprint.editors.renderwindoweditor:ON
+		Plugins/inova.organprint.apps.app:OFF
+		Plugins/inova.organprint.apps.minimalapplication:ON
+		Plugins/inova.organprint.views.stepselector:ON
 		Plugins/inova.pacs.views.dicomview:ON
-		Plugins/my.organprint.views.sidepanel:ON
+		Plugins/inova.organprint.views.sidepanel:ON
 	)
 elseif("${ProjectToGenerate}" STREQUAL "POPE")
 	set(PROJECT_PLUGINS

@@ -1,0 +1,19 @@
+/**
+\page inova_organprint_views_sidepanel The OrganPrint SidePanel Plugin
+
+\imageMacro{icon.xpm,"Icon of OrganPrint SidePanel Plugin",2.00}
+
+\tableofcontents
+
+\section inova_organprint_views_sidepanelOverview Overview
+
+Describe the features of your plugin here
+
+<ul>
+  <li>Increases productivity</li>
+  <li>Creates beautiful images</li>
+  <li>Generates PhD thesis</li>
+  <li>Brings world peace</li>
+</ul>
+
+*/

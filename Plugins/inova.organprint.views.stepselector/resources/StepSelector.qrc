@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/inova.organprint.views.stepselector" >
+    <file>OrganPrintIcon.png</file>
+    <file>Styles.qss</file>
+    <file>step2.html</file>
+    <file>step2.png</file>
+  </qresource>
+</RCC>

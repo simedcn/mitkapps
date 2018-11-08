@@ -1,2 +1,2 @@
-IDI_ICON1               ICON    DISCARDABLE     "../../../Plugins/my.organprint.minimalapplication/resources/Organ_print_icon.ico"
-GLFW_ICON               ICON                    "../../../Plugins/my.organprint.minimalapplication/resources/Organ_print_icon.ico"
+IDI_ICON1               ICON    DISCARDABLE     "../../../Plugins/inova.organprint.apps.minimalapplication/resources/Organ_print_icon.ico"
+GLFW_ICON               ICON                    "../../../Plugins/inova.organprint.apps.minimalapplication/resources/Organ_print_icon.ico"
