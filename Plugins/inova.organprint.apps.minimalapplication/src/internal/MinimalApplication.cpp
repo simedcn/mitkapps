@@ -16,10 +16,10 @@
 #include <mitkWorkbenchUtil.h>
 //#include <QmitkStatusBar.h>
 #include <QMessageBox>
-#include "vtk_glew.h"
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
 #include <QOpenGLFunctions>
+//#include "vtk_glew.h"
 
 
 const std::vector<QString> MinimalApplication::VIEW_IDS =

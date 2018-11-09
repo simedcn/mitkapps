@@ -106,8 +106,8 @@ protected slots:
 	void on_table_Series_selectionChanged(const QStringList&);
 
 protected:
-	Ui::DicomViewControls& ui;
 	QWidget *m_Parent;
+	Ui::DicomViewControls& ui;
 	berry::IPreferences::Pointer m_DicomViewPreferencesNode;
 	QString m_StoreSCUExecutable;
 	bool is_savedDestination_LocalFolder = false;
