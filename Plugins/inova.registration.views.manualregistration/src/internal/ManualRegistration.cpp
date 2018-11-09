@@ -627,7 +627,7 @@ void ManualRegistration::on_mouse_rotated(QVector<double> point)
 		return;
 	int i_view = int(point[2] - 100000);
 	//i_view = (int)this->GetRenderWindowPart()->GetActiveQmitkRenderWindow()->GetLayoutIndex();
-	auto geo = this->GetRenderWindowPart()->GetActiveQmitkRenderWindow()->geometry();
+	//auto geo = this->GetRenderWindowPart()->GetActiveQmitkRenderWindow()->geometry();
 
 	//double range_x = ui.sbTransX->maximum() - ui.sbTransX->minimum();
 	//double range_y = ui.sbTransY->maximum() - ui.sbTransY->minimum();

@@ -24,8 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatformUI.h>
 
-#include "vtk_glew.h"
-//#include <GL/glew.h>
+//#include "vtk_glew.h"
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
 #include <QOpenGLFunctions>

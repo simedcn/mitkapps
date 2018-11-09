@@ -17,6 +17,7 @@
 #include <berryPlatform.h>
 
 #include <sstream>
+#include <cmath>
 
 
 RegistrationPluginPreferencePage::RegistrationPluginPreferencePage(QWidget* /*parent*/, Qt::WindowFlags)

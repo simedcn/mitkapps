@@ -51,8 +51,8 @@
 
 MainWindow::MainWindow(QmitkStdMultiWidget* multiwidget, QWidget* parent) :
 	QWidget(parent),
-	multiWidget(multiwidget),
-	ui(*new Ui::mainwindow)
+	ui(*new Ui::mainwindow),
+	multiWidget(multiwidget)
 {
 	ui.setupUi(this);
 
