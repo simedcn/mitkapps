@@ -6,7 +6,7 @@
 #include <QRect>
 
 
-DicomViewDialog::DicomViewDialog(QWidget* parent = nullptr) : QDialog(parent)
+DicomViewDialog::DicomViewDialog(QWidget* parent) : QDialog(parent)
 {
     dicomView = new DicomView();
     dicomView->CreateQtPartControl(this);

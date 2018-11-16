@@ -11,7 +11,7 @@ class INOVA_PACS_VIEWS_DICOMVIEW_EXPORT DicomViewDialog : public QDialog
 {
     Q_OBJECT
 public:
-    DicomViewDialog(QWidget* parent);
+    DicomViewDialog(QWidget* parent = nullptr);
     ~DicomViewDialog();
 
     static void execute(QWidget* parent);

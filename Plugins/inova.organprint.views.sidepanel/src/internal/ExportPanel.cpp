@@ -142,7 +142,11 @@ void orgpnt::ExportPanel::OpenWith3DSlicer() {
         mitk::StatusBar::GetInstance()->DisplayText("Opening in 3D Slicer...");
 
         // creating file name
+#if defined(__APPLE__) || defined(__MACH__)
+        std::string tmpFile = std::to_string(std::rand() % 10000000);
+#else
         std::string tmpFile(std::tmpnam(nullptr));
+#endif
         QString finalPath((tmpFile  + std::string("_") + node->GetName() + std::string(".stl")).c_str());
         opener.addArgument(finalPath);
         MITK_INFO << "Creating temporay file and adding it to the list of arguments" << finalPath.toStdString();

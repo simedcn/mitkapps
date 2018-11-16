@@ -195,9 +195,9 @@ void ExternalProgramOpener::saveProgramPath(QString & path) {
 QString ExternalProgramOpener::loadProgramPath() {
     QSettings settings("OrganPrint.ini",QSettings::IniFormat);
     settings.beginGroup(GROUP_ID);
-    return std::move(settings
-                     .value(executableName,QVariant(NO_PATH))
-                     .toString());
+    return settings
+    .value(executableName,QVariant(NO_PATH))
+    .toString();
 
 }
 
